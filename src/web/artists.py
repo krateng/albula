@@ -1,0 +1,2 @@
+def page():
+    yield "test"

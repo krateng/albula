@@ -1,0 +1,34 @@
+body {
+	background-color:#333337;
+	color:beige;
+	font-family:"Ubuntu";
+	margin:0px;
+	padding-top: 70px;
+	padding-left: 20px;
+	padding-right: 20px;
+	padding-bottom: 20px;
+
+}
+
+
+
+
+
+div.top_bar {
+	background-color: black;
+	position: fixed;
+	left:0px;
+	right:0px;
+	top:0px;
+
+	height:60px;
+}
+
+div.top_bar > table {
+	margin-top:15px;
+	width:100%;
+}
+
+div.top_bar > table td {
+	text-align: center;
+}

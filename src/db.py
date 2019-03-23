@@ -115,14 +115,17 @@ def add_track(title,artists,album,albumartist,file):
         A_ = ArtistKey(name=A.name)
         TRACKS_OF_ARTIST.setdefault(A_,[]).append(T)
 
-
-    AA = Artist(name=albumartist)
-    AA_ = ArtistKey(name=albumartist)
-    if AA_ not in ARTISTS:
-        ARTISTS[AA_] = AA
-        TRACKS_OF_ARTIST.setdefault(AA_,[]) # any artist defined as album artist also goes in track artist list
+    if albumartist in ["Various","Various Artists"]:
+        AA = None
+        AA_ = None
     else:
-        AA = ARTISTS[AA_]
+        AA = Artist(name=albumartist)
+        AA_ = ArtistKey(name=albumartist)
+        if AA_ not in ARTISTS:
+            ARTISTS[AA_] = AA
+            TRACKS_OF_ARTIST.setdefault(AA_,[]) # any artist defined as album artist also goes in track artist list
+        else:
+            AA = ARTISTS[AA_]
 
     AB = Album(albumartist=AA,title=album,tracklist=[T])
     AB_ = AlbumKey(albumartist=AA,title=album)
