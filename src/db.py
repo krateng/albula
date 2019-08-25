@@ -7,43 +7,56 @@ from mutagen.flac import FLAC
 
 import cleanup
 
+from dbhelper import DBClass, Session, init_database, Reference, MultiReference
 
-from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine, Column, Integer, String, exists, ForeignKey
+from sqlalchemy.orm import relationship, backref
 
-engine = create_engine('sqlite:///database.db', echo=True)
-Base = declarative_base()
-Session = sessionmaker(bind=engine)
 
-class Track(Base):
-	__tablename__ = "tracks"
-	id = Column(Integer,primary_key=True,autoincrement=True)
-	title = Column(String)
 
-#	def __init__(self,title):
-#		self.title = title
+#class TrackArtist(DBClass):
+##	__tablename__ = "trackartists"
+##	uid = Column(Integer,primary_key=True,autoincrement=True)
+#	track_id = Column(Integer,ForeignKey('track.uid'))
+#	artist_id = Column(Integer,ForeignKey('artist.uid'))
 
-class Album(Base):
-	__tablename__ = "albums"
-	id = Column(Integer,primary_key=True,autoincrement=True)
+
+
+class Album(DBClass):
+#	__tablename__ = "albums"
+#	uid = Column(Integer,primary_key=True,autoincrement=True)
 	name = Column(String)
 	albumartist = Column(String)
+#	tracks = relationship(Track, backref = 'album',lazy=False,cascade="all")
 
 #	def __init__(self,name,albumartist):
 #		self.name = name
 #		self.albumartist = albumartist
 
-class Artist(Base):
-	__tablename__ = "artists"
-	id = Column(Integer,primary_key=True,autoincrement=True)
+class Artist(DBClass):
+#	__tablename__ = "artists"
+#	uid = Column(Integer,primary_key=True,autoincrement=True)
 	name = Column(String)
+#	tracks = relationship(TrackArtist, backref = 'artist',lazy=False,cascade="all")
 
 #	def __init__(self,name):
 #		self.name = name
 
+class Track(DBClass):
+#	__tablename__ = "tracks"
+#	uid = Column(Integer,primary_key=True,autoincrement=True)
+	title = Column(String)
+#	album_id = Column(Integer,ForeignKey('album.uid'))
+	album = Reference(Album,backref="tracks")
+	artists = MultiReference(Artist,backref="tracks")
+#	artists = relationship(TrackArtist, backref = 'track',lazy=False,cascade="all")
 
-Base.metadata.create_all(engine)
+#	def __init__(self,title):
+#		self.title = title
+
+
+
+init_database()
 
 #Track = namedtuple("Track",["artists","title","files"])
 #Album = namedtuple("Album",["albumartist","title","tracklist"])
@@ -131,20 +144,26 @@ def add_of_find_existing_track(title,artists,album,albumartist,file,session):
 	albumobj = add_of_find_existing_album(album,albumartist,session)
 	artistobjs = [add_of_find_existing_artist(artist,session) for artist in artists]
 
-	trackobj = Track(title=title)
-	session.add(trackobj)
+	trackobj = Track(title=title,album=albumobj)
+
+	for a in artistobjs:
+		TrackArtist(artist=a,track=trackobj)
+
+	#session.add(trackobj)
 	return trackobj
 
 def add_of_find_existing_album(name,artist,session):
 
+	session.query(exists().where(Album.name == name and Album.artist == artist))
+
 	albumobj = Album(name=name,albumartist=artist)
-	session.add(albumobj)
+	#session.add(albumobj)
 	return albumobj
 
 def add_of_find_existing_artist(name,session):
 
 	artistobj = Artist(name=name)
-	session.add(artistobj)
+	#session.add(artistobj)
 	return artistobj
 
 
