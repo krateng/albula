@@ -6,9 +6,10 @@ from sqlalchemy.ext.declarative import declarative_base
 
 engine = create_engine('sqlite:///database.db', echo=True)
 DBBase = declarative_base()
+meta = DBBase.metadata
 Session = sessionmaker(bind=engine)
 
-# wrapper class
+# wrapper class (ignored and overwritten for now)
 class DBClass:
 
 	def __init_subclass__(cls):
@@ -29,18 +30,20 @@ class DBClass:
 			val = cls.__dict__[attribute]
 
 
-			# properly model foreign keys
-			if isinstance(val,Reference):
-				# add relation with name backref to other class
-				setattr(val.cls,val.backref,relationship(cls.__wrapped_alchemy_class__, backref = val.cls.__name__.lower(),lazy=False,cascade="all"))
+	#		# properly model foreign keys
+	#		if isinstance(val,Reference):
+	#			# add relation with name backref to other class
+	#			setattr(val.cls,val.backref,relationship(cls.__wrapped_alchemy_class__, backref = val.cls.__name__.lower(),lazy=False,cascade="all"))
+#
+#				# add foreign key to this class
+#				setattr(cls.__wrapped_alchemy_class__,val.cls.__name__.lower() + "_id",Column(Integer,ForeignKey(val.cls.__wrapped_alchemy_class__.__tablename__ + '.uid')))
+#
+#			elif isinstance(val,MultiReference):
+#				pass
+#			else:
+#				setattr(AlchemyClass,attribute,val)
+			setattr(AlchemyClass,attribute,val)
 
-				# add foreign key to this class
-				setattr(cls.__wrapped_alchemy_class__,val.cls.__name__.lower() + "_id",Column(Integer,ForeignKey(val.cls.__wrapped_alchemy_class__.__tablename__ + '.uid')))
-
-			elif isinstance(val,MultiReference):
-				pass
-			else:
-				setattr(AlchemyClass,attribute,val)
 
 		def newinit(self,*args,**kwargs):
 			# init internal class
@@ -52,7 +55,12 @@ class DBClass:
 
 
 
-#DBClass = DBBase
+
+
+
+
+
+DBClass = DBBase
 #orig = DBClass.__init_subclass__
 #def new_init_subclass(cls):
 #	setattr(cls,"uid",Column(Integer,primary_key=True,autoincrement=True))

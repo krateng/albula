@@ -7,12 +7,16 @@ from mutagen.flac import FLAC
 
 import cleanup
 
-from dbhelper import DBClass, Session, init_database, Reference, MultiReference
+from dbhelper import DBClass, Session, init_database, Reference, MultiReference, meta
 
-from sqlalchemy import create_engine, Column, Integer, String, exists, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, exists, ForeignKey, Table
 from sqlalchemy.orm import relationship, backref
 
+from nimrodel import EAPI
 
+# object api won't work because we don't have permanent objects (DB)
+#api = OAPI(path="api")
+api = EAPI(path="api")
 
 #class TrackArtist(DBClass):
 ##	__tablename__ = "trackartists"
@@ -21,42 +25,101 @@ from sqlalchemy.orm import relationship, backref
 #	artist_id = Column(Integer,ForeignKey('artist.uid'))
 
 
+trackartists = Table('trackartists', meta,
+    Column('track_id', Integer, ForeignKey('tracks.uid')),
+    Column('artist_id', Integer, ForeignKey('artists.uid'))
+)
 
+class FileRef(DBClass):
+	__tablename__ = "files"
+	uid = Column(Integer,primary_key=True,autoincrement=True)
+	path = Column(String)
+	track_id = Column(Integer,ForeignKey('tracks.uid'))
+
+
+#@api.apiclass("album")
 class Album(DBClass):
-#	__tablename__ = "albums"
-#	uid = Column(Integer,primary_key=True,autoincrement=True)
+	__tablename__ = "albums"
+	uid = Column(Integer,primary_key=True,autoincrement=True)
 	name = Column(String)
 	albumartist = Column(String)
-#	tracks = relationship(Track, backref = 'album',lazy=False,cascade="all")
+	tracks = relationship("Track",backref="album",lazy=False)
+
+	def __apidict__(self):
+		return {
+			"uid":self.uid,
+			"albumartist":self.albumartist,
+			"name":self.name,
+			#"tracks":self.tracks
+		}
+
 
 #	def __init__(self,name,albumartist):
 #		self.name = name
 #		self.albumartist = albumartist
 
+#@api.apiclass("artist")
 class Artist(DBClass):
-#	__tablename__ = "artists"
-#	uid = Column(Integer,primary_key=True,autoincrement=True)
+	__tablename__ = "artists"
+	uid = Column(Integer,primary_key=True,autoincrement=True)
 	name = Column(String)
 #	tracks = relationship(TrackArtist, backref = 'artist',lazy=False,cascade="all")
+
+	def __apidict__(self):
+		return {
+			"uid":self.uid,
+			"name":self.name,
+			#"tracks":self.tracks
+		}
+
 
 #	def __init__(self,name):
 #		self.name = name
 
+#@api.apiclass("track")
 class Track(DBClass):
-#	__tablename__ = "tracks"
-#	uid = Column(Integer,primary_key=True,autoincrement=True)
+	__tablename__ = "tracks"
+	uid = Column(Integer,primary_key=True,autoincrement=True)
 	title = Column(String)
 #	album_id = Column(Integer,ForeignKey('album.uid'))
-	album = Reference(Album,backref="tracks")
-	artists = MultiReference(Artist,backref="tracks")
+#	album = Reference(Album,backref="tracks")
+	#artists = MultiReference(Artist,backref="tracks")
+
+	album_id = Column(Integer,ForeignKey('albums.uid'))
+	artists = relationship(Artist, secondary=lambda: trackartists, backref="tracks",lazy=False)
+	files = relationship(FileRef,backref="track",lazy=False)
 #	artists = relationship(TrackArtist, backref = 'track',lazy=False,cascade="all")
 
 #	def __init__(self,title):
 #		self.title = title
 
+	def __apidict__(self):
+		return {
+			"uid":self.uid,
+			"title":self.title,
+			"artists":self.artists
+		}
+
 
 
 init_database()
+
+
+
+@api.get("artists")
+def list_artists():
+	session = Session()
+	return list(session.query(Artist))
+
+@api.get("albums")
+def list_albums():
+	session = Session()
+	return list(session.query(Album))
+
+@api.get("tracks")
+def list_tracks():
+	session = Session()
+	return list(session.query(Track))
 
 #Track = namedtuple("Track",["artists","title","files"])
 #Album = namedtuple("Album",["albumartist","title","tracklist"])
@@ -117,8 +180,14 @@ def build_database(dir):
 				audio = MP3(fullpath)
 
 				tags = audio.tags
-				album = tags.get("TALB").text[0]
-				title = tags.get("TIT2").text[0]
+				try:
+					album = tags.get("TALB").text[0]
+				except:
+					album = "Unknown Album"
+				try:
+					title = tags.get("TIT2").text[0]
+				except:
+					title = f
 				#artists = [set(obj.text) for obj in tags.getall("TPE1") + tags.getall("TPE2") + tags.getall("TPE3") + tags.getall("TPE4")]
 				artists = [set(obj.text) for obj in tags.getall("TPE1")]
 				artists = set.union(*artists)
@@ -138,33 +207,54 @@ def build_database(dir):
 			artists,title = cleanup.fullclean(artists,title)
 			add_of_find_existing_track(title=title,artists=artists,album=album,albumartist=albumartist,file=fullpath,session=session)
 
+	session.commit()
 
 def add_of_find_existing_track(title,artists,album,albumartist,file,session):
+
+
 
 	albumobj = add_of_find_existing_album(album,albumartist,session)
 	artistobjs = [add_of_find_existing_artist(artist,session) for artist in artists]
 
-	trackobj = Track(title=title,album=albumobj)
+	fileref = FileRef(path=file)
 
-	for a in artistobjs:
-		TrackArtist(artist=a,track=trackobj)
 
-	#session.add(trackobj)
+	for result in session.query(Track).filter(Track.title.lower() == title.lower() and Track.artists == artistobjs):
+		trackobj = result # if there is any result, take it
+		break
+	else:
+		trackobj = Track(title=title,album=albumobj,artists=artistobjs)
+
+	trackobj.files.append(fileref)
+
+	#for a in artistobjs:
+	#	TrackArtist(artist=a,track=trackobj)
+
+	session.add(trackobj)
+	session.add(fileref)
 	return trackobj
 
 def add_of_find_existing_album(name,artist,session):
 
-	session.query(exists().where(Album.name == name and Album.artist == artist))
+	for result in session.query(Album).filter(Album.name.lower() == name.lower() and Album.artist.lower() == artist.lower()):
+		return result
 
 	albumobj = Album(name=name,albumartist=artist)
-	#session.add(albumobj)
+	session.add(albumobj)
 	return albumobj
 
 def add_of_find_existing_artist(name,session):
 
+	for result in session.query(Artist).filter(Artist.name.lower() == name.lower()):
+		return result
+
 	artistobj = Artist(name=name)
-	#session.add(artistobj)
+	session.add(artistobj)
 	return artistobj
+
+
+
+
 
 
 

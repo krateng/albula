@@ -22,7 +22,7 @@ def removespecial(s):
 
 
 delimiters_feat = ["ft.","ft","feat.","feat","featuring","Ft.","Ft","Feat.","Feat","Featuring"]			#Delimiters used for extra artists, even when in the title field
-#delimiters = ["vs.","vs","&"]											#Delimiters in informal artist strings, spaces expected around them.
+delimiters = ["vs.","vs","&"]											#Delimiters in informal artist strings, spaces expected around them.
 delimiters = []															#not using these here because risk of false positives. user has control over tagging
 delimiters_formal = ["; ",";","/"]										#Delimiters used specifically to tag multiple artists when only one tag field is available, no spaces used
 
