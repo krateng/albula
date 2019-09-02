@@ -14,21 +14,77 @@ body {
 
 
 
-div.top_bar {
+#top_bar {
 	background-color: black;
 	position: fixed;
 	left:0px;
 	right:0px;
 	top:0px;
-
-	height:60px;
-}
-
-div.top_bar > table {
-	margin-top:15px;
-	width:100%;
-}
-
-div.top_bar > table td {
 	text-align: center;
+
+	height:80px;
+	padding-top:25px;
+	padding-left:15px;
+	padding-right: 15px;
+}
+
+#content_area {
+
+	left:5px;
+	right:5px;
+	top:105px;
+	bottom:105px;
+
+	position:fixed;
+	overflow-y: scroll;
+}
+
+#playback_bar {
+	background-color: black;
+	position: fixed;
+	left:0px;
+	right:0px;
+	bottom:0px;
+	text-align: center;
+
+	height:80px;
+	padding-bottom:25px;
+	padding-left:15px;
+	padding-right: 15px;
+}
+
+#top_bar > div {
+	display:inline;
+	padding-left:30px;
+	padding-right: 30px;
+	font-size: 30px;
+}
+
+.content_element {
+	display:inline-block;
+	width:160px;
+	table-layout: fixed;
+
+	overflow: hidden;
+
+	padding:20px;
+}
+
+.content_element tr td span {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.content_element tr.image {
+	height:160px;
+}
+.content_element tr.secondary_info {
+	height:20px;
+	font-size: 75%;
+}
+.content_element tr.main_info {
+	height:20px;
+	font-weight: bold;
+	font-size: 90%;
 }

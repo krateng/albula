@@ -1,3 +1,10 @@
-testlibrary
+# generic temporary / dev files
+*.xcf
+*.pyc
 
-src/nimrodel
+# user files
+*.db
+/testlibrary
+
+# only for development, normally external
+/src/nimrodel

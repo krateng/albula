@@ -1,2 +1,0 @@
-def page():
-    yield "test"

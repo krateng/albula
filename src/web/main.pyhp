@@ -1,0 +1,37 @@
+<html>
+	<head>
+		<pyhp include="common/head.html" />
+	</head>
+
+	<body>
+		<div id="top_bar">
+			<div>Artists</div>
+			<div>Albums</div>
+			<div>Tracks</div>
+		</div>
+
+
+		<div id="content_area">
+
+			<pyhp for="album" in="db.list_albums()">
+				<table class="content_element album">
+					<tr class="image"><td>
+					</td></tr>
+					<tr class="secondary_info"><td>
+						<span><pyhp echo="album.albumartist" /></span>
+					</td></tr>
+					<tr class="main_info"><td>
+						<span><pyhp echo="album.name" /></span>
+					</td></tr>
+				</table>
+			</pyhp>
+
+
+
+		</div>
+
+		<div id="playback_bar">
+
+		</div>
+	</body>
+</html>

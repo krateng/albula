@@ -4,7 +4,9 @@ from sqlalchemy import create_engine, Column, Integer, String, exists, ForeignKe
 from sqlalchemy.orm import sessionmaker, relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine('sqlite:///database.db', echo=True)
+VERBOSE = False
+
+engine = create_engine('sqlite:///database.db', echo=VERBOSE)
 DBBase = declarative_base()
 meta = DBBase.metadata
 Session = sessionmaker(bind=engine)

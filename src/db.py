@@ -16,7 +16,7 @@ from nimrodel import EAPI
 
 # object api won't work because we don't have permanent objects (DB)
 #api = OAPI(path="api")
-api = EAPI(path="api")
+api = EAPI(path="api",delay=True)
 
 #class TrackArtist(DBClass):
 ##	__tablename__ = "trackartists"
@@ -53,6 +53,9 @@ class Album(DBClass):
 			#"tracks":self.tracks
 		}
 
+	def __repr__(self):
+		return "<Album '" + self.name + "'>"
+
 
 #	def __init__(self,name,albumartist):
 #		self.name = name
@@ -71,6 +74,9 @@ class Artist(DBClass):
 			"name":self.name,
 			#"tracks":self.tracks
 		}
+
+	def __repr__(self):
+		return "<Artist '" + self.name + "'>"
 
 
 #	def __init__(self,name):
@@ -100,6 +106,9 @@ class Track(DBClass):
 			"artists":self.artists
 		}
 
+	def __repr__(self):
+		return "<Track '" + self.title + "'>"
+
 
 
 init_database()
@@ -120,6 +129,39 @@ def list_albums():
 def list_tracks():
 	session = Session()
 	return list(session.query(Track))
+
+
+@api.get("artist/{id}")
+def get_artist(id):
+	session = Session()
+	artist = list(session.query(Artist).filter(Artist.uid == id))[0]
+	result = {}
+	result["artist"] = artist
+	alltracks = list_tracks()
+	result["tracks"] = [t for t in alltracks if artist.uid in [a.uid for a in t.artists]]
+	result["albums"] = list(set(t.album for t in result["tracks"]))
+
+	return result
+
+
+@api.get("album/{id}")
+def get_album(id):
+	session = Session()
+	album = list(session.query(Album).filter(Album.uid == id))[0]
+	result = {}
+	result["album"] = album
+	alltracks = list_tracks()
+	result["tracks"] = album.tracks
+	# sort artists by presence on this album
+	artisttracks = {}
+	for t in result["tracks"]:
+		for a in t.artists:
+			artisttracks[a] = artisttracks.setdefault(a,0) + 1
+	result["artists"] = sorted([a for a in artisttracks],key=lambda x: artisttracks[x],reverse=True)
+	#result["artists"] = list(set(a for t in result["tracks"] for a in t.artists))
+
+	return result
+
 
 #Track = namedtuple("Track",["artists","title","files"])
 #Album = namedtuple("Album",["albumartist","title","tracklist"])
