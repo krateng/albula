@@ -13,11 +13,17 @@ def server_handlers(server):
 
 	@server.get("/<name>")
 	def page(name):
-		return pyhpfile("web/" + name + ".pyhp")
+	#	session = db.Session()
+		result = pyhpfile("web/" + name + ".pyhp",{"db":db})
+	#	session.close()
+		return result
 
 	@server.get("/")
 	def start():
-		return pyhpfile("web/main.pyhp",{"db":db})
+	#	session = db.Session()
+		result = pyhpfile("web/main.pyhp",{"db":db})
+	#	session.close()
+		return result
 
 
 

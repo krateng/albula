@@ -114,26 +114,44 @@ class Track(DBClass):
 init_database()
 
 
+def db(func):
+	def wrapper(*args,**kwargs):
+		if "session" in kwargs:
+			session = kwargs.pop("session")
+			inherited_session = True
+		else:
+			session = Session()
+			inherited_session = False
+
+		result = func(*args,**kwargs,session=session)
+
+		if not inherited_session:
+			session.close()
+
+		return result
+
+	return wrapper
+
 
 @api.get("artists")
-def list_artists():
-	session = Session()
+@db
+def list_artists(session):
 	return list(session.query(Artist))
 
 @api.get("albums")
-def list_albums():
-	session = Session()
+@db
+def list_albums(session):
 	return list(session.query(Album))
 
 @api.get("tracks")
-def list_tracks():
-	session = Session()
+@db
+def list_tracks(session):
 	return list(session.query(Track))
 
 
 @api.get("artist/{id}")
-def get_artist(id):
-	session = Session()
+@db
+def get_artist(id,session):
 	artist = list(session.query(Artist).filter(Artist.uid == id))[0]
 	result = {}
 	result["artist"] = artist
@@ -145,8 +163,8 @@ def get_artist(id):
 
 
 @api.get("album/{id}")
-def get_album(id):
-	session = Session()
+@db
+def get_album(id,session):
 	album = list(session.query(Album).filter(Album.uid == id))[0]
 	result = {}
 	result["album"] = album
