@@ -18,7 +18,7 @@ DIRECTORIES = [
 
 
 
-#db.build_database(DIRECTORIES)
+db.build_database(DIRECTORIES)
 
 #thread_web = Thread(target=server.runserver,args=(PORT,))
 #thread_web.daemon = True

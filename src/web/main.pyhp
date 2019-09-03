@@ -1,17 +1,51 @@
 <html>
 	<head>
 		<pyhp include="common/head.html" />
+		<script>
+
+
+
+			function showView() {
+				var url_string = window.location.href;
+				var url = new URL(url_string);
+				var view = url.searchParams.get("view");
+				for (let area of document.getElementsByClassName("content_area")) {
+					area.classList.add("hide")
+				}
+
+				if (view == "tracks") {
+					document.getElementById("content_area_tracks").classList.remove("hide");
+				}
+				if (view == "albums") {
+					document.getElementById("content_area_albums").classList.remove("hide");
+				}
+				if (view == "artists") {
+					document.getElementById("content_area_artists").classList.remove("hide");
+				}
+			}
+
+			function lnk(args) {
+				var searchParams = new URLSearchParams(window.location.search);
+				for (var key in args) {
+					searchParams.set(key, args[key]);
+				}
+				history.pushState({},"","?" + searchParams.toString());
+				showView();
+			}
+
+
+		</script>
 	</head>
 
-	<body>
+	<body onload="showView()">
 		<div id="top_bar">
-			<div>Artists</div>
-			<div>Albums</div>
-			<div>Tracks</div>
+			<div onclick="lnk({view:'artists'})">Artists</div>
+			<div onclick="lnk({view:'albums'})">Albums</div>
+			<div onclick="lnk({view:'tracks'})">Tracks</div>
 		</div>
 
 
-		<div id="content_area">
+		<div id="content_area_albums" class="content_area hide">
 
 			<pyhp for="album" in="db.list_albums()">
 				<div class="content_element album">
@@ -23,6 +57,41 @@
 					</td></tr>
 					<tr class="main_info"><td>
 						<span title="{album.name}"><pyhp echo="album.name" /></span>
+					</td></tr>
+				</table>
+				</div>
+			</pyhp>
+
+		</div>
+		<div id="content_area_artists" class="content_area hide">
+
+			<pyhp for="artist" in="db.list_artists()">
+				<div class="content_element artist">
+				<table>
+					<tr class="image"><td style="background-image:url('/img/artistart/{artist.artwork[0].uid}');">
+					</td></tr>
+					<tr class="main_info"><td>
+						<span title="{artist.name}"><pyhp echo="artist.name" /></span>
+					</td></tr>
+				</table>
+				</div>
+			</pyhp>
+
+
+
+		</div>
+		<div id="content_area_tracks" class="content_area hide">
+
+			<pyhp for="track" in="db.list_tracks()">
+				<div class="content_element track">
+				<table>
+					<tr class="image"><td style="background-image:url('/img/trackart/{track.artwork[0].uid}');">
+					</td></tr>
+					<tr class="secondary_info"><td>
+						<span title="{', '.join(a.name for a in track.artists)}"><pyhp echo="', '.join(a.name for a in track.artists)" /></span>
+					</td></tr>
+					<tr class="main_info"><td>
+						<span title="{track.title}"><pyhp echo="track.title" /></span>
 					</td></tr>
 				</table>
 				</div>

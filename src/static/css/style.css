@@ -28,7 +28,7 @@ body {
 	padding-right: 15px;
 }
 
-#content_area {
+.content_area {
 
 	left:5px;
 	right:5px;
@@ -37,6 +37,9 @@ body {
 
 	position:fixed;
 	overflow-y: scroll;
+}
+.hide {
+	display:none;
 }
 
 #playback_bar {
@@ -59,6 +62,29 @@ body {
 	padding-right: 30px;
 	font-size: 30px;
 }
+
+
+
+/** scrollbar **/
+
+::-webkit-scrollbar {
+  width: 8px;
+  cursor: pointer;
+}
+::-webkit-scrollbar-track {
+  background: grey;
+  background-color:rgba(0,255,255,0.1);
+}
+::-webkit-scrollbar-thumb {
+background-color:rgba(103,85,0,0.7);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: gold;
+}
+
+
+
+
 
 .content_element {
 	display:inline-block;
@@ -104,7 +130,7 @@ body {
 	font-size: 75%;
 }
 .content_element tr.main_info {
-	height:18px;
+	height:25px;
 	font-weight: bold;
 	font-size: 90%;
 }

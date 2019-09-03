@@ -5,6 +5,7 @@
 # user files
 *.db
 /testlibrary
+/src/cache
 
 # only for development, normally external
 /src/nimrodel

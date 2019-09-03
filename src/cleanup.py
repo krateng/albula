@@ -1,5 +1,5 @@
 import re
-
+import unicodedata
 
 def fullclean(artists_,title):
 	artists = []
@@ -17,7 +17,7 @@ def fullclean(artists_,title):
 def removespecial(s):
 	s = s.replace("\t","").replace("␟","").replace("\n","")
 	s = re.sub(" +"," ",s)
-	return s
+	return "".join(ch for ch in s if unicodedata.category(ch)[0]!="C")
 
 
 
