@@ -14,16 +14,18 @@
 		<div id="content_area">
 
 			<pyhp for="album" in="db.list_albums()">
-				<table class="content_element album">
-					<tr class="image"><td>
+				<div class="content_element album">
+				<table>
+					<tr class="image"><td style="background-image:url('/img/albumart/{album.artwork[0].uid}');">
 					</td></tr>
 					<tr class="secondary_info"><td>
-						<span><pyhp echo="album.albumartist" /></span>
+						<span title="{album.albumartist}"><pyhp echo="album.albumartist" /></span>
 					</td></tr>
 					<tr class="main_info"><td>
-						<span><pyhp echo="album.name" /></span>
+						<span title="{album.name}"><pyhp echo="album.name" /></span>
 					</td></tr>
 				</table>
+				</div>
 			</pyhp>
 
 

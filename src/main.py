@@ -9,13 +9,16 @@ import os
 
 
 PORT = 42051
-DIRECTORY = "../testlibrary/"
+DIRECTORIES = [
+	"/media/krateng/Krateng/audio/musiclibrary",
+	"/media/krateng/Krateng/audio/musiclibrary_flac"
+]
 
 
 
 
 
-#db.build_database(DIRECTORY)
+#db.build_database(DIRECTORIES)
 
 #thread_web = Thread(target=server.runserver,args=(PORT,))
 #thread_web.daemon = True

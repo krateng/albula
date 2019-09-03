@@ -9,7 +9,7 @@ import cleanup
 
 from dbhelper import DBClass, Session, init_database, Reference, MultiReference, meta
 
-from sqlalchemy import create_engine, Column, Integer, String, exists, ForeignKey, Table
+from sqlalchemy import create_engine, Column, Integer, String, exists, ForeignKey, Table, and_, or_
 from sqlalchemy.orm import relationship, backref
 
 from nimrodel import EAPI
@@ -25,6 +25,19 @@ api = EAPI(path="api",delay=True)
 #	artist_id = Column(Integer,ForeignKey('artist.uid'))
 
 
+
+
+#######
+### MODELS
+#######
+
+
+
+
+
+
+
+
 trackartists = Table('trackartists', meta,
     Column('track_id', Integer, ForeignKey('tracks.uid')),
     Column('artist_id', Integer, ForeignKey('artists.uid'))
@@ -32,6 +45,24 @@ trackartists = Table('trackartists', meta,
 
 class FileRef(DBClass):
 	__tablename__ = "files"
+	uid = Column(Integer,primary_key=True,autoincrement=True)
+	path = Column(String)
+	track_id = Column(Integer,ForeignKey('tracks.uid'))
+
+class ArtistArtRef(DBClass):
+	__tablename__ = "artistart"
+	uid = Column(Integer,primary_key=True,autoincrement=True)
+	path = Column(String)
+	artist_id = Column(Integer,ForeignKey('artists.uid'))
+
+class AlbumArtRef(DBClass):
+	__tablename__ = "albumart"
+	uid = Column(Integer,primary_key=True,autoincrement=True)
+	path = Column(String)
+	album_id = Column(Integer,ForeignKey('albums.uid'))
+
+class TrackArtRef(DBClass):
+	__tablename__ = "trackart"
 	uid = Column(Integer,primary_key=True,autoincrement=True)
 	path = Column(String)
 	track_id = Column(Integer,ForeignKey('tracks.uid'))
@@ -44,12 +75,15 @@ class Album(DBClass):
 	name = Column(String)
 	albumartist = Column(String)
 	tracks = relationship("Track",backref="album",lazy=False)
+	artwork = relationship(AlbumArtRef,backref="album",lazy=False)
 
 	def __apidict__(self):
 		return {
 			"uid":self.uid,
 			"albumartist":self.albumartist,
 			"name":self.name,
+			#"artwork":[a.path for a in self.artwork]
+			"artwork":[a.uid for a in self.artwork]
 			#"tracks":self.tracks
 		}
 
@@ -57,30 +91,26 @@ class Album(DBClass):
 		return "<Album '" + self.name + "'>"
 
 
-#	def __init__(self,name,albumartist):
-#		self.name = name
-#		self.albumartist = albumartist
-
 #@api.apiclass("artist")
 class Artist(DBClass):
 	__tablename__ = "artists"
 	uid = Column(Integer,primary_key=True,autoincrement=True)
 	name = Column(String)
+	artwork = relationship(ArtistArtRef,backref="artist",lazy=False)
 #	tracks = relationship(TrackArtist, backref = 'artist',lazy=False,cascade="all")
 
 	def __apidict__(self):
 		return {
 			"uid":self.uid,
 			"name":self.name,
+			#"artwork":[a.path for a in self.artwork]
+			"artwork":[a.uid for a in self.artwork]
 			#"tracks":self.tracks
 		}
 
 	def __repr__(self):
 		return "<Artist '" + self.name + "'>"
 
-
-#	def __init__(self,name):
-#		self.name = name
 
 #@api.apiclass("track")
 class Track(DBClass):
@@ -94,16 +124,17 @@ class Track(DBClass):
 	album_id = Column(Integer,ForeignKey('albums.uid'))
 	artists = relationship(Artist, secondary=lambda: trackartists, backref="tracks",lazy=False)
 	files = relationship(FileRef,backref="track",lazy=False)
+	artwork = relationship(TrackArtRef,backref="track",lazy=False)
 #	artists = relationship(TrackArtist, backref = 'track',lazy=False,cascade="all")
 
-#	def __init__(self,title):
-#		self.title = title
 
 	def __apidict__(self):
 		return {
 			"uid":self.uid,
 			"title":self.title,
-			"artists":self.artists
+			"artists":self.artists,
+			#"artwork":[a.path for a in self.artwork]
+			"artwork":[a.uid for a in self.artwork]
 		}
 
 	def __repr__(self):
@@ -112,6 +143,20 @@ class Track(DBClass):
 
 
 init_database()
+
+
+
+
+
+
+
+
+#######
+### DB ACCESS FUNCTIONS
+#######
+
+
+
 
 
 def db(func):
@@ -181,6 +226,21 @@ def get_album(id,session):
 	return result
 
 
+@db
+def get_file_by_ref(uid,type,session):
+	print("getting file path for uid",uid)
+	if type == "albumart":
+		path = list(session.query(AlbumArtRef).filter(AlbumArtRef.uid == uid))[0].path
+	elif type == "artistart":
+		path = list(session.query(ArtistArtRef).filter(ArtistArtRef.uid == uid))[0].path
+	elif type == "trackart":
+		path = list(session.query(TrackArtRef).filter(TrackArtRef.uid == uid))[0].path
+	elif type == "music":
+		path = list(session.query(FileRef).filter(FileRef.uid == uid))[0].path
+
+	return path
+
+
 #Track = namedtuple("Track",["artists","title","files"])
 #Album = namedtuple("Album",["albumartist","title","tracklist"])
 #Artist = namedtuple("Artist",["name"])
@@ -216,56 +276,109 @@ def tuple_to_dict(tup):
 
 
 
-def build_database(dir):
+#######
+### BUILD
+#######
+
+
+
+
+
+def build_database(dirs):
 
 	session = Session()
 
-	for (root,dirs,files) in os.walk(dir,followlinks=True):
-		for f in files:
-			fullpath = os.path.join(dir,root,f)
+	pics_album = []
+	pics_artist = []
+	# temporary pic storage. we need to wait til we have all the music files so we can match them
 
-			if f.endswith(".flac"):
-				audio = FLAC(fullpath)
-
-				tags = audio.tags
-				album = [entry[1] for entry in tags if entry[0] == "ALBUM"][0]
-				title = [entry[1] for entry in tags if entry[0] == "TITLE"][0]
-				artists = [entry[1] for entry in tags if entry[0] == "ARTIST"]
-				try:
-					albumartist = [entry[1] for entry in tags if entry[0] == "ALBUMARTIST"][0]
-				except:
-					albumartist = ", ".join(artists)
-
-			elif f.endswith(".mp3"):
-				audio = MP3(fullpath)
-
-				tags = audio.tags
-				try:
-					album = tags.get("TALB").text[0]
-				except:
-					album = "Unknown Album"
-				try:
-					title = tags.get("TIT2").text[0]
-				except:
-					title = f
-				#artists = [set(obj.text) for obj in tags.getall("TPE1") + tags.getall("TPE2") + tags.getall("TPE3") + tags.getall("TPE4")]
-				artists = [set(obj.text) for obj in tags.getall("TPE1")]
-				artists = set.union(*artists)
-				try:
-					albumartist = tags.get("TPE2").text[0]
-				except:
-					albumartist = ", ".join(artists)
-
-			else:
-				continue
-
-				# image files!
+	for dir in dirs:
+		for (root,dirs,files) in os.walk(dir,followlinks=True):
+			for f in files:
+				print("Scanning file",f)
+				fullpath = os.path.join(dir,root,f)
+				ext = f.split(".")[-1].lower()
 
 
 
+				if ext in ["flac"]:
+					audio = FLAC(fullpath)
 
-			artists,title = cleanup.fullclean(artists,title)
-			add_of_find_existing_track(title=title,artists=artists,album=album,albumartist=albumartist,file=fullpath,session=session)
+					tags = audio.tags
+					try:
+						album = [entry[1] for entry in tags if entry[0] == "ALBUM"][0]
+					except:
+						album = "Unknown Album"
+					try:
+						title = [entry[1] for entry in tags if entry[0] == "TITLE"][0]
+					except:
+						title = f
+					artists = [entry[1] for entry in tags if entry[0] == "ARTIST"]
+					try:
+						albumartist = [entry[1] for entry in tags if entry[0] == "ALBUMARTIST"][0]
+					except:
+						albumartist = ", ".join(artists)
+
+				elif ext in ["mp3"]:
+					audio = MP3(fullpath)
+
+					tags = audio.tags
+					try:
+						album = tags.get("TALB").text[0]
+					except:
+						album = "Unknown Album"
+					try:
+						title = tags.get("TIT2").text[0]
+					except:
+						title = f
+					#artists = [set(obj.text) for obj in tags.getall("TPE1") + tags.getall("TPE2") + tags.getall("TPE3") + tags.getall("TPE4")]
+					artists = [set(obj.text) for obj in tags.getall("TPE1")]
+					artists = set.union(*artists)
+					try:
+						albumartist = tags.get("TPE2").text[0]
+					except:
+						albumartist = ", ".join(artists)
+
+				elif ext in ["png","jpg","jpeg","webp"]:
+
+					if "album" in f:
+						pics_album.append(fullpath)
+
+					elif "artist" in f:
+						pics_artist.append(fullpath)
+
+					continue
+
+				else:
+					print("File",f,"has unknown format")
+					continue
+
+
+
+
+				artists,title = cleanup.fullclean(artists,title)
+				add_of_find_existing_track(title=title,artists=artists,album=album,albumartist=albumartist,file=fullpath,session=session)
+
+
+	for img in pics_album:
+		imgpath = "/".join(img.split("/")[:-1])
+		print("Finding tracks in folder",imgpath)
+		for result in session.query(FileRef).filter(FileRef.path.startswith(imgpath)):
+			# if any music file is in the same folder as the image (including subfolders), associate it
+			id = result.track.album.uid
+			ref = AlbumArtRef(album_id=id,path=img)
+			print("Found",result.path)
+			session.add(ref)
+			break
+
+#	for img in pics_artist:
+#		imgpath = "/".join(img.split("/")[:-1])
+#		for result in session.query(FileRef).filter(FileRef.path.startswith(imgpath)):
+#			# if any music file is in the same folder as the image (including subfolders), associate it
+#			id = result.track.
+#			ref = AlbumArtRef(track_id=id,path=img)
+#			session.add(ref)
+#			break
 
 	session.commit()
 
@@ -279,9 +392,10 @@ def add_of_find_existing_track(title,artists,album,albumartist,file,session):
 	fileref = FileRef(path=file)
 
 
-	for result in session.query(Track).filter(Track.title.lower() == title.lower() and Track.artists == artistobjs):
-		trackobj = result # if there is any result, take it
-		break
+	for result in session.query(Track).filter(Track.title.ilike(title)):
+		if (result.artists == artistobjs):
+			trackobj = result # if there is any result, take it
+			break
 	else:
 		trackobj = Track(title=title,album=albumobj,artists=artistobjs)
 
@@ -296,7 +410,7 @@ def add_of_find_existing_track(title,artists,album,albumartist,file,session):
 
 def add_of_find_existing_album(name,artist,session):
 
-	for result in session.query(Album).filter(Album.name.lower() == name.lower() and Album.artist.lower() == artist.lower()):
+	for result in session.query(Album).filter(and_(Album.name.ilike(name),Album.albumartist.ilike(artist))):
 		return result
 
 	albumobj = Album(name=name,albumartist=artist)
@@ -305,7 +419,7 @@ def add_of_find_existing_album(name,artist,session):
 
 def add_of_find_existing_artist(name,session):
 
-	for result in session.query(Artist).filter(Artist.name.lower() == name.lower()):
+	for result in session.query(Artist).filter(Artist.name.ilike(name)):
 		return result
 
 	artistobj = Artist(name=name)

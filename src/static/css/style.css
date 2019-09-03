@@ -63,28 +63,48 @@ body {
 .content_element {
 	display:inline-block;
 	width:160px;
-	table-layout: fixed;
 
-	overflow: hidden;
 
-	padding:20px;
+	margin-right:10px;
+	margin-left:10px;
+	margin-bottom:20px;
 }
 
-.content_element tr td span {
-	text-overflow: ellipsis;
-	overflow: hidden;
+.content_element table {
+	table-layout: fixed;
+	width: 160px;
 	white-space: nowrap;
 }
+.content_element table td {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 
-.content_element tr.image {
-	height:160px;
+	vertical-align: bottom;
 }
+
+/*.content_element table td:hover {
+	overflow:visible;
+	background-color:black;
+}*/
+
+
+.content_element table tr.image {
+	height:160px;
+	width:160px;
+}
+.content_element table tr.image td {
+	background-size:cover;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
 .content_element tr.secondary_info {
-	height:20px;
+	height:25px;
 	font-size: 75%;
 }
 .content_element tr.main_info {
-	height:20px;
+	height:18px;
 	font-weight: bold;
 	font-size: 90%;
 }
