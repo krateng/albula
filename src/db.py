@@ -298,65 +298,87 @@ def build_database(dirs):
 			for f in files:
 				#print("Scanning file",f)
 				scanned += 1
-				if scanned % 10 == 0:
+				if scanned % 25 == 0:
 					print(scanned,"files scanned...")
 				fullpath = os.path.join(dir,root,f)
 				ext = f.split(".")[-1].lower()
 
 
-
-				if ext in ["flac"]:
-					audio = FLAC(fullpath)
-
-					tags = audio.tags
-					try:
-						album = [entry[1] for entry in tags if entry[0] == "ALBUM"][0]
-					except:
-						album = "Unknown Album"
-					try:
-						title = [entry[1] for entry in tags if entry[0] == "TITLE"][0]
-					except:
-						title = f
-					artists = [entry[1] for entry in tags if entry[0] == "ARTIST"]
-					try:
-						albumartist = [entry[1] for entry in tags if entry[0] == "ALBUMARTIST"][0]
-					except:
-						albumartist = ", ".join(artists)
+				### AUDIO FILES
+				if ext in ["flac","mp3"]:
 
 					embedded_pictures = {}
 
-				elif ext in ["mp3"]:
-					audio = MP3(fullpath)
+					if ext in ["flac"]:
+						audio = FLAC(fullpath)
 
-					tags = audio.tags
-					try:
-						album = tags.get("TALB").text[0]
-					except:
-						album = "Unknown Album"
-					try:
-						title = tags.get("TIT2").text[0]
-					except:
-						title = f
+						tags = audio.tags
+						try:
+							album = [entry[1] for entry in tags if entry[0] == "ALBUM"][0]
+						except:
+							album = "Unknown Album"
+						try:
+							title = [entry[1] for entry in tags if entry[0] == "TITLE"][0]
+						except:
+							title = f
+						artists = [entry[1] for entry in tags if entry[0] == "ARTIST"]
+						try:
+							albumartist = [entry[1] for entry in tags if entry[0] == "ALBUMARTIST"][0]
+						except:
+							albumartist = ", ".join(artists)
 
-					embedded_pictures = {}
-					imgs = tags.getall("APIC")
-					for i in imgs:
-						if i.type == 3:
 
-							imagefile = str(hash(i.data)) + "." + i.mime.split("/")[-1]
-							if not os.path.exists("cache/" + imagefile):
-								with open("cache/" + imagefile,"wb") as fi:
-									fi.write(i.data)
-							embedded_pictures["album"] = "cache/" + imagefile
+						imgs = audio.pictures
+						for i in imgs:
+							if i.type == 3:
+								embedded_pictures["album"] = (hash(i.data),i.mime,i.data)
 
-					#artists = [set(obj.text) for obj in tags.getall("TPE1") + tags.getall("TPE2") + tags.getall("TPE3") + tags.getall("TPE4")]
-					artists = [set(obj.text) for obj in tags.getall("TPE1")]
-					artists = set.union(*artists)
-					try:
-						albumartist = tags.get("TPE2").text[0]
-					except:
-						albumartist = ", ".join(artists)
 
+
+					elif ext in ["mp3"]:
+						audio = MP3(fullpath)
+
+						tags = audio.tags
+						try:
+							album = tags.get("TALB").text[0]
+						except:
+							album = "Unknown Album"
+						try:
+							title = tags.get("TIT2").text[0]
+						except:
+							title = f
+
+						imgs = tags.getall("APIC")
+						for i in imgs:
+							if i.type == 3:
+								embedded_pictures["album"] = (hash(i.data),i.mime,i.data)
+
+
+						#artists = [set(obj.text) for obj in tags.getall("TPE1") + tags.getall("TPE2") + tags.getall("TPE3") + tags.getall("TPE4")]
+						artists = [set(obj.text) for obj in tags.getall("TPE1")]
+						artists = set.union(*artists)
+						try:
+							albumartist = tags.get("TPE2").text[0]
+						except:
+							albumartist = ", ".join(artists)
+
+
+					# extract track from file and add to database
+					artists,title = cleanup.fullclean(artists,title)
+					track = add_of_find_existing_track(title=title,artists=artists,album=album,albumartist=albumartist,file=fullpath,session=session)
+
+					if "album" in embedded_pictures:
+						imghash,mime,data = embedded_pictures["album"]
+						imagefile = str(imghash) + "." + mime.split("/")[-1]
+						if not os.path.exists("cache/" + imagefile):
+							with open("cache/" + imagefile,"wb") as fi:
+								fi.write(data)
+							ref = AlbumArtRef(album_id=track.album.uid,path="cache/" + imagefile)
+							#print("Added embedded album art for",track)
+							session.add(ref)
+
+
+				### ARTWORK FILES
 				elif ext in ["png","jpg","jpeg","webp"]:
 
 					if "album" in f:
@@ -365,25 +387,20 @@ def build_database(dirs):
 					elif "artist" in f:
 						pics_artist.append(fullpath)
 
-					continue
 
+				### OTHER
 				else:
 					print("File",f,"has unknown format")
-					continue
 
 
 
 
-				artists,title = cleanup.fullclean(artists,title)
-				track = add_of_find_existing_track(title=title,artists=artists,album=album,albumartist=albumartist,file=fullpath,session=session)
-				if "album" in embedded_pictures:
-					ref = AlbumArtRef(album_id=track.album.uid,path=embedded_pictures["album"])
-					#print("Added embedded album art for",track)
-					session.add(ref)
+
+	# after all audio files are scanned, check our scanned artwork files and see if they
+	# can be matched with a track
 
 	for img in pics_album:
 		imgpath = "/".join(img.split("/")[:-1])
-		#print("Finding tracks in folder",imgpath)
 		for result in session.query(FileRef).filter(FileRef.path.startswith(imgpath)):
 			# if any music file is in the same folder as the image (including subfolders), associate it
 			id = result.track.album.uid
@@ -411,6 +428,10 @@ def build_database(dirs):
 
 	session.commit()
 
+
+
+
+
 def add_of_find_existing_track(title,artists,album,albumartist,file,session):
 
 
@@ -422,8 +443,9 @@ def add_of_find_existing_track(title,artists,album,albumartist,file,session):
 
 
 	for result in session.query(Track).filter(Track.title.ilike(title)):
-		if (result.artists == artistobjs):
+		if (result.artists == artistobjs and result.album == albumobj): #check same album for now, rethink pls
 			trackobj = result # if there is any result, take it
+			print(trackobj,"has multiple files!")
 			break
 	else:
 		trackobj = Track(title=title,album=albumobj,artists=artistobjs)
