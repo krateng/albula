@@ -6,7 +6,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 VERBOSE = False
 
-engine = create_engine('sqlite:///database.db', echo=VERBOSE)
+#engine = create_engine('sqlite:///database.db', echo=VERBOSE)
+engine = create_engine('sqlite://', echo=VERBOSE)
 DBBase = declarative_base()
 meta = DBBase.metadata
 Session = sessionmaker(bind=engine)

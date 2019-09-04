@@ -50,7 +50,7 @@
 			<pyhp for="album" in="db.list_albums()">
 				<div class="content_element album">
 				<table>
-					<tr class="image"><td style="background-image:url('/img/albumart/{album.artwork[0].uid}');">
+					<tr class="image"><td style="background-image:url('{album.get_artwork()}');">
 					</td></tr>
 					<tr class="secondary_info"><td>
 						<span title="{album.albumartist}"><pyhp echo="album.albumartist" /></span>
@@ -68,7 +68,7 @@
 			<pyhp for="artist" in="db.list_artists()">
 				<div class="content_element artist">
 				<table>
-					<tr class="image"><td style="background-image:url('/img/artistart/{artist.artwork[0].uid}');">
+					<tr class="image"><td style="background-image:url('{artist.get_artwork()}');">
 					</td></tr>
 					<tr class="main_info"><td>
 						<span title="{artist.name}"><pyhp echo="artist.name" /></span>
@@ -85,7 +85,17 @@
 			<pyhp for="track" in="db.list_tracks()">
 				<div class="content_element track">
 				<table>
-					<tr class="image"><td style="background-image:url('/img/trackart/{track.artwork[0].uid}');">
+				<!--	<pyhp>
+						img = ""
+						try:
+							img = "/img/trackart/" + str(track.artwork[0].uid)
+						except:
+							try:
+								img = "/img/albumart/" + str(track.album.artwork[0].uid)
+							except:
+								img = ""
+					</pyhp>-->
+					<tr class="image"><td style="background-image:url('{track.get_artwork()}');">
 					</td></tr>
 					<tr class="secondary_info"><td>
 						<span title="{', '.join(a.name for a in track.artists)}"><pyhp echo="', '.join(a.name for a in track.artists)" /></span>
