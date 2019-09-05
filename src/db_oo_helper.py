@@ -1,4 +1,13 @@
 
+
+
+db = {
+	"classes":{},
+	"objects":[]
+}
+
+
+
 class Ref:
 	def __init__(self,cls,backref=None,exclusive=False):
 		self.cls = cls
@@ -25,10 +34,16 @@ class DBObject:
 
 		# create constructor
 		types = cls.__annotations__
-		def init(self,**vars):
+		def init(self,types=types,**vars):
 			for v in vars:
+				# set attributes according to keyword arguments
 				assert isinstance(vars[v],types[v])
 				setattr(self,v,vars[v])
+
+			# set defaults
+			for v in types:
+				if v not in vars:
+					setattr(self,v,types[v]()) # can just call type to get a version of it, e.g. list() -> []
 
 			self.uid = len(db["objects"])
 			db["objects"].append(self)

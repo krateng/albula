@@ -28,7 +28,7 @@ def server_handlers(server):
 	@server.get("/img/<type>/<uid>")
 	def image(type,uid):
 		uid = int(uid)
-		path = db.get_file_by_ref(uid,type=type)
+		path = db.get_file_by_ref(uid)
 		if path.endswith(".jpeg") or path.endswith(".jpg"):
 			response.set_header('Content-type', 'image/jpeg')
 		elif path.endswith(".png"):

@@ -9,13 +9,10 @@ from mutagen.flac import FLAC
 
 import cleanup
 
-from db_oo_helper import Ref, MultiRef, DBObject
+from db_oo_helper import Ref, MultiRef, DBObject, db
 
 
-db = {
-	"classes":{},
-	"objects":[]
-}
+
 
 
 class Artwork(DBObject):
@@ -29,7 +26,7 @@ class Audio(DBObject):
 class Album(DBObject):
 	name: str
 	albumartist: str
-	artwork: list = MultiRef(Artwork,exclusive=False)
+	artwork: list = MultiRef(Artwork,exclusive=False,backref="album")
 
 	def __apidict__(self):
 		return {
@@ -39,9 +36,13 @@ class Album(DBObject):
 			"artwork":[a.uid for a in self.artwork]
 		}
 
+	def get_artwork(self):
+		if len(self.artwork) > 0: return "/img/albumart/" + str(self.artwork[0].uid)
+		else: return ""
+
 class Artist(DBObject):
 	name: str
-	artwork: list = MultiRef(Artwork,exclusive=False)
+	artwork: list = MultiRef(Artwork,exclusive=False,backref="artist")
 
 	def __apidict__(self):
 		return {
@@ -50,12 +51,16 @@ class Artist(DBObject):
 			"artwork":[a.uid for a in self.artwork]
 		}
 
+	def get_artwork(self):
+		if len(self.artwork) > 0: return "/img/artistart/" + str(self.artwork[0].uid)
+		else: return ""
+
 class Track(DBObject):
 	title: str
 	artists: list = MultiRef(Artist,backref="tracks",exclusive=False)
 	albums: list = MultiRef(Album,backref="tracks",exclusive=False)
-	audiofiles: list
-	artwork: list = MultiRef(Artwork,exclusive=False)
+	audiofiles: list = MultiRef(Audio,exclusive=True,backref="track")
+	artwork: list = MultiRef(Artwork,exclusive=False,backref="track")
 
 	def __apidict__(self):
 		return {
@@ -65,15 +70,19 @@ class Track(DBObject):
 			"artwork":[a.uid for a in self.artwork]
 		}
 
+	def get_artwork(self):
+		if len(self.artwork) > 0: return "/img/trackart/" + str(self.artwork[0].uid)
+		else: return ""
 
 
-bp = Artist(name="Blackpink")
-ex = Artist(name="EXID")
-rv = Artist(name="Red Velvet")
-ay = Album(name="Ah Yeah",albumartist="EXID")
-st = Album(name="Square Three",albumartist="BLACKPINK")
-AAIYL = Track(title="As If It's Your Last",artists=[bp],albums=[st])
-mash = Track(title="Megamashup 2019",artists=[rv,bp,ex],albums=[ay])
+if False:
+	bp = Artist(name="Blackpink")
+	ex = Artist(name="EXID")
+	rv = Artist(name="Red Velvet")
+	ay = Album(name="Ah Yeah",albumartist="EXID")
+	st = Album(name="Square Three",albumartist="BLACKPINK")
+	AAIYL = Track(title="As If It's Your Last",artists=[bp],albums=[st])
+	mash = Track(title="Megamashup 2019",artists=[rv,bp,ex],albums=[ay])
 
 
 
@@ -215,7 +224,7 @@ def build_database(dirs):
 
 					# extract track from file and add to database
 					artists,title = cleanup.fullclean(artists,title)
-					track = add_of_find_existing_track(title=title,artists=artists,album=album,albumartist=albumartist,file=fullpath,session=session)
+					track = add_of_find_existing_track(title=title,artists=artists,album=album,albumartist=albumartist,file=fullpath)
 
 					if "album" in embedded_pictures:
 						imghash,mime,data = embedded_pictures["album"]
@@ -224,9 +233,7 @@ def build_database(dirs):
 							with open("cache/" + imagefile,"wb") as fi:
 								fi.write(data)
 							#ref = AlbumArtRef(album_id=track.album.uid,path="cache/" + imagefile)
-							track.artwork.append(Artwork(path="cache/" + imagefile))
-							#print("Added embedded album art for",track)
-							session.add(ref)
+							track.albums[0].artwork.append(Artwork(path="cache/" + imagefile))
 
 
 				### ARTWORK FILES
@@ -254,43 +261,69 @@ def build_database(dirs):
 		imgpath = "/".join(img.split("/")[:-1])
 		# find ALL tracks in folders and subfolders
 		album_occurences = {}
-		for result in [audio for audio in db["classes"][Audio] if audio.path.startswith(imgpath):
-			albums = result.track.artists
-			for a in artists:
-				artist_occurences[a] = artist_occurences.get(a,0) + 1
+		for result in [audio for audio in db["classes"][Audio] if audio.path.startswith(imgpath)]:
+			albums = result.track.albums
+			for a in albums:
+				album_occurences[a] = album_occurences.get(a,0) + 1
 
 		try:
-			artist = sorted([a for a in artist_occurences],key=lambda x: artist_occurences[x],reverse=True)[0]
-			ref = ArtistArtRef(artist_id=artist.uid,path=img)
-			session.add(ref)
+			album = sorted([a for a in album_occurences],key=lambda x: album_occurences[x],reverse=True)[0]
+			album.artwork.append(Artwork(path=img))
 		except:
 			pass
-
-
-		for result in session.query(FileRef).filter(FileRef.path.startswith(imgpath)):
-			# if any music file is in the same folder as the image (including subfolders), associate it
-			result.track.
-			id = result.track.album.uid
-			ref = AlbumArtRef(album_id=id,path=img)
-			#print("Found",result.path)
-			session.add(ref)
-			break
 
 	for img in pics_artist:
 		imgpath = "/".join(img.split("/")[:-1])
 		# find ALL tracks in folders and subfolders
 		artist_occurences = {}
-		for result in session.query(FileRef).filter(FileRef.path.startswith(imgpath)):
+		for result in [audio for audio in db["classes"][Audio] if audio.path.startswith(imgpath)]:
 			artists = result.track.artists
 			for a in artists:
 				artist_occurences[a] = artist_occurences.get(a,0) + 1
 
 		try:
 			artist = sorted([a for a in artist_occurences],key=lambda x: artist_occurences[x],reverse=True)[0]
-			ref = ArtistArtRef(artist_id=artist.uid,path=img)
-			session.add(ref)
+			artist.artwork.append(Artwork(path=img))
 		except:
 			pass
 
 
-	session.commit()
+
+
+
+
+def add_of_find_existing_track(title,artists,album,albumartist,file):
+
+
+
+	albumobj = add_of_find_existing_album(album,albumartist)
+	artistobjs = [add_of_find_existing_artist(artist) for artist in artists]
+
+	for t in db["classes"][Track]:
+		if t.artists == artistobjs and t.title == title:
+			trackobj = t
+			break
+	else:
+		trackobj = Track(title=title,albums=[albumobj],artists=artistobjs)
+
+	trackobj.audiofiles.append(Audio(path=file))
+
+	return trackobj
+
+def add_of_find_existing_album(name,artist):
+
+	for a in db["classes"][Album]:
+		if a.name.lower() == name.lower() and a.albumartist.lower() == artist.lower():
+			return a
+
+	albumobj = Album(name=name,albumartist=artist)
+	return albumobj
+
+def add_of_find_existing_artist(name):
+
+	for a in db["classes"][Artist]:
+		if a.name.lower() == name.lower():
+			return a
+
+	artistobj = Artist(name=name)
+	return artistobj
