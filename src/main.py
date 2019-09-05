@@ -9,6 +9,7 @@ import os
 
 
 PORT = 42051
+THREADS = 12
 DIRECTORIES = [
 	"/media/krateng/Krateng/audio/musiclibrary",
 	"/media/krateng/Krateng/audio/musiclibrary_flac"
@@ -17,8 +18,8 @@ DIRECTORIES = [
 
 
 
-
-db.build_database(DIRECTORIES)
+db.load_database()
+#db.build_database(DIRECTORIES)
 
 #thread_web = Thread(target=server.runserver,args=(PORT,))
 #thread_web.daemon = True
@@ -42,7 +43,8 @@ server = Bottle()
 db.api.mount(server=server)
 web.server_handlers(server=server)
 
-run(server, host='::', port=PORT, server='waitress')
+#run(server, host='::', port=PORT, server='waitress',threads=24)
+waitress.serve(server,port=PORT,threads=THREADS)
 
 
 #try:

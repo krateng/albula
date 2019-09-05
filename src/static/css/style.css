@@ -64,6 +64,10 @@ body {
 }
 
 
+[onclick]:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
 
 /** scrollbar **/
 
@@ -116,21 +120,20 @@ background-color:rgba(103,85,0,0.7);
 
 
 .content_element table tr.image {
-	height:160px;
+	height:170px;
 	width:160px;
 }
 .content_element table tr.image td {
 	background-size:cover;
 	background-position: center;
 	background-repeat: no-repeat;
+	border-bottom:10px solid transparent;
 }
 
 .content_element tr.secondary_info {
-	height:25px;
 	font-size: 75%;
 }
 .content_element tr.main_info {
-	height:25px;
 	font-weight: bold;
 	font-size: 90%;
 }

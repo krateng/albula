@@ -24,8 +24,20 @@
 				}
 			}
 
-			function lnk(args) {
+			function lnk() {
 				var searchParams = new URLSearchParams(window.location.search);
+				// arguments as object
+				if (arguments.length == 1 &amp;&amp; typeof arguments[0] === 'object') {
+					args = arguments[0];
+				}
+				// arguments as tuple
+				else {
+					args = {};
+					for (var i=0;i &lt; arguments.length;i += 2) {
+						args[arguments[i]] = arguments[i+1];
+					}
+				}
+
 				for (var key in args) {
 					searchParams.set(key, args[key]);
 				}
@@ -39,9 +51,9 @@
 
 	<body onload="showView()">
 		<div id="top_bar">
-			<div onclick="lnk({view:'artists'})">Artists</div>
-			<div onclick="lnk({view:'albums'})">Albums</div>
-			<div onclick="lnk({view:'tracks'})">Tracks</div>
+			<div onclick="lnk('view','artists')">Artists</div>
+			<div onclick="lnk('view','albums')">Albums</div>
+			<div onclick="lnk('view','tracks')">Tracks</div>
 		</div>
 
 
@@ -56,7 +68,7 @@
 						<span title="{album.albumartist}"><pyhp echo="album.albumartist" /></span>
 					</td></tr>
 					<tr class="main_info"><td>
-						<span title="{album.name}"><pyhp echo="album.name" /></span>
+						<span onclick="lnk('view','album','id',{album.uid})" title="{album.name}"><pyhp echo="album.name" /></span>
 					</td></tr>
 				</table>
 				</div>

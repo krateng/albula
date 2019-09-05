@@ -4,6 +4,7 @@
 
 # user files
 *.db
+*.pck
 /testlibrary
 /src/cache
 

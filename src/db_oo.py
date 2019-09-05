@@ -9,7 +9,7 @@ from mutagen.flac import FLAC
 
 import cleanup
 
-from db_oo_helper import Ref, MultiRef, DBObject, db
+from db_oo_helper import Ref, MultiRef, DBObject, db, save_database, load_database
 
 
 
@@ -72,7 +72,10 @@ class Track(DBObject):
 
 	def get_artwork(self):
 		if len(self.artwork) > 0: return "/img/trackart/" + str(self.artwork[0].uid)
-		else: return ""
+		else:
+			for a in self.albums:
+				if len(a.artwork) > 0: return "/img/albumart/" + str(a.artwork[0].uid)
+		return ""
 
 
 if False:
@@ -152,6 +155,8 @@ def build_database(dirs):
 	pics_artist = []
 	# temporary pic storage. we need to wait til we have all the music files so we can match them
 
+	alreadydone = set(a.path for a in db["classes"][Audio])
+
 	for dir in dirs:
 		for (root,dirs,files) in os.walk(dir,followlinks=True):
 			for f in files:
@@ -160,6 +165,7 @@ def build_database(dirs):
 				if scanned % 25 == 0:
 					print(scanned,"files scanned...")
 				fullpath = os.path.join(dir,root,f)
+				if fullpath in alreadydone: continue
 				ext = f.split(".")[-1].lower()
 
 
@@ -287,6 +293,8 @@ def build_database(dirs):
 		except:
 			pass
 
+
+	save_database()
 
 
 

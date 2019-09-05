@@ -1,4 +1,4 @@
-
+import pickle
 
 
 db = {
@@ -6,6 +6,19 @@ db = {
 	"objects":[]
 }
 
+def save_database():
+	with open("database.pck","wb") as f:
+		pickle.dump(db,f)
+
+
+def load_database():
+	global db
+	try:
+		with open("database.pck","rb") as f:
+			dbl = pickle.load(f)
+			db["classes"], db["objects"] = dbl["classes"], dbl["objects"]
+	except:
+		pass
 
 
 class Ref:
@@ -55,7 +68,6 @@ class DBObject:
 			if v in cls.__dict__:
 				classvar = cls.__dict__[v]
 				if isinstance(classvar,Ref) and classvar.backref is not None:
-					print("making methods for",v," - ",classvar)
 					# make getter method that checks instances of THIS object for references to the target object
 
 					# 1 to 1
@@ -83,7 +95,6 @@ class DBObject:
 					elif not classvar.exclusive and isinstance(classvar,MultiRef):
 						def find_objects_that_reference_me_among_others(self,attr=v):
 							for obj in db["classes"][cls]:
-								print("checking if",self,"is in attribute",attr,"of object",obj)
 								if self in obj.__getattribute__(attr): yield obj
 						prop = property(find_objects_that_reference_me_among_others)
 
