@@ -28,12 +28,15 @@ body {
 	padding-right: 15px;
 }
 
-.content_area {
+#content_area {
 
 	left:5px;
 	right:5px;
 	top:105px;
 	bottom:105px;
+
+	padding-top:20px;
+	padding-bottom:20px;
 
 	position:fixed;
 	overflow-y: scroll;

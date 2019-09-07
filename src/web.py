@@ -25,31 +25,15 @@ def server_handlers(server):
 	#	session.close()
 		return result
 
-	@server.get("/img/<type>/<uid>")
-	def image(type,uid):
+
+	@server.get("/imgof/<uid>")
+	def imageof(uid):
 		uid = int(uid)
-		path = db.get_file_by_ref(uid)
-		if path.endswith(".jpeg") or path.endswith(".jpg"):
-			response.set_header('Content-type', 'image/jpeg')
-		elif path.endswith(".png"):
-			response.set_header('Content-type', 'image/png')
-		with open(path,"rb") as imagefile:
-			stream = imagefile.read()
-			#encoded = base64.b64encode(stream)
 
+		obj = db.db.get(uid)
+		artwork = obj.get_artwork()
+		if artwork is None: return ""
+
+		mime,stream = artwork.read()
+		response.set_header('Content-type', mime)
 		return stream
-
-
-
-#    html = "<html>"
-#    html += "<head>"
-#    with open("static/html/common_head.html","r") as common_head:
-#        html += common_head.read()
-#    html += "</head><body>"
-#    with open("static/html/common_header.html","r") as common_header:
-#        html += common_header.read()
-#    for y in SourceFileLoader(name,"web/" + name + ".py").load_module().page():
-#        html += y + "\n"
-#
-#    html += "</body></html>"
-#    return html

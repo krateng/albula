@@ -12,11 +12,21 @@ import cleanup
 #from db_oo_helper import Ref, MultiRef, DBObject, db, save_database, load_database
 from doreah.database import Database, Ref, MultiRef
 
-db = Database(file="newdb.pck")
+db = Database(file="database.ddb")
 
 
 class Artwork(db.DBObject):
 	path: str
+
+	def read(self):
+		if self.path.endswith(".jpeg") or self.path.endswith(".jpg"):
+			mime = 'image/jpeg'
+		elif self.path.endswith(".png"):
+			mime = 'image/png'
+		with open(self.path,"rb") as imagefile:
+			stream = imagefile.read()
+
+		return mime,stream
 
 class Audio(db.DBObject):
 	path: str
@@ -37,8 +47,8 @@ class Album(db.DBObject):
 		}
 
 	def get_artwork(self):
-		if len(self.artwork) > 0: return "/img/albumart/" + str(self.artwork[0].uid)
-		else: return ""
+		if len(self.artwork) > 0: return self.artwork[0]
+		else: return None
 
 class Artist(db.DBObject):
 	name: str
@@ -52,8 +62,8 @@ class Artist(db.DBObject):
 		}
 
 	def get_artwork(self):
-		if len(self.artwork) > 0: return "/img/artistart/" + str(self.artwork[0].uid)
-		else: return ""
+		if len(self.artwork) > 0: return self.artwork[0]
+		else: return None
 
 class Track(db.DBObject):
 	title: str
@@ -66,16 +76,16 @@ class Track(db.DBObject):
 		return {
 			"uid":self.uid,
 			"title":self.title,
-			"artists":self.artists,
+			"artists":list(self.artists),
 			"artwork":[a.uid for a in self.artwork]
 		}
 
 	def get_artwork(self):
-		if len(self.artwork) > 0: return "/img/trackart/" + str(self.artwork[0].uid)
+		if len(self.artwork) > 0: return self.artwork[0]
 		else:
 			for a in self.albums:
-				if len(a.artwork) > 0: return "/img/albumart/" + str(a.artwork[0].uid)
-		return ""
+				if len(a.artwork) > 0: return a.artwork[0]
+		return None
 
 
 
@@ -147,6 +157,10 @@ def get_file_by_ref(uid):
 	path = db.get(uid).path
 	return path
 
+def get_artwork_of(uid):
+	obj = db.get(uid)
+	artwork = obj.get_artwork()
+	return artwork
 
 
 def build_database(dirs):
@@ -158,7 +172,7 @@ def build_database(dirs):
 	pics_artist = []
 	# temporary pic storage. we need to wait til we have all the music files so we can match them
 
-	alreadydone = set(a.path for a in db.getall(Audio))
+	alreadydone = set(a.path for a in db.getall(Audio)).union(set(a.path for a in db.getall(Artwork)))
 
 	for dir in dirs:
 		for (root,dirs,files) in os.walk(dir,followlinks=True):

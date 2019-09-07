@@ -1,52 +1,7 @@
 <html>
 	<head>
 		<pyhp include="common/head.html" />
-		<script>
-
-
-
-			function showView() {
-				var url_string = window.location.href;
-				var url = new URL(url_string);
-				var view = url.searchParams.get("view");
-				for (let area of document.getElementsByClassName("content_area")) {
-					area.classList.add("hide")
-				}
-
-				if (view == "tracks") {
-					document.getElementById("content_area_tracks").classList.remove("hide");
-				}
-				if (view == "albums") {
-					document.getElementById("content_area_albums").classList.remove("hide");
-				}
-				if (view == "artists") {
-					document.getElementById("content_area_artists").classList.remove("hide");
-				}
-			}
-
-			function lnk() {
-				var searchParams = new URLSearchParams(window.location.search);
-				// arguments as object
-				if (arguments.length == 1 &amp;&amp; typeof arguments[0] === 'object') {
-					args = arguments[0];
-				}
-				// arguments as tuple
-				else {
-					args = {};
-					for (var i=0;i &lt; arguments.length;i += 2) {
-						args[arguments[i]] = arguments[i+1];
-					}
-				}
-
-				for (var key in args) {
-					searchParams.set(key, args[key]);
-				}
-				history.pushState({},"","?" + searchParams.toString());
-				showView();
-			}
-
-
-		</script>
+		<script src="/main.js"></script>
 	</head>
 
 	<body onload="showView()">
@@ -54,72 +9,14 @@
 			<div onclick="lnk('view','artists')">Artists</div>
 			<div onclick="lnk('view','albums')">Albums</div>
 			<div onclick="lnk('view','tracks')">Tracks</div>
+			<br/>
+			<div onclick="lnk('sort','alphabet')">A-Z</div>
+			<div onclick="lnk('sort','last')">⏲️</div>
+			<div onclick="lnk('sort','most')">#</div>
 		</div>
 
 
-		<div id="content_area_albums" class="content_area hide">
-
-			<pyhp for="album" in="db.list_albums()">
-				<div class="content_element album">
-				<table>
-					<tr class="image"><td style="background-image:url('{album.get_artwork()}');">
-					</td></tr>
-					<tr class="secondary_info"><td>
-						<span title="{album.albumartist}"><pyhp echo="album.albumartist" /></span>
-					</td></tr>
-					<tr class="main_info"><td>
-						<span onclick="lnk('view','album','id',{album.uid})" title="{album.name}"><pyhp echo="album.name" /></span>
-					</td></tr>
-				</table>
-				</div>
-			</pyhp>
-
-		</div>
-		<div id="content_area_artists" class="content_area hide">
-
-			<pyhp for="artist" in="db.list_artists()">
-				<div class="content_element artist">
-				<table>
-					<tr class="image"><td style="background-image:url('{artist.get_artwork()}');">
-					</td></tr>
-					<tr class="main_info"><td>
-						<span title="{artist.name}"><pyhp echo="artist.name" /></span>
-					</td></tr>
-				</table>
-				</div>
-			</pyhp>
-
-
-
-		</div>
-		<div id="content_area_tracks" class="content_area hide">
-
-			<pyhp for="track" in="db.list_tracks()">
-				<div class="content_element track">
-				<table>
-				<!--	<pyhp>
-						img = ""
-						try:
-							img = "/img/trackart/" + str(track.artwork[0].uid)
-						except:
-							try:
-								img = "/img/albumart/" + str(track.album.artwork[0].uid)
-							except:
-								img = ""
-					</pyhp>-->
-					<tr class="image"><td style="background-image:url('{track.get_artwork()}');">
-					</td></tr>
-					<tr class="secondary_info"><td>
-						<span title="{', '.join(a.name for a in track.artists)}"><pyhp echo="', '.join(a.name for a in track.artists)" /></span>
-					</td></tr>
-					<tr class="main_info"><td>
-						<span title="{track.title}"><pyhp echo="track.title" /></span>
-					</td></tr>
-				</table>
-				</div>
-			</pyhp>
-
-
+		<div id="content_area" class="content_area">
 
 		</div>
 
