@@ -1,60 +1,74 @@
+
+var infos = {
+	"artists":{url:"http://localhost:42051/api/artists",primary:e=>e.name,secondary:e=>"",singular:"artist"},
+	"albums":{url:"http://localhost:42051/api/albums",primary:e=>e.name,secondary:e=>e.albumartist,singular:"album"},
+	"tracks":{url:"http://localhost:42051/api/tracks",primary:e=>e.title,secondary:e=>e.artists.map(a=>a.name).join(", "),singular:"track"}
+}
+
+var sortings = {
+	"alphabet":e=>e.sorttitle,
+	"last":e=>e.last_played,
+	"most":e=>e.times_played
+}
+
+var sortingfuncs = {}
+
+for (var s in sortings) {
+	sorting = sortings[s]
+	function compare(s,a,b) {
+		var a_ = s(a);
+		var b_ = s(b);
+		if (a_==b_) {return 0;}
+		return (a_>b_) ? 1 : -1;
+	}
+	sortingfuncs[s] = compare.bind(null,sorting); // bind parameter s
+}
+
+console.log(sortingfuncs)
+
+
 function showView() {
 	var url_string = window.location.href;
 	var url = new URL(url_string);
-	var view = url.searchParams.get("view");
-//	for (let area of document.getElementsByClassName("content_area")) {
-//		area.classList.add("hide")
-//	}
+	var view = url.searchParams.get("view") || "albums";
+	var sortby = url.searchParams.get("sort") || "alphabet";
 
-	if (view == "tracks") {
-		var url = "http://localhost:42051/api/tracks"
-	//	document.getElementById("content_area_tracks").classList.remove("hide");
-	}
-	if (view == "albums") {
-		var url = "http://localhost:42051/api/albums"
-	//	document.getElementById("content_area_albums").classList.remove("hide");
-	}
-	if (view == "artists") {
-		var url = "http://localhost:42051/api/artists"
-	//	document.getElementById("content_area_artists").classList.remove("hide");
-	}
+	var url = infos[view].url
+
 
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function() {
-	    if (this.readyState == 4 && this.status == 200) {
-	       var elements = JSON.parse(xhttp.responseText)["result"];
+		if (this.readyState == 4 && this.status == 200) {
+			var elements = JSON.parse(xhttp.responseText)["result"];
 
-		   var elements_html = ""
+			var elements_html = ""
 
-		   infos = {
-			   "artists":{primary:e=>e.name,secondary:e=>"",singular:"artist"},
-			   "albums":{primary:e=>e.name,secondary:e=>e.albumartist,singular:"album"},
-			   "tracks":{primary:e=>e.title,secondary:e=>e.artists.map(a=>a.name).join(", "),singular:"track"}
-		   }
+			elements.sort(sortingfuncs[sortby]);
+			console.log(elements)
 
 		   for (var i=0;i<elements.length;i++) {
-			   element = elements[i]
-			   console.log(element)
-			   info = infos[view]
-			   elements_html += `
-			   <div class="content_element ` + info.singular + `">
+				element = elements[i]
+				//console.log(element)
+				info = infos[view]
+				elements_html += `
+				<div class="content_element ` + info.singular + `">
 				   <table>
-					   <tr class="image"><td style="background-image:url('/imgof/` + element.uid + `');">
-					   </td></tr>
-					   <tr class="secondary_info"><td>
-						   <span title="` + info.secondary(element) + `">` + info.secondary(element) + `</span>
-					   </td></tr>
-					   <tr class="main_info"><td>
-						   <span onclick="lnk('view','album','id',` + element.uid + `)" title="` + info.primary(element) + `">` + info.primary(element) + `</span>
-					   </td></tr>
-				   </table>
-			   </div>
-			   `
+						<tr class="image"><td style="background-image:url('/imgof/` + element.uid + `');">
+						</td></tr>
+						<tr class="secondary_info"><td>
+							<span title="` + info.secondary(element) + `">` + info.secondary(element) + `</span>
+						</td></tr>
+						<tr class="main_info"><td>
+							<span onclick="lnk('view','album','id',` + element.uid + `)" title="` + info.primary(element) + `">` + info.primary(element) + `</span>
+						</td></tr>
+					</table>
+				</div>
+				`
 
-		   }
+			}
 
-		   document.getElementById("content_area").innerHTML = elements_html;
-	    }
+			document.getElementById("content_area").innerHTML = elements_html;
+		}
 	};
 	xhttp.open("GET", url, true);
 	xhttp.send();

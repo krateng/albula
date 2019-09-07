@@ -43,7 +43,10 @@ class Album(db.DBObject):
 			"uid":self.uid,
 			"albumartist":self.albumartist,
 			"name":self.name,
-			"artwork":[a.uid for a in self.artwork]
+			"sorttitle":self.name.lower(),
+			"artwork":[a.uid for a in self.artwork],
+			"last_played":max(t.lastplayed for t in self.tracks),
+			"times_played":sum(t.timesplayed for t in self.tracks)
 		}
 
 	def get_artwork(self):
@@ -58,7 +61,10 @@ class Artist(db.DBObject):
 		return {
 			"uid":self.uid,
 			"name":self.name,
-			"artwork":[a.uid for a in self.artwork]
+			"sorttitle":self.name.lower(),
+			"artwork":[a.uid for a in self.artwork],
+			"last_played":max(t.lastplayed for t in self.tracks),
+			"times_played":sum(t.timesplayed for t in self.tracks)
 		}
 
 	def get_artwork(self):
@@ -71,13 +77,18 @@ class Track(db.DBObject):
 	albums: list = MultiRef(Album,backref="tracks",exclusive=False)
 	audiofiles: list = MultiRef(Audio,exclusive=True,backref="track")
 	artwork: list = MultiRef(Artwork,exclusive=False,backref="track")
+	lastplayed: int
+	timesplayed: int
 
 	def __apidict__(self):
 		return {
 			"uid":self.uid,
 			"title":self.title,
+			"sorttitle":self.title.lower(),
 			"artists":list(self.artists),
-			"artwork":[a.uid for a in self.artwork]
+			"artwork":[a.uid for a in self.artwork],
+			"last_played":self.lastplayed,
+			"times_played":self.timesplayed
 		}
 
 	def get_artwork(self):
