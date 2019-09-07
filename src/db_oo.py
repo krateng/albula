@@ -9,21 +9,21 @@ from mutagen.flac import FLAC
 
 import cleanup
 
-from db_oo_helper import Ref, MultiRef, DBObject, db, save_database, load_database
+#from db_oo_helper import Ref, MultiRef, DBObject, db, save_database, load_database
+from doreah.database import Database, Ref, MultiRef
+
+db = Database(file="newdb.pck")
 
 
-
-
-
-class Artwork(DBObject):
+class Artwork(db.DBObject):
 	path: str
 
-class Audio(DBObject):
+class Audio(db.DBObject):
 	path: str
 
 
 
-class Album(DBObject):
+class Album(db.DBObject):
 	name: str
 	albumartist: str
 	artwork: list = MultiRef(Artwork,exclusive=False,backref="album")
@@ -40,7 +40,7 @@ class Album(DBObject):
 		if len(self.artwork) > 0: return "/img/albumart/" + str(self.artwork[0].uid)
 		else: return ""
 
-class Artist(DBObject):
+class Artist(db.DBObject):
 	name: str
 	artwork: list = MultiRef(Artwork,exclusive=False,backref="artist")
 
@@ -55,7 +55,7 @@ class Artist(DBObject):
 		if len(self.artwork) > 0: return "/img/artistart/" + str(self.artwork[0].uid)
 		else: return ""
 
-class Track(DBObject):
+class Track(db.DBObject):
 	title: str
 	artists: list = MultiRef(Artist,backref="tracks",exclusive=False)
 	albums: list = MultiRef(Album,backref="tracks",exclusive=False)
@@ -78,6 +78,9 @@ class Track(DBObject):
 		return ""
 
 
+
+db.done()
+
 if False:
 	bp = Artist(name="Blackpink")
 	ex = Artist(name="EXID")
@@ -97,20 +100,20 @@ api = EAPI(path="api",delay=True)
 
 @api.get("artists")
 def list_artists():
-	return db["classes"][Artist]
+	return db.getall(Artist)
 
 @api.get("albums")
 def list_albums():
-	return db["classes"][Album]
+	return db.getall(Album)
 
 @api.get("tracks")
 def list_tracks():
-	return db["classes"][Track]
+	return db.getall(Track)
 
 
 @api.get("artist/{id}")
 def get_artist(id:int):
-	artist = db["objects"][id]
+	artist = db.get(id)
 	result = {}
 	result["artist"] = artist
 	result["tracks"] = artist.tracks
@@ -124,7 +127,7 @@ def get_artist(id:int):
 
 @api.get("album/{id}")
 def get_album(id:int):
-	album = db["objects"][id]
+	album = db.get(id)
 	result = {}
 	result["album"] = album
 	result["tracks"] = album.tracks
@@ -141,7 +144,7 @@ def get_album(id:int):
 
 def get_file_by_ref(uid):
 	#print("getting file path for uid",uid)
-	path = db["objects"][uid].path
+	path = db.get(uid).path
 	return path
 
 
@@ -155,14 +158,14 @@ def build_database(dirs):
 	pics_artist = []
 	# temporary pic storage. we need to wait til we have all the music files so we can match them
 
-	alreadydone = set(a.path for a in db["classes"][Audio])
+	alreadydone = set(a.path for a in db.getall(Audio))
 
 	for dir in dirs:
 		for (root,dirs,files) in os.walk(dir,followlinks=True):
 			for f in files:
 				#print("Scanning file",f)
 				scanned += 1
-				if scanned % 25 == 0:
+				if scanned % 100 == 0:
 					print(scanned,"files scanned...")
 				fullpath = os.path.join(dir,root,f)
 				if fullpath in alreadydone: continue
@@ -267,7 +270,10 @@ def build_database(dirs):
 		imgpath = "/".join(img.split("/")[:-1])
 		# find ALL tracks in folders and subfolders
 		album_occurences = {}
-		for result in [audio for audio in db["classes"][Audio] if audio.path.startswith(imgpath)]:
+		for result in [audio for audio in db.getall(Audio) if audio.path.startswith(imgpath)]:
+			#print("getting albums of track",result.path)
+			#print(result.__dict__)
+			#print(result)
 			albums = result.track.albums
 			for a in albums:
 				album_occurences[a] = album_occurences.get(a,0) + 1
@@ -282,7 +288,7 @@ def build_database(dirs):
 		imgpath = "/".join(img.split("/")[:-1])
 		# find ALL tracks in folders and subfolders
 		artist_occurences = {}
-		for result in [audio for audio in db["classes"][Audio] if audio.path.startswith(imgpath)]:
+		for result in [audio for audio in db.getall(Audio) if audio.path.startswith(imgpath)]:
 			artists = result.track.artists
 			for a in artists:
 				artist_occurences[a] = artist_occurences.get(a,0) + 1
@@ -294,7 +300,7 @@ def build_database(dirs):
 			pass
 
 
-	save_database()
+	db.save()
 
 
 
@@ -307,7 +313,7 @@ def add_of_find_existing_track(title,artists,album,albumartist,file):
 	albumobj = add_of_find_existing_album(album,albumartist)
 	artistobjs = [add_of_find_existing_artist(artist) for artist in artists]
 
-	for t in db["classes"][Track]:
+	for t in db.getall(Track):
 		if t.artists == artistobjs and t.title == title:
 			trackobj = t
 			break
@@ -320,7 +326,7 @@ def add_of_find_existing_track(title,artists,album,albumartist,file):
 
 def add_of_find_existing_album(name,artist):
 
-	for a in db["classes"][Album]:
+	for a in db.getall(Album):
 		if a.name.lower() == name.lower() and a.albumartist.lower() == artist.lower():
 			return a
 
@@ -329,7 +335,7 @@ def add_of_find_existing_album(name,artist):
 
 def add_of_find_existing_artist(name):
 
-	for a in db["classes"][Artist]:
+	for a in db.getall(Artist):
 		if a.name.lower() == name.lower():
 			return a
 
