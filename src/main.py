@@ -5,15 +5,11 @@ import db
 from threading import *
 import time
 import os
+from doreah.settings import get_settings
 
 
-
-PORT = 42051
+HOST, PORT, DIRECTORIES = get_settings("HOST","PORT","MUSIC_DIRECTORIES")
 THREADS = 12
-DIRECTORIES = [
-	"/media/krateng/Krateng/audio/musiclibrary",
-	"/media/krateng/Krateng/audio/musiclibrary_flac"
-]
 
 
 
@@ -44,7 +40,7 @@ db.api.mount(server=server)
 web.server_handlers(server=server)
 
 #run(server, host='::', port=PORT, server='waitress',threads=24)
-waitress.serve(server,port=PORT,threads=THREADS)
+waitress.serve(server,host=HOST,port=PORT,threads=THREADS)
 
 
 #try:
