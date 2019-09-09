@@ -218,7 +218,7 @@ background-color:rgba(103,85,0,0.7);
 	height:20px;
 	background-color:rgba(103,85,0,0.7);
 }
-#playback_bar #progressbar #progressed:hover {
+#playback_bar #progressbar:hover #progressed {
 	background-color:gold;
 }
 
@@ -229,6 +229,8 @@ background-color:rgba(103,85,0,0.7);
 
 #playback_bar table tr td {
 	width:33%;
+	padding-left:25px;
+	padding-right:25px;
 }
 #playback_bar table tr td#metadata {
 	text-align:left;
@@ -256,4 +258,18 @@ background-color:rgba(103,85,0,0.7);
 
 #play_pause_button.button_pause {
 	background-image: url("/pause.png")
+}
+
+#volumecontrol {
+	background-color:rgba(0,255,255,0.1);
+	display:inline-block;
+	width:100px;
+	height:30px;
+}
+#volumecontrol #volume {
+	height:30px;
+	background-color:rgba(103,85,0,0.7);
+}
+#volumecontrol:hover #volume {
+	background-color:gold;
 }

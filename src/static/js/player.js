@@ -1,6 +1,10 @@
 
 function seek(ev,element) {
-	 currentPlaylist.sound.seek(currentPlaylist.sound.duration() * ev.clientX / element.offsetWidth);
+	 currentPlaylist.sound.seek(currentPlaylist.sound.duration() * ev.offsetX / element.offsetWidth);
+}
+
+function changeVolume(prct) {
+	Howler.volume(prct);
 }
 
 function playtracks(tracks) {
@@ -8,6 +12,8 @@ function playtracks(tracks) {
 	currentPlaylist.sound = null;
 	currentPlaylist.list = tracks;
 	currentPlaylist.idx = -1;
+
+	next();
 
 	play();
 
@@ -21,24 +27,27 @@ var currentPlaylist = {
 	"loop":false
 }
 
+function next() {
+	pause();
+	currentPlaylist.sound = null;
+	currentPlaylist.idx += 1;
+	if (currentPlaylist.list.length <= currentPlaylist.idx) {
+		if (currentPlaylist.loop) {currentPlaylist.idx = 0;}
+		else {currentPlaylist.idx = -1; return;}
+	}
+	currentPlaylist.sound = new Howl({
+		src: ["/audioof/" + currentPlaylist.list[currentPlaylist.idx]],
+		format: "mp3"
+	})
+}
+
 
 function play() {
-	if (currentPlaylist.sound === null) {
-		currentPlaylist.idx += 1;
-		if (currentPlaylist.list.length <= currentPlaylist.idx) {
-			if (currentPlaylist.loop) {currentPlaylist.idx = 0;}
-			else {currentPlaylist.idx = -1; pause(); return;}
-		}
-		currentPlaylist.sound = new Howl({
-			src: ["/audioof/" + currentPlaylist.list[currentPlaylist.idx]],
-			format: "mp3"
-		})
-	}
 	button = document.getElementById("play_pause_button");
 	button.className = "button_pause";
 	button.onclick = pause;
 	currentPlaylist.sound.play();
-	currentPlaylist.sound.on("end",function(){currentPlaylist.sound = null; currentPlaylist.idx += 1; play()})
+	currentPlaylist.sound.on("end",function(){next(); play()})
 }
 function pause() {
 	button = document.getElementById("play_pause_button");
