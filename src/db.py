@@ -31,6 +31,16 @@ class Artwork(db.DBObject):
 class Audio(db.DBObject):
 	path: str
 
+	def read(self):
+		if self.path.endswith(".mp3"):
+			mime = 'audio/mp3'
+		elif self.path.endswith(".flac"):
+			mime = 'audio/flac'
+		with open(self.path,"rb") as audiofile:
+			stream = audiofile.read()
+
+		return mime,stream
+
 
 
 class Album(db.DBObject):
@@ -46,7 +56,8 @@ class Album(db.DBObject):
 			"sorttitle":self.name.lower(),
 			"artwork":[a.uid for a in self.artwork],
 			"last_played":max(t.lastplayed for t in self.tracks),
-			"times_played":sum(t.timesplayed for t in self.tracks)
+			"times_played":sum(t.timesplayed for t in self.tracks),
+			"track_ids":[track.uid for track in self.tracks]
 		}
 
 	def get_artwork(self):
@@ -64,12 +75,16 @@ class Artist(db.DBObject):
 			"sorttitle":self.name.lower(),
 			"artwork":[a.uid for a in self.artwork],
 			"last_played":max(t.lastplayed for t in self.tracks),
-			"times_played":sum(t.timesplayed for t in self.tracks)
+			"times_played":sum(t.timesplayed for t in self.tracks),
+			"track_ids":[track.uid for track in self.tracks]
 		}
 
 	def get_artwork(self):
 		if len(self.artwork) > 0: return self.artwork[0]
 		else: return None
+
+	def get_tracklist(self):
+		return self.tracks
 
 class Track(db.DBObject):
 	title: str
@@ -88,7 +103,8 @@ class Track(db.DBObject):
 			"artists":list(self.artists),
 			"artwork":[a.uid for a in self.artwork],
 			"last_played":self.lastplayed,
-			"times_played":self.timesplayed
+			"times_played":self.timesplayed,
+			"track_ids":[self.uid]
 		}
 
 	def get_artwork(self):
@@ -97,6 +113,13 @@ class Track(db.DBObject):
 			for a in self.albums:
 				if len(a.artwork) > 0: return a.artwork[0]
 		return None
+
+	def get_audio(self):
+		if len(self.audiofiles) > 0: return self.audiofiles[0]
+		return None
+
+	def get_tracklist(self):
+		return [self]
 
 
 

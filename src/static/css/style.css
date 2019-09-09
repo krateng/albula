@@ -55,8 +55,6 @@ body {
 
 	height:80px;
 	padding-bottom:25px;
-	padding-left:15px;
-	padding-right: 15px;
 }
 
 #top_bar > div {
@@ -70,6 +68,9 @@ body {
 [onclick]:hover {
 	//text-decoration: underline;
 	cursor: pointer;
+}
+span[onclick]:hover {
+	text-decoration: underline;
 }
 
 
@@ -154,6 +155,7 @@ background-color:rgba(103,85,0,0.7);
 
 
 
+/* content area */
 
 .content_element {
 	display:inline-block;
@@ -201,4 +203,57 @@ background-color:rgba(103,85,0,0.7);
 .content_element tr.main_info {
 	font-weight: bold;
 	font-size: 90%;
+}
+
+
+
+/* player*/
+
+#playback_bar #progressbar {
+	width:100%;
+	height:20px;
+	background-color:rgba(0,255,255,0.1);
+}
+#playback_bar #progressbar #progressed {
+	height:20px;
+	background-color:rgba(103,85,0,0.7);
+}
+#playback_bar #progressbar #progressed:hover {
+	background-color:gold;
+}
+
+#playback_bar table {
+	width:100%;
+	padding-top:5px;
+}
+
+#playback_bar table tr td {
+	width:33%;
+}
+#playback_bar table tr td#metadata {
+	text-align:left;
+}
+#playback_bar table tr td#controls {
+	text-align:center;
+}
+#playback_bar table tr td#settings {
+	text-align:right;
+}
+
+
+#playback_bar  #play_pause_button {
+	width:40px;
+	height:40px;
+	display:inline-block;
+	background-size:contain;
+	background-position:center;
+	background-repeat: no-repeat;
+}
+
+#play_pause_button.button_play {
+	background-image: url("/play.png")
+}
+
+#play_pause_button.button_pause {
+	background-image: url("/pause.png")
 }

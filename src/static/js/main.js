@@ -24,7 +24,7 @@ for (var s in sortings) {
 	sortingfuncs[s] = compare.bind(null,sorting); // bind parameter s
 }
 
-console.log(sortingfuncs)
+//console.log(sortingfuncs)
 
 
 function showView() {
@@ -44,7 +44,7 @@ function showView() {
 			var elements_html = ""
 
 			elements.sort(sortingfuncs[sortby]);
-			console.log(elements)
+			//console.log(elements)
 
 		   for (var i=0;i<elements.length;i++) {
 				element = elements[i]
@@ -53,7 +53,7 @@ function showView() {
 				elements_html += `
 				<div class="content_element ` + info.singular + `">
 				   <table>
-						<tr class="image"><td style="background-image:url('/imgof/` + element.uid + `');">
+						<tr class="image"><td onclick="playtracks([` + element.track_ids.join(",") + `])" style="background-image:url('/imgof/` + element.uid + `');">
 						</td></tr>
 						<tr class="secondary_info"><td>
 							<span title="` + info.secondary(element) + `">` + info.secondary(element) + `</span>

@@ -20,6 +20,17 @@
 		</div>
 
 		<div id="playback_bar">
+			<div id="progressbar" onclick="seek(event,this)">
+				<div id="progressed" style="width:0%;"></div>
+			</div>
+			<table><tr>
+				<td id="metadata"></td>
+				<td id="controls">
+					<div id="play_pause_button" class="button_play" onclick="play()"></div>
+				</td>
+				<td id="settings"></td>
+			</tr></table>
+
 
 		</div>
 	</body>

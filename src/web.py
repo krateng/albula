@@ -34,3 +34,16 @@ def server_handlers(server):
 		mime,stream = artwork.read()
 		response.set_header('Content-type', mime)
 		return stream
+
+	@server.get("/audioof/<uid>")
+	@auth.authenticated
+	def audioof(uid):
+		uid = int(uid)
+
+		obj = db.db.get(uid)
+		audio = obj.get_audio()
+		if audio is None: return ""
+
+		mime,stream = audio.read()
+		response.set_header('Content-type', mime)
+		return stream
