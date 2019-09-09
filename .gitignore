@@ -1,6 +1,7 @@
 # generic temporary / dev files
 *.xcf
 *.pyc
+*.txt
 
 # user files
 *.db

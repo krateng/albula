@@ -1,7 +1,6 @@
 <html>
 	<head>
 		<pyhp include="common/head.html" />
-		<script src="/main.js"></script>
 	</head>
 
 	<body onload="showView()">

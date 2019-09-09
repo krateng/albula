@@ -6,6 +6,7 @@ from threading import *
 import time
 import os
 from doreah.settings import get_settings
+import auth
 
 
 HOST, PORT, DIRECTORIES = get_settings("HOST","PORT","MUSIC_DIRECTORIES")
@@ -37,6 +38,7 @@ def graceful_exit(sig=None,frame=None):
 server = Bottle()
 
 db.api.mount(server=server)
+auth.authapi.mount(server=server)
 web.server_handlers(server=server)
 
 #run(server, host='::', port=PORT, server='waitress',threads=24)
