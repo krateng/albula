@@ -53,7 +53,7 @@ function showView() {
 				elements_html += `
 				<div class="content_element ` + info.singular + `">
 				   <table>
-						<tr class="image"><td onclick="playtracks([` + element.track_ids.join(",") + `])" style="background-image:url('/imgof/` + element.uid + `');">
+						<tr class="image"><td onclick="setPlaylist([` + element.track_ids.join(",") + `])" style="background-image:url('/imgof/` + element.uid + `');">
 						</td></tr>
 						<tr class="secondary_info"><td>
 							<span title="` + info.secondary(element) + `">` + info.secondary(element) + `</span>

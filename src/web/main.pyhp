@@ -21,7 +21,7 @@
 
 		<div id="playback_bar">
 			<div id="progressbar" onclick="seek(event,this)">
-				<div id="progressed" style="width:0%;"></div>
+				<div id="progressed" style="width:0%;" class="update" data-updatefrom="updateProgressBar"></div>
 			</div>
 			<table><tr>
 				<td id="metadata"></td>
