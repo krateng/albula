@@ -2,6 +2,7 @@
 
 from nimrodel import EAPI
 import os
+import requests
 
 import mutagen
 from mutagen.mp3 import MP3
@@ -12,6 +13,7 @@ import cleanup
 
 #from db_oo_helper import Ref, MultiRef, DBObject, db, save_database, load_database
 from doreah.database import Database, Ref, MultiRef
+from doreah.settings import get_settings
 
 db = Database(file="database.ddb")
 
@@ -93,6 +95,7 @@ class Track(db.DBObject):
 	albums: list = MultiRef(Album,backref="tracks",exclusive=False)
 	audiofiles: list = MultiRef(Audio,exclusive=True,backref="track")
 	artwork: list = MultiRef(Artwork,exclusive=False,backref="track")
+	length: int
 	lastplayed: int
 	timesplayed: int
 
@@ -100,6 +103,7 @@ class Track(db.DBObject):
 		return {
 			"uid":self.uid,
 			"title":self.title,
+			"length":self.length,
 			#"sorttitle":self.title.lower(),
 			"artist_ids":list(a.uid for a in self.artists),
 			"artist_names":list(a.name for a in self.artists),
@@ -189,10 +193,26 @@ def get_artwork_of(uid):
 
 @api.post("play")
 def play_track(id:int,seconds:int,time:int):
-	print("played",db.get(id),"for",seconds,"seconds")
 	track = db.get(id)
 	track.timesplayed += 1
 	track.lastplayed = time
+
+	if seconds > (track.length / 2):
+		print("Scrobbling!")
+
+		if get_settings("MALOJA_SCROBBLE"):
+			server = get_settings("MALOJA_SERVER")
+			key = get_settings("MALOJA_KEY")
+			url = server + "/api/newscrobble"
+			data = {
+				"artist":"/".join(a.name for a in track.artists),
+				"title":track.title,
+				"duration":seconds,
+				"time":time,
+				"key":key
+			}
+
+		requests.post(url, data=data)
 
 
 def save_database():
@@ -244,6 +264,8 @@ def build_database(dirs):
 						except:
 							albumartist = ", ".join(artists)
 
+						length = int(audio.info.length)
+
 
 						imgs = audio.pictures
 						for i in imgs:
@@ -279,10 +301,12 @@ def build_database(dirs):
 						except:
 							albumartist = ", ".join(artists)
 
+						length = int(audio.info.length)
+
 
 					# extract track from file and add to database
 					artists,title = cleanup.fullclean(artists,title)
-					track = add_of_find_existing_track(title=title,artists=artists,album=album,albumartist=albumartist,file=fullpath)
+					track = add_of_find_existing_track(title=title,artists=artists,album=album,albumartist=albumartist,file=fullpath,length=length)
 
 					if "album" in embedded_pictures:
 						imghash,mime,data = embedded_pictures["album"]
@@ -355,7 +379,7 @@ def build_database(dirs):
 
 
 
-def add_of_find_existing_track(title,artists,album,albumartist,file):
+def add_of_find_existing_track(title,artists,album,albumartist,file,length):
 
 
 
@@ -367,7 +391,7 @@ def add_of_find_existing_track(title,artists,album,albumartist,file):
 			trackobj = t
 			break
 	else:
-		trackobj = Track(title=title,albums=[albumobj],artists=artistobjs)
+		trackobj = Track(title=title,albums=[albumobj],artists=artistobjs,length=length)
 
 	trackobj.audiofiles.append(Audio(path=file))
 
