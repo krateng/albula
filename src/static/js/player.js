@@ -14,6 +14,7 @@ function play() {
 	button = document.getElementById("play_pause_button");
 	button.className = "button_pause";
 	button.onclick = pause;
+
 }
 function pause() {
 	if (sound != null) {
@@ -49,19 +50,30 @@ function next() {
 }
 
 function initSound() {
+	track = objs[list[idx]];
 	sound = new Howl({
 		src: ["/audioof/" + list[idx]],
 		format: "mp3"
 	});
 	sound.on("end",done)
+
+	document.getElementById("current_track_artwork").style.backgroundImage = "url('/imgof/" + list[idx] + "')";
+	document.getElementById("current_track_title").innerHTML = track.title;
+	document.getElementById("current_track_artists").innerHTML = track.artist_names.join(", ");
 }
 
 function done() {
 	pause();
+	xhttpreq("/api/play",data={id:list[idx]},method="POST");
 	sound = null;
 	if (next()) {
 		initSound();
 		play();
+	}
+	else {
+		document.getElementById("current_track_artwork").style.backgroundImage = "none";
+		document.getElementById("current_track_title").innerHTML = "";
+		document.getElementById("current_track_artists").innerHTML = "";
 	}
 
 }

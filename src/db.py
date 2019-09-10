@@ -8,6 +8,7 @@ from mutagen.mp3 import MP3
 from mutagen.flac import FLAC
 
 import cleanup
+import auth
 
 #from db_oo_helper import Ref, MultiRef, DBObject, db, save_database, load_database
 from doreah.database import Database, Ref, MultiRef
@@ -53,7 +54,7 @@ class Album(db.DBObject):
 			"uid":self.uid,
 			"albumartist":self.albumartist,
 			"name":self.name,
-			"sorttitle":self.name.lower(),
+			#"sorttitle":self.name.lower(),
 			"artwork":[a.uid for a in self.artwork],
 			"last_played":max(t.lastplayed for t in self.tracks),
 			"times_played":sum(t.timesplayed for t in self.tracks),
@@ -72,7 +73,7 @@ class Artist(db.DBObject):
 		return {
 			"uid":self.uid,
 			"name":self.name,
-			"sorttitle":self.name.lower(),
+			#"sorttitle":self.name.lower(),
 			"artwork":[a.uid for a in self.artwork],
 			"last_played":max(t.lastplayed for t in self.tracks),
 			"times_played":sum(t.timesplayed for t in self.tracks),
@@ -99,8 +100,9 @@ class Track(db.DBObject):
 		return {
 			"uid":self.uid,
 			"title":self.title,
-			"sorttitle":self.title.lower(),
-			"artists":list(self.artists),
+			#"sorttitle":self.title.lower(),
+			"artist_ids":list(a.uid for a in self.artists),
+			"artist_names":list(a.name for a in self.artists),
 			"artwork":[a.uid for a in self.artwork],
 			"last_played":self.lastplayed,
 			"times_played":self.timesplayed,
@@ -123,23 +125,10 @@ class Track(db.DBObject):
 
 
 
-#db.done()
-
-if False:
-	bp = Artist(name="Blackpink")
-	ex = Artist(name="EXID")
-	rv = Artist(name="Red Velvet")
-	ay = Album(name="Ah Yeah",albumartist="EXID")
-	st = Album(name="Square Three",albumartist="BLACKPINK")
-	AAIYL = Track(title="As If It's Your Last",artists=[bp],albums=[st])
-	mash = Track(title="Megamashup 2019",artists=[rv,bp,ex],albums=[ay])
 
 
 
-
-
-
-api = EAPI(path="api",delay=True)
+api = EAPI(path="api",delay=True,auth=auth.check)
 
 
 @api.get("artists")
@@ -195,6 +184,11 @@ def get_artwork_of(uid):
 	obj = db.get(uid)
 	artwork = obj.get_artwork()
 	return artwork
+
+
+@api.post("play")
+def play_track(id:int):
+	print("played",db.get(id))
 
 
 def build_database(dirs):

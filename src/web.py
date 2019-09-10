@@ -33,6 +33,7 @@ def server_handlers(server):
 
 		mime,stream = artwork.read()
 		response.set_header('Content-type', mime)
+		response.set_header("Cache-Control", "public, max-age=360000")
 		return stream
 
 	@server.get("/audioof/<uid>")
@@ -46,4 +47,5 @@ def server_handlers(server):
 
 		mime,stream = audio.read()
 		response.set_header('Content-type', mime)
+		response.set_header("Cache-Control", "public, max-age=360000")
 		return stream

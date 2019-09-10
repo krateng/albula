@@ -24,7 +24,26 @@
 				<div id="progressed" style="width:0%;" class="update" data-updatefrom="updateProgressBar"></div>
 			</div>
 			<table><tr>
-				<td id="metadata"></td>
+				<td id="metadata">
+					<div id="current_track_artwork"></div>
+					<div id="current_track_data">
+						<span id="current_track_title"></span>
+						<span id="current_track_artists"></span>
+					</div>
+
+					<!--
+					<table>
+						<tr>
+							<td id="current_track_artwork"></td>
+							<td id="current_track_data">
+								<span id="current_track_title">Test</span>
+								<span id="current_track_artists">test</span>
+							</td>
+							<td id="next_tracks"></td>
+						</tr>
+					</table>
+					-->
+				</td>
 				<td id="controls">
 					<div id="play_pause_button" class="button_play" onclick="play()"></div>
 				</td>
