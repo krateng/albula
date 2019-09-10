@@ -7,6 +7,7 @@ import time
 import os
 from doreah.settings import get_settings
 import auth
+import signal
 
 
 HOST, PORT, DIRECTORIES = get_settings("HOST","PORT","MUSIC_DIRECTORIES")
@@ -29,10 +30,11 @@ db.build_database(DIRECTORIES)
 
 def graceful_exit(sig=None,frame=None):
 	print("Server shutting down...")
+	db.save_database()
 	os._exit(42)
 
-#signal.signal(signal.SIGINT, graceful_exit)
-#signal.signal(signal.SIGTERM, graceful_exit)
+signal.signal(signal.SIGINT, graceful_exit)
+signal.signal(signal.SIGTERM, graceful_exit)
 
 
 server = Bottle()

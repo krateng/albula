@@ -8,7 +8,7 @@ from mutagen.mp3 import MP3
 from mutagen.flac import FLAC
 
 import cleanup
-import auth
+
 
 #from db_oo_helper import Ref, MultiRef, DBObject, db, save_database, load_database
 from doreah.database import Database, Ref, MultiRef
@@ -127,6 +127,7 @@ class Track(db.DBObject):
 
 
 
+import auth
 
 api = EAPI(path="api",delay=True,auth=auth.check)
 
@@ -187,9 +188,15 @@ def get_artwork_of(uid):
 
 
 @api.post("play")
-def play_track(id:int):
-	print("played",db.get(id))
+def play_track(id:int,seconds:int,time:int):
+	print("played",db.get(id),"for",seconds,"seconds")
+	track = db.get(id)
+	track.timesplayed += 1
+	track.lastplayed = time
 
+
+def save_database():
+	db.save()
 
 def build_database(dirs):
 

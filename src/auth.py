@@ -6,6 +6,8 @@ from threading import Lock
 from bottle import response as bottleresponse
 from bottle import request, HTTPResponse, redirect
 
+from db import db
+
 
 authapi = EAPI(path="auth",delay=True)
 
@@ -47,6 +49,9 @@ lock = Lock()
 updatelock = Lock()
 
 sessions = {} #token -> timestamp expire
+class Session(db.DBObject):
+	token: str
+	timestamp: float
 
 def update():
 	updatelock.acquire()
@@ -105,7 +110,8 @@ def validate_challenge(challenge,response):
 def get_token(challenge,response):
 	if validate_challenge(challenge,response):
 		token = generate_token()
-		sessions[token] = time.time() + SESSION_EXPIRE
+		#sessions[token] = time.time() + SESSION_EXPIRE
+		Session(token=token,timestamp=time.time() + SESSION_EXPIRE)
 		bottleresponse.set_header("Set-Cookie","albulasessiontoken=" + token)# + "; HttpOnly")
 		return {"token":token}
 	else:
@@ -115,10 +121,15 @@ def get_token(challenge,response):
 def check(request):
 	token = request.get_cookie("albulasessiontoken")
 	if token is None: return False
-	if token not in sessions: return False
-	if sessions[token] < time.time(): return False
+	for ses in db.getall(Session):
+		if ses.token == token:
+			session = ses
+			break
+	else:
+		return False
+	if session.timestamp < time.time(): return False
 
-	sessions[token] = time.time() + SESSION_EXPIRE
+	session.timestamp = time.time() + SESSION_EXPIRE
 	return True
 
 def authenticated(func):

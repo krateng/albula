@@ -269,14 +269,14 @@ background-color:rgba(103,85,0,0.7);
 
 #playback_bar #controls div {
 	display:inline-block;
-	background-size:contain;
 	background-position:center;
 	background-repeat: no-repeat;
+	width:40px;
+	height:40px;
 }
 
 #playback_bar  #play_pause_button {
-	width:40px;
-	height:40px;
+	background-size:contain;
 }
 
 #play_pause_button.button_play {
@@ -289,13 +289,11 @@ background-color:rgba(103,85,0,0.7);
 
 #prev_button {
 	background-image: url("/prev.png");
-	width:30px;
-	height:30px;
+	background-size:70%;
 }
 #next_button {
 	background-image: url("/next.png");
-	width:30px;
-	height:30px;
+	background-size:70%;
 }
 
 #volumecontrol {

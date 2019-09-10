@@ -4,6 +4,7 @@ var playing = false;
 var loop = false;
 var random = false;
 var sound = null;
+var played = 0;
 
 
 // function should always be called when new track becomes current one. inits sound object and fills in metadata
@@ -19,16 +20,41 @@ function initSound(startplay=false) {
 	document.getElementById("current_track_title").innerHTML = track.title;
 	document.getElementById("current_track_artists").innerHTML = track.artist_names.join(", ");
 
+	played = 0;
+
 	if (startplay) {
 		play()
 	}
+}
+
+// helper functions to abstract timekeeping into a clock analogy
+var lastUpdate = 0;
+var ticking = false;
+function now() {
+	return Math.floor(Date.now() / 1000);
+}
+function startClock() {
+	if (!ticking) {
+		ticking = true;
+		lastUpdate = now();
+	}
+
+}
+function stopClock() {
+	if (ticking) {
+		var passed = now() - lastUpdate;
+		played += passed;
+		ticking = false;
+	}
+
 }
 
 // function should always be called when track stops being current one.
 // returns whether track was playing before
 function uninitSound() {
 
-	xhttpreq("/api/play",data={id:list[idx]},method="POST");
+	stopClock();
+	xhttpreq("/api/play",data={id:list[idx],seconds:played,time:now()},method="POST");
 
 	playing = false
 	if (sound != null) {
@@ -49,6 +75,7 @@ function uninitSound() {
 function play() {
 	if (sound != null) {
 		sound.play();
+		startClock();
 	}
 	console.log("Playing element",idx,"of",list)
 
@@ -63,7 +90,8 @@ function play() {
 // pause current playback
 function pause() {
 	if (sound != null) {
-		sound.pause()
+		sound.pause();
+		stopClock();
 	}
 
 	button = document.getElementById("play_pause_button");
