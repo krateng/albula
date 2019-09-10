@@ -45,7 +45,9 @@
 					-->
 				</td>
 				<td id="controls">
-					<div id="play_pause_button" class="button_play" onclick="play()"></div>
+					<div id="prev_button" class="button_prev" onclick="prev()"></div>
+					<div id="play_pause_button" class="button_play" onclick="play"></div>
+					<div id="next_button" class="button_next" onclick="next()"></div>
 				</td>
 				<td id="settings">
 					<div id="volumecontrol" class="seekable" data-seekcallback="changeVolume">

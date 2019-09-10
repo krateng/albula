@@ -5,6 +5,47 @@ var loop = false;
 var random = false;
 var sound = null;
 
+
+// function should always be called when new track becomes current one. inits sound object and fills in metadata
+function initSound(startplay=false) {
+	track = objs[list[idx]];
+	sound = new Howl({
+		src: ["/audioof/" + list[idx]],
+		format: "mp3"
+	});
+	sound.on("end",next)
+
+	document.getElementById("current_track_artwork").style.backgroundImage = "url('/imgof/" + list[idx] + "')";
+	document.getElementById("current_track_title").innerHTML = track.title;
+	document.getElementById("current_track_artists").innerHTML = track.artist_names.join(", ");
+
+	if (startplay) {
+		play()
+	}
+}
+
+// function should always be called when track stops being current one.
+// returns whether track was playing before
+function uninitSound() {
+
+	xhttpreq("/api/play",data={id:list[idx]},method="POST");
+
+	playing = false
+	if (sound != null) {
+		playing = sound.playing;
+		sound.stop();
+		sound = null;
+	}
+
+	document.getElementById("current_track_artwork").style.backgroundImage = "none";
+	document.getElementById("current_track_title").innerHTML = "";
+	document.getElementById("current_track_artists").innerHTML = "";
+
+	return playing;
+}
+
+
+// play current track at current position
 function play() {
 	if (sound != null) {
 		sound.play();
@@ -16,6 +57,10 @@ function play() {
 	button.onclick = pause;
 
 }
+
+
+
+// pause current playback
 function pause() {
 	if (sound != null) {
 		sound.pause()
@@ -34,11 +79,16 @@ function setPlaylist(lst) {
 	play();
 }
 
+
+// change current track. init sound object and put metadata in etc
+
 function next() {
+	playing = uninitSound();
 	idx += 1;
 	if (idx >= list.length) {
 		if (loop) {
 			idx = 0;
+			initSound(playing);
 			return true;
 		}
 		else {
@@ -46,37 +96,30 @@ function next() {
 			return false;
 		}
 	}
+	initSound(playing);
 	return true;
 }
 
-function initSound() {
-	track = objs[list[idx]];
-	sound = new Howl({
-		src: ["/audioof/" + list[idx]],
-		format: "mp3"
-	});
-	sound.on("end",done)
-
-	document.getElementById("current_track_artwork").style.backgroundImage = "url('/imgof/" + list[idx] + "')";
-	document.getElementById("current_track_title").innerHTML = track.title;
-	document.getElementById("current_track_artists").innerHTML = track.artist_names.join(", ");
+function prev() {
+	playing = uninitSound();
+	idx -= 1;
+	if (idx < 0) {
+		if (loop) {
+			idx = list.length - 1;
+			initSound(playing);
+			return true;
+		}
+		else {
+			list = [];
+			return false;
+		}
+	}
+	initSound(playing);
+	return true;
 }
 
-function done() {
-	pause();
-	xhttpreq("/api/play",data={id:list[idx]},method="POST");
-	sound = null;
-	if (next()) {
-		initSound();
-		play();
-	}
-	else {
-		document.getElementById("current_track_artwork").style.backgroundImage = "none";
-		document.getElementById("current_track_title").innerHTML = "";
-		document.getElementById("current_track_artists").innerHTML = "";
-	}
 
-}
+
 
 
 
