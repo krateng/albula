@@ -310,18 +310,59 @@ background-color:rgba(103,85,0,0.7);
 	background-color:gold;
 }
 
+#playback_bar #metadata table {
+	table-layout: fixed;
+	width:100%;
+}
 
-#playback_bar #metadata #current_track_artwork {
+#playback_bar #metadata table #current_track_artwork {
 	width:105px;
 	height:105px;
 	background-size: cover;
 	background-repeat:no-repeat;
 	background-position: center;
-
 }
-#playback_bar #metadata #current_track_data {
+
+
+#playback_bar #metadata table #current_track_data {
+	width:300px;
 	padding:25px;
 }
+
+#playback_bar #metadata table #next_tracks {
+	width:200px;
+	opacity: 0.7;
+}
+
+#playback_bar #metadata table #next_tracks table tr:nth-child(2) {
+	opacity:0.9
+}
+#playback_bar #metadata table #next_tracks table tr:nth-child(3) {
+	opacity:0.8
+}
+#playback_bar #metadata table #next_tracks table tr:nth-child(4) {
+	opacity:0.7
+}
+
+#playback_bar #metadata table #next_tracks > span {
+	font-size: 70%;
+	text-transform: uppercase;
+	color:lightgrey;
+}
+
+#playback_bar #metadata table #next_tracks table {
+	table-layout: fixed;
+	height:100%;
+}
+#playback_bar #metadata table #next_tracks table tr {
+	height:20%;
+	white-space: nowrap;
+}
+#playback_bar #metadata table #next_tracks table tr td:empty:after{
+  content: "\00a0";
+}
+
+
 #playback_bar #metadata #current_track_data span {
 	display:block;
 	padding-top:0px;

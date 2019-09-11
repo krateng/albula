@@ -25,24 +25,38 @@
 			</div>
 			<table><tr>
 				<td id="metadata">
-					<div id="current_track_artwork"></div>
+				<!--	<div id="current_track_artwork"></div>
 					<div id="current_track_data">
 						<span id="current_track_title"></span>
 						<span id="current_track_artists"></span>
 					</div>
+					<div id="up_next">
+						<ul>
+							<li>wat</li>
+							<li>wut</li>
+						</ul>
+					</div> -->
 
-					<!--
+
 					<table>
 						<tr>
 							<td id="current_track_artwork"></td>
 							<td id="current_track_data">
-								<span id="current_track_title">Test</span>
-								<span id="current_track_artists">test</span>
+								<span id="current_track_title"></span>
+								<span id="current_track_artists"></span>
 							</td>
-							<td id="next_tracks"></td>
+							<td id="next_tracks">
+								<span>Up Next</span>
+								<table>
+									<tr><td id="next_1"></td></tr>
+									<tr><td id="next_2"></td></tr>
+									<tr><td id="next_3"></td></tr>
+									<tr><td id="next_4"></td></tr>
+								</table>
+
+							</td>
 						</tr>
 					</table>
-					-->
 				</td>
 				<td id="controls">
 					<div id="prev_button" class="button_prev" onclick="prev()"></div>

@@ -20,6 +20,18 @@ function initSound(startplay=false) {
 	document.getElementById("current_track_title").innerHTML = track.title;
 	document.getElementById("current_track_artists").innerHTML = track.artist_names.join(", ");
 
+	for (var i=1;i<5;i++) {
+		try {
+			var next = objs[list[idx+i]]
+			document.getElementById("next_" + i).innerHTML = next.artist_names.join(", ") + " - " + next.title;
+		}
+		catch {
+
+		}
+	}
+
+
+
 	played = 0;
 
 	if (startplay) {
@@ -54,18 +66,36 @@ function stopClock() {
 function uninitSound() {
 
 	stopClock();
-	xhttpreq("/api/play",data={id:list[idx],seconds:played,time:now()},method="POST");
+	xhttpreq("/api/play",{id:list[idx],seconds:played,time:now()},"POST");
+	//update local info, doesn't necessarily need to be exactly consistent with db, just for
+	//sorting and stuff
+	var track = objs[list[idx]];
+	track.last_played = now();
+	track.times_played += 1;
+
 
 	playing = false
 	if (sound != null) {
 		playing = sound.playing;
-		sound.stop();
+
+		if (sound.state() != "loaded") {
+			// Stopping a sound before it's loaded will mean it will still play later
+			sound.unload();
+		}
+		else {
+			sound.stop();
+		}
 		sound = null;
 	}
 
 	document.getElementById("current_track_artwork").style.backgroundImage = "none";
 	document.getElementById("current_track_title").innerHTML = "";
 	document.getElementById("current_track_artists").innerHTML = "";
+
+	document.getElementById("next_1").innerHTML = "";
+	document.getElementById("next_2").innerHTML = "";
+	document.getElementById("next_3").innerHTML = "";
+	document.getElementById("next_4").innerHTML = "";
 
 	return playing;
 }

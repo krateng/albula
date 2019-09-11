@@ -7,7 +7,8 @@ var infos = {
 		change:e=>{
 			e.sorttitle = e.name.toLowerCase()
 		},
-		singular:"artist"
+		singular:"artist",
+		loaded:false
 	},
 	"albums":{
 		url:"/api/albums",
@@ -16,7 +17,8 @@ var infos = {
 		change:e=>{
 			e.sorttitle = e.name.toLowerCase();
 		},
-		singular:"album"
+		singular:"album",
+		loaded:false
 	},
 	"tracks":{
 		url:"/api/tracks",
@@ -25,14 +27,15 @@ var infos = {
 		change:e=>{
 			e.sorttitle = e.title.toLowerCase()
 		},
-		singular:"track"
+		singular:"track",
+		loaded:false
 	}
 }
 
 var sortings = {
 	"alphabet":e=>e.sorttitle,
-	"last":e=>e.last_played,
-	"most":e=>e.times_played
+	"last":e=>-e.last_played,
+	"most":e=>-e.times_played
 }
 
 var sortingfuncs = {}
@@ -53,7 +56,6 @@ for (var s in sortings) {
 
 var data = {}
 var objs = [] //direct id mapping
-var to_populate = 3
 
 // populate data from server
 for (var view in infos) {
@@ -76,7 +78,7 @@ for (var view in infos) {
 				this.info.change(el); //apply all local data preparations
 				objs[el.uid] = el;
 			}
-			to_populate -= 1;
+			this.info.loaded = true
 		}
 	};
 	xhttp.open("GET", url, true);
@@ -85,10 +87,7 @@ for (var view in infos) {
 
 
 function showView() {
-	if (to_populate > 0) {
-		setTimeout(showView,100);
-		return;
-	}
+
 	var url_string = window.location.href;
 	var url = new URL(url_string);
 	var view = url.searchParams.get("view") || "albums";
@@ -97,6 +96,11 @@ function showView() {
 
 	var info = infos[view]
 	var elements = data[view]
+
+	if (!info.loaded) {
+		setTimeout(showView,100);
+		return;
+	}
 
 
 	var elements_html = ""
