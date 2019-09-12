@@ -96,15 +96,22 @@ def build_database(dirs):
 						length = int(audio.info.length)
 
 
+
 					# extract track from file and add to database
 					artists,title = cleanup.fullclean(artists,title)
-					track = add_of_find_existing_track(title=title,artists=artists,album=album,albumartist=albumartist,file=fullpath,length=length)
+
+					track = Track(
+						title=title,
+						albums=[Album(name=album,albumartist=albumartist)],
+						artists=[Artist(name=name) for name in artists],
+						length=length
+					)
+
+					track.audiofiles.append(Audio(path=fullpath))
 
 					if "album" in embedded_pictures:
 						imghash,mime,data = embedded_pictures["album"]
 						hsh = str(imghash)
-
-
 
 						imagefile = hsh[:3] + "/" + hsh[3:] + "." + mime.split("/")[-1]
 						if not os.path.exists("cache/" + imagefile):
@@ -141,9 +148,6 @@ def build_database(dirs):
 		# find ALL tracks in folders and subfolders
 		album_occurences = {}
 		for result in [audio for audio in db.getall(Audio) if audio.path.startswith(imgpath)]:
-			#print("getting albums of track",result.path)
-			#print(result.__dict__)
-			#print(result)
 			albums = result.track.albums
 			for a in albums:
 				album_occurences[a] = album_occurences.get(a,0) + 1
@@ -171,43 +175,3 @@ def build_database(dirs):
 
 
 	db.save()
-
-
-
-
-
-def add_of_find_existing_track(title,artists,album,albumartist,file,length):
-
-
-
-	albumobj = add_of_find_existing_album(album,albumartist)
-	artistobjs = [add_of_find_existing_artist(artist) for artist in artists]
-
-	for t in db.getall(Track):
-		if t.artists == artistobjs and t.title == title:
-			trackobj = t
-			break
-	else:
-		trackobj = Track(title=title,albums=[albumobj],artists=artistobjs,length=length)
-
-	trackobj.audiofiles.append(Audio(path=file))
-
-	return trackobj
-
-def add_of_find_existing_album(name,artist):
-
-	for a in db.getall(Album):
-		if a.name.lower() == name.lower() and a.albumartist.lower() == artist.lower():
-			return a
-
-	albumobj = Album(name=name,albumartist=artist)
-	return albumobj
-
-def add_of_find_existing_artist(name):
-
-	for a in db.getall(Artist):
-		if a.name.lower() == name.lower():
-			return a
-
-	artistobj = Artist(name=name)
-	return artistobj
