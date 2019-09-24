@@ -4,6 +4,10 @@ from nimrodel import EAPI
 import requests
 
 
+import mutagen
+from mutagen.mp3 import MP3
+from mutagen.flac import FLAC
+
 
 #from db_oo_helper import Ref, MultiRef, DBObject, db, save_database, load_database
 from doreah.database import Database, Ref, MultiRef
@@ -42,6 +46,66 @@ class Audio(db.DBObject):
 
 		return mime,stream
 
+	def metadata(self):
+		try:
+			return self.cached_metadata
+		except:
+			pass
+
+		ext = self.path.split(".")[-1].lower()
+		if ext in ["flac"]:
+			audio = FLAC(self.path)
+
+			tags = audio.tags
+			try:
+				album = [entry[1] for entry in tags if entry[0] == "ALBUM"][0]
+			except:
+				album = None
+			try:
+				title = [entry[1] for entry in tags if entry[0] == "TITLE"][0]
+			except:
+				title = self.path.split("/")[-1].split(".")[0]
+			artists = [entry[1] for entry in tags if entry[0] == "ARTIST"]
+			try:
+				albumartist = [entry[1] for entry in tags if entry[0] == "ALBUMARTIST"][0]
+			except:
+				albumartist = None
+
+			length = int(audio.info.length)
+
+		elif ext in ["mp3"]:
+			audio = MP3(self.path)
+
+			tags = audio.tags
+			try:
+				album = tags.get("TALB").text[0]
+			except:
+				album = None
+			try:
+				title = tags.get("TIT2").text[0]
+			except:
+				title = self.path.split("/")[-1].split(".")[0]
+
+			#artists = [set(obj.text) for obj in tags.getall("TPE1") + tags.getall("TPE2") + tags.getall("TPE3") + tags.getall("TPE4")]
+			artists = [set(obj.text) for obj in tags.getall("TPE1")]
+			artists = set.union(*artists)
+			try:
+				albumartist = tags.get("TPE2").text[0]
+			except:
+				albumartist = None
+
+			length = int(audio.info.length)
+
+		self.cached_metadata = {
+			"title":title,
+			"artists":artists,
+			"album":album,
+			"albumartist":albumartist,
+			"length":length
+		}
+
+		return self.cached_metadata
+
 
 
 class Album(db.DBObject):
@@ -57,7 +121,7 @@ class Album(db.DBObject):
 			"name":self.name,
 			#"sorttitle":self.name.lower(),
 			"artwork":[a.uid for a in self.artwork],
-			"last_played":max(t.lastplayed for t in self.tracks),
+			"last_played":max([t.lastplayed for t in self.tracks] + [0]),
 			"times_played":sum(t.timesplayed for t in self.tracks),
 			"track_ids":[track.uid for track in self.tracks]
 		}
@@ -218,7 +282,7 @@ def play_track(id:int,seconds:int,time:int):
 AUDIOFORMATS = ["mp3","flac"]
 IMAGEFORMATS = ["jpeg","jpg","png"]
 
-from scanners.simple import build_database
+from scanners.structural import build_database
 
 def save_database():
 	db.save()
