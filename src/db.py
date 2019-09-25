@@ -7,6 +7,7 @@ import requests
 import mutagen
 from mutagen.mp3 import MP3
 from mutagen.flac import FLAC
+import zlib
 
 
 #from db_oo_helper import Ref, MultiRef, DBObject, db, save_database, load_database
@@ -72,6 +73,7 @@ class Audio(db.DBObject):
 				albumartist = None
 
 			length = int(audio.info.length)
+			imgs = audio.pictures
 
 		elif ext in ["mp3"]:
 			audio = MP3(self.path)
@@ -95,13 +97,17 @@ class Audio(db.DBObject):
 				albumartist = None
 
 			length = int(audio.info.length)
+			imgs = tags.getall("APIC")
 
 		self.cached_metadata = {
 			"title":title,
 			"artists":artists,
 			"album":album,
 			"albumartist":albumartist,
-			"length":length
+			"length":length,
+			"embedded_artwork":{
+				"album":[{"hash":zlib.adler32(i.data),"mime":i.mime,"data":i.data} for i in imgs if i.type == 3]
+			}
 		}
 
 		return self.cached_metadata

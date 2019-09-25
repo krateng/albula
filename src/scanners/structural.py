@@ -3,11 +3,6 @@
 from db import db,Audio,Artwork,Album,Artist,Track,AUDIOFORMATS,IMAGEFORMATS
 
 import os
-import mutagen
-from mutagen.mp3 import MP3
-from mutagen.flac import FLAC
-import zlib
-
 import cleanup
 
 
@@ -136,11 +131,13 @@ def scan_tree(d):
 
 
 	## check artwork files
-#	for i in images:
-#		if "artist" in i.path.lower() and folder_artist is not None:
-#			folder_artist.artwork.append(i)
-#		elif "album" in i.path.lower() and folder_album is not None:
-#			folder_album.artwork.append(i)
+	for i in images:
+		# if an image is here, just create the db object right now to append the artwork
+		# so we don't need to carry this stuff up the function stack
+		if "artist" in i.path.lower() and folder_artist is not None:
+			Artist(name=folder_artist).artwork.append(i)
+		elif "album" in i.path.lower() and folder_album is not None:
+			Album(name=folder_album[1],albumartist=folder_album[0]).artwork.append(i)
 
 	return audiofiles
 
@@ -167,9 +164,26 @@ def build_database(dirs):
 		for f in files:
 			aud = f["obj"]
 
-			Track(
+
+
+
+			track = Track(
 				title=f["title"],
 				artists=[Artist(name=a) for a in f["artists"]],
 				albums=[Album(name=f["album"],albumartist=f["albumartist"])],
 				audiofiles=[aud]
 			)
+
+			# embedded artwork
+			for pic in f["embedded_artwork"]["album"]:
+				imghash,mime,data = str(pic["hash"]),pic["mime"],pic["data"]
+
+				imagefile = imghash[:3] + "/" + imghash[3:] + "." + mime.split("/")[-1]
+				artwork = Artwork(path="cache/" + imagefile)
+				if not os.path.exists("cache/" + imagefile):
+					os.makedirs("cache/" + imagefile.split("/")[0],exist_ok=True)
+					with open("cache/" + imagefile,"wb") as fi:
+						fi.write(data)
+					#ref = AlbumArtRef(album_id=track.album.uid,path="cache/" + imagefile)
+				if artwork not in track.albums[0].artwork:
+					track.albums[0].artwork.append(Artwork(path="cache/" + imagefile))
