@@ -155,10 +155,13 @@ def build_database(dirs):
 		files = scan_tree(d)
 
 		# all tracks that have no albumartist yet get their artist as albumartist
+		# all tracks that have no album get their own title as album
 		for f in files:
 			if f["albumartist"] is None:
 				#print("no albumartist:",f)
 				f["albumartist"] = ", ".join(f["artists"])
+			if f["album"] is None:
+				f["album"] = f["title"]
 
 		# create objects from metadata
 		for f in files:
@@ -171,7 +174,8 @@ def build_database(dirs):
 				title=f["title"],
 				artists=[Artist(name=a) for a in f["artists"]],
 				albums=[Album(name=f["album"],albumartist=f["albumartist"])],
-				audiofiles=[aud]
+				audiofiles=[aud],
+				length=f["length"]
 			)
 
 			# embedded artwork

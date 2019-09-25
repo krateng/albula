@@ -7,6 +7,32 @@ var sound = null;
 var played = 0;
 
 
+
+// helper functions to abstract timekeeping into a clock analogy
+var lastUpdate = 0;
+var ticking = false;
+function now() {
+	return Math.floor(Date.now() / 1000);
+}
+function startClock() {
+	if (!ticking) {
+		ticking = true;
+		lastUpdate = now();
+	}
+
+}
+function stopClock() {
+	if (ticking) {
+		var passed = now() - lastUpdate;
+		played += passed;
+		ticking = false;
+	}
+
+}
+
+
+
+
 // function should always be called when new track becomes current one. inits sound object and fills in metadata
 function initSound(startplay=false) {
 	track = objs[list[idx]];
@@ -39,27 +65,6 @@ function initSound(startplay=false) {
 	}
 }
 
-// helper functions to abstract timekeeping into a clock analogy
-var lastUpdate = 0;
-var ticking = false;
-function now() {
-	return Math.floor(Date.now() / 1000);
-}
-function startClock() {
-	if (!ticking) {
-		ticking = true;
-		lastUpdate = now();
-	}
-
-}
-function stopClock() {
-	if (ticking) {
-		var passed = now() - lastUpdate;
-		played += passed;
-		ticking = false;
-	}
-
-}
 
 // function should always be called when track stops being current one.
 // returns whether track was playing before
