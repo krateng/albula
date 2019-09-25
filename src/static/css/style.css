@@ -1,7 +1,4 @@
 body {
-	background-color:#333337;
-	color:beige;
-	font-family:"Ubuntu";
 	margin:0px;
 	padding-top: 70px;
 	padding-left: 20px;
@@ -101,7 +98,7 @@ div.centered_box span {
 
 	text-overflow: ellipsis;
 }
-div.centered_box input,span,button {
+div.centered_box (input,span,button) {
 	padding:5px;
 	width:100%;
 	margin-top:5px;

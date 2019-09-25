@@ -227,7 +227,7 @@ def get_artist(id:int):
 	artist = db.get(id)
 	result = {}
 	result["artist"] = artist
-	result["tracks"] = artist.tracks
+	result["tracks"] = list(artist.tracks)
 	result["albums"] = []
 	for t in result["tracks"]:
 		result["albums"] += t.albums
@@ -241,7 +241,7 @@ def get_album(id:int):
 	album = db.get(id)
 	result = {}
 	result["album"] = album
-	result["tracks"] = album.tracks
+	result["tracks"] = list(album.tracks)
 	# sort artists by presence on this album
 	artisttracks = {}
 	for t in result["tracks"]:
