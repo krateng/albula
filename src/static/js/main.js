@@ -19,6 +19,7 @@ var infos = {
 			e.sorttitle = e.name.toLowerCase();
 		},
 		singular:"album",
+		secondary_singular:"artist",
 		loaded:false
 	},
 	"tracks":{
@@ -30,6 +31,7 @@ var infos = {
 			e.sorttitle = e.title.toLowerCase()
 		},
 		singular:"track",
+		secondary_singular:"artist",
 		loaded:false
 	}
 }
@@ -116,7 +118,7 @@ function showView() {
 
 		secondary_info_html = [];
 		for (var j=0;j<info.secondary(element).length;j++) {
-			secondary_info_html.push(`<span onclick="lnk('view','artist','id',` + info.secondary_ids(element)[j] + `)">` +
+			secondary_info_html.push(`<span onclick="lnk('view','` + info.secondary_singular + `','id',` + info.secondary_ids(element)[j] + `)">` +
 				info.secondary(element)[j] + `</span>`)
 		}
 
@@ -127,10 +129,10 @@ function showView() {
 					<div class="artwork" style="background-image:url('/imgof/` + element.uid + `');"></div>
 					<div class="hover"></div>
 				</td></tr>
-				<tr class="secondary_info"><td>` + secondary_info_html.join(" | ") + `
+				<tr class="secondary_info"><td>` + secondary_info_html.join(" | ") + `<span></span>
 				</td></tr>
 				<tr class="main_info"><td>
-					<span onclick="lnk('view','album','id',` + element.uid + `)" title="` + info.primary(element) + `">` + info.primary(element) + `</span>
+					<span onclick="lnk('view','` + info.singular + `','id',` + element.uid + `)" title="` + info.primary(element) + `">` + info.primary(element) + `</span>
 				</td></tr>
 			</table>
 		</div>

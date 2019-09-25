@@ -74,11 +74,11 @@ def scan_tree(d):
 
 	# if metadata lacks albumartist, assume it's the most common album with this
 	# name in this subtree
-	for a in audiofiles:
-		if a["album"] is not None and a["albumartist"] is None:
-			samename = [alb for alb in albumlist if alb[1] == a["album"] and alb[0] is not None]
-			if len(samename) > 0:
-				a["albumartist"] = samename[0][0]
+#	for a in audiofiles:
+#		if a["album"] is not None and a["albumartist"] is None:
+#			samename = [alb for alb in albumlist if alb[1] == a["album"] and alb[0] is not None]
+#			if len(samename) > 0:
+#				a["albumartist"] = samename[0][0]
 
 
 	# determine folder artist / album
@@ -113,7 +113,7 @@ def scan_tree(d):
 					#print("adding, now",commonartists)
 				else:
 					break
-			commonalbum = ", ".join(commonartists), commonalbum[1]
+			commonalbum = ";".join(commonartists), commonalbum[1]
 
 		#folder_album = Album(name=commonalbum[1],albumartist=commonalbum[0])
 		folder_album = commonalbum
