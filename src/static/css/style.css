@@ -98,7 +98,7 @@ div.centered_box span {
 
 	text-overflow: ellipsis;
 }
-div.centered_box (input,span,button) {
+div.centered_box input,div.centered_box span,div.centered_box button {
 	padding:5px;
 	width:100%;
 	margin-top:5px;

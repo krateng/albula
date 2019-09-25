@@ -5,7 +5,7 @@ var infos = {
 		primary:e=>e.name,
 		secondary:e=>[],
 		change:e=>{
-			e.sorttitle = e.name.toLowerCase()
+			e.sorttitle = e.name.toLowerCase().replace("'","").replace('"','')
 		},
 		singular:"artist",
 		loaded:false
@@ -16,7 +16,7 @@ var infos = {
 		secondary:e=>e.albumartist_names,
 		secondary_ids:e=>e.albumartist_ids,
 		change:e=>{
-			e.sorttitle = e.name.toLowerCase();
+			e.sorttitle = e.name.toLowerCase().replace("'","").replace('"','');
 		},
 		singular:"album",
 		secondary_singular:"artist",
@@ -28,7 +28,7 @@ var infos = {
 		secondary:e=>e.artist_names,
 		secondary_ids:e=>e.artist_ids,
 		change:e=>{
-			e.sorttitle = e.title.toLowerCase()
+			e.sorttitle = e.title.toLowerCase().replace("'","").replace('"','');
 		},
 		singular:"track",
 		secondary_singular:"artist",
