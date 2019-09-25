@@ -3,9 +3,6 @@
 from db import db,Audio,Artwork,Album,Artist,Track,AUDIOFORMATS,IMAGEFORMATS
 
 import os
-import mutagen
-from mutagen.mp3 import MP3
-from mutagen.flac import FLAC
 import zlib
 
 import cleanup
@@ -36,90 +33,34 @@ def build_database(dirs):
 				### AUDIO FILES
 				if ext in ["flac","mp3"]:
 
-					embedded_pictures = {}
-
-					if ext in ["flac"]:
-						audio = FLAC(fullpath)
-
-						tags = audio.tags
-						try:
-							album = [entry[1] for entry in tags if entry[0] == "ALBUM"][0]
-						except:
-							album = "Unknown Album"
-						try:
-							title = [entry[1] for entry in tags if entry[0] == "TITLE"][0]
-						except:
-							title = f
-						artists = [entry[1] for entry in tags if entry[0] == "ARTIST"]
-						try:
-							albumartist = [entry[1] for entry in tags if entry[0] == "ALBUMARTIST"][0]
-						except:
-							albumartist = ", ".join(artists)
-
-						length = int(audio.info.length)
-
-
-						imgs = audio.pictures
-						for i in imgs:
-							if i.type == 3:
-								embedded_pictures["album"] = (zlib.adler32(i.data),i.mime,i.data)
-
-
-
-					elif ext in ["mp3"]:
-						audio = MP3(fullpath)
-
-						tags = audio.tags
-						try:
-							album = tags.get("TALB").text[0]
-						except:
-							album = "Unknown Album"
-						try:
-							title = tags.get("TIT2").text[0]
-						except:
-							title = f
-
-						imgs = tags.getall("APIC")
-						for i in imgs:
-							if i.type == 3:
-								embedded_pictures["album"] = (zlib.adler32(i.data),i.mime,i.data)
-
-
-						#artists = [set(obj.text) for obj in tags.getall("TPE1") + tags.getall("TPE2") + tags.getall("TPE3") + tags.getall("TPE4")]
-						artists = [set(obj.text) for obj in tags.getall("TPE1")]
-						artists = set.union(*artists)
-						try:
-							albumartist = tags.get("TPE2").text[0]
-						except:
-							albumartist = ", ".join(artists)
-
-						length = int(audio.info.length)
-
+					audio = Audio(path=fullpath)
+					metadata = audio.metadata()
 
 
 					# extract track from file and add to database
-					artists,title = cleanup.fullclean(artists,title)
+					artists,title = cleanup.fullclean(metadata["artists"],metadata["title"])
 
 					track = Track(
 						title=title,
-						albums=[Album(name=album,albumartist=albumartist)],
+						albums=[Album(name=metadata["album"],albumartist=metadata["albumartist"])],
 						artists=[Artist(name=name) for name in artists],
-						length=length
+						audiofiles=[audio],
+						length=metadata["length"]
 					)
 
-					track.audiofiles.append(Audio(path=fullpath))
+					# embedded artwork
+					for pic in metadata["embedded_artwork"]["album"]:
+						imghash,mime,data = str(pic["hash"]),pic["mime"],pic["data"]
 
-					if "album" in embedded_pictures:
-						imghash,mime,data = embedded_pictures["album"]
-						hsh = str(imghash)
-
-						imagefile = hsh[:3] + "/" + hsh[3:] + "." + mime.split("/")[-1]
+						imagefile = imghash[:3] + "/" + imghash[3:] + "." + mime.split("/")[-1]
+						artwork = Artwork(path="cache/" + imagefile)
 						if not os.path.exists("cache/" + imagefile):
 							os.makedirs("cache/" + imagefile.split("/")[0],exist_ok=True)
 							with open("cache/" + imagefile,"wb") as fi:
 								fi.write(data)
 							#ref = AlbumArtRef(album_id=track.album.uid,path="cache/" + imagefile)
-						track.albums[0].artwork.append(Artwork(path="cache/" + imagefile))
+						if artwork not in track.albums[0].artwork:
+							track.albums[0].artwork.append(Artwork(path="cache/" + imagefile))
 
 
 				### ARTWORK FILES
