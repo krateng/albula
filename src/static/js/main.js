@@ -3,7 +3,7 @@ var infos = {
 	"artists":{
 		url:"/api/artists",
 		primary:e=>e.name,
-		secondary:e=>"",
+		secondary:e=>[],
 		change:e=>{
 			e.sorttitle = e.name.toLowerCase()
 		},
@@ -13,7 +13,8 @@ var infos = {
 	"albums":{
 		url:"/api/albums",
 		primary:e=>e.name,
-		secondary:e=>e.albumartist,
+		secondary:e=>e.albumartist_names,
+		secondary_ids:e=>e.albumartist_ids,
 		change:e=>{
 			e.sorttitle = e.name.toLowerCase();
 		},
@@ -23,7 +24,8 @@ var infos = {
 	"tracks":{
 		url:"/api/tracks",
 		primary:e=>e.title,
-		secondary:e=>e.artist_names.join(", "),
+		secondary:e=>e.artist_names,
+		secondary_ids:e=>e.artist_ids,
 		change:e=>{
 			e.sorttitle = e.title.toLowerCase()
 		},
@@ -112,6 +114,12 @@ function showView() {
 		element = elements[i]
 		//console.log(element)
 
+		secondary_info_html = [];
+		for (var j=0;j<info.secondary(element).length;j++) {
+			secondary_info_html.push(`<span onclick="lnk('view','artist','id',` + info.secondary_ids(element)[j] + `)">` +
+				info.secondary(element)[j] + `</span>`)
+		}
+
 		elements_html += `
 		<div class="content_element ` + info.singular + `">
 		   <table>
@@ -119,8 +127,7 @@ function showView() {
 					<div class="artwork" style="background-image:url('/imgof/` + element.uid + `');"></div>
 					<div class="hover"></div>
 				</td></tr>
-				<tr class="secondary_info"><td>
-					<span title="` + info.secondary(element) + `">` + info.secondary(element) + `</span>
+				<tr class="secondary_info"><td>` + secondary_info_html.join(" | ") + `
 				</td></tr>
 				<tr class="main_info"><td>
 					<span onclick="lnk('view','album','id',` + element.uid + `)" title="` + info.primary(element) + `">` + info.primary(element) + `</span>

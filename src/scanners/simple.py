@@ -3,8 +3,6 @@
 from db import db,Audio,Artwork,Album,Artist,Track,AUDIOFORMATS,IMAGEFORMATS
 
 import os
-import zlib
-
 import cleanup
 
 def build_database(dirs):

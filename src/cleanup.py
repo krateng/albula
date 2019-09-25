@@ -14,6 +14,14 @@ def fullclean(artists_,title):
 
 	return (artists,title)
 
+def cleanartists(artists_):
+	artists = []
+	for a in artists_:
+		artists += parseArtists(removespecial(a))
+	artists = list(set(artists))
+	artists.sort()
+	return artists
+
 def removespecial(s):
 	s = s.replace("\t","").replace("␟","").replace("\n","")
 	s = re.sub(" +"," ",s)

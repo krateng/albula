@@ -113,17 +113,14 @@ class Audio(db.DBObject):
 		return self.cached_metadata
 
 
-
-class Album(db.DBObject):
-	__primary__ = "name","albumartist"
+class Artist(db.DBObject):
+	__primary__ = "name",
 	name: str
-	albumartist: str
-	artwork: list = MultiRef(Artwork,exclusive=False,backref="album")
+	artwork: list = MultiRef(Artwork,exclusive=False,backref="artist")
 
 	def __apidict__(self):
 		return {
 			"uid":self.uid,
-			"albumartist":self.albumartist,
 			"name":self.name,
 			#"sorttitle":self.name.lower(),
 			"artwork":[a.uid for a in self.artwork],
@@ -136,18 +133,25 @@ class Album(db.DBObject):
 		if len(self.artwork) > 0: return self.artwork[0]
 		else: return None
 
-class Artist(db.DBObject):
-	__primary__ = "name",
+	def get_tracklist(self):
+		return self.tracks
+
+
+class Album(db.DBObject):
+	__primary__ = "name","albumartists"
 	name: str
-	artwork: list = MultiRef(Artwork,exclusive=False,backref="artist")
+	albumartists: list = MultiRef(Artist,exclusive=False,backref="albums")
+	artwork: list = MultiRef(Artwork,exclusive=False,backref="album")
 
 	def __apidict__(self):
 		return {
 			"uid":self.uid,
+			"albumartist_ids":list(a.uid for a in self.albumartists),
+			"albumartist_names":list(a.name for a in self.albumartists),
 			"name":self.name,
 			#"sorttitle":self.name.lower(),
 			"artwork":[a.uid for a in self.artwork],
-			"last_played":max(t.lastplayed for t in self.tracks),
+			"last_played":max([t.lastplayed for t in self.tracks] + [0]),
 			"times_played":sum(t.timesplayed for t in self.tracks),
 			"track_ids":[track.uid for track in self.tracks]
 		}
@@ -156,8 +160,6 @@ class Artist(db.DBObject):
 		if len(self.artwork) > 0: return self.artwork[0]
 		else: return None
 
-	def get_tracklist(self):
-		return self.tracks
 
 class Track(db.DBObject):
 	__primary__ = "title","artists"

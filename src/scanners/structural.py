@@ -89,9 +89,11 @@ def scan_tree(d):
 	#print("finding album for folder",d.name)
 	#print(albums)
 	if len(albumlist) > 0 and albums[albumlist[0]] > len(audiofiles)/1.5:
-		commonalbum = albumlist[0]
 		#print("common album",commonalbum)
-		if commonalbum[0] in ["",None]:
+		commonalbum = albumlist[0]
+		#if commonalbum[0] is None: commonalbum = [],commonalbum[1]
+		#commonalbum = cleanup.cleanartists(commonalbum[0]),commonalbum[1]
+		if commonalbum[0] in [[],"",None]:
 			# if most files have no album artist metadata, guess from tracks
 			artists = {}
 			count = 0
@@ -137,7 +139,7 @@ def scan_tree(d):
 		if "artist" in i.path.lower() and folder_artist is not None:
 			Artist(name=folder_artist).artwork.append(i)
 		elif "album" in i.path.lower() and folder_album is not None:
-			Album(name=folder_album[1],albumartist=folder_album[0]).artwork.append(i)
+			Album(name=folder_album[1],albumartists=[Artist(name=a) for a in cleanup.cleanartists([folder_album[0]])]).artwork.append(i)
 
 	return audiofiles
 
@@ -167,13 +169,14 @@ def build_database(dirs):
 		for f in files:
 			aud = f["obj"]
 
-
+			artists,title = cleanup.fullclean(f["artists"],f["title"])
+			albumartists = cleanup.cleanartists([f["albumartist"]])
 
 
 			track = Track(
-				title=f["title"],
-				artists=[Artist(name=a) for a in f["artists"]],
-				albums=[Album(name=f["album"],albumartist=f["albumartist"])],
+				title=title,
+				artists=[Artist(name=a) for a in artists],
+				albums=[Album(name=f["album"],albumartists=[Artist(name=a) for a in albumartists])],
 				audiofiles=[aud],
 				length=f["length"]
 			)
