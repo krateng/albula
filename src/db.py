@@ -3,6 +3,8 @@
 from nimrodel import EAPI
 import requests
 
+import random
+
 
 import mutagen
 from mutagen.mp3 import MP3
@@ -22,11 +24,11 @@ class Artwork(db.DBObject):
 	path: str
 
 	def read(self):
-		if self.path.endswith(".jpeg") or self.path.endswith(".jpg"):
+		if self.path.lower().endswith(".jpeg") or self.path.lower().endswith(".jpg"):
 			mime = 'image/jpeg'
-		elif self.path.endswith(".png"):
+		elif self.path.lower().endswith(".png"):
 			mime = 'image/png'
-		elif self.path.endswith(".webp"):
+		elif self.path.lower().endswith(".webp"):
 			mime = 'image/webp'
 		with open(self.path,"rb") as imagefile:
 			stream = imagefile.read()
@@ -130,7 +132,7 @@ class Artist(db.DBObject):
 		}
 
 	def get_artwork(self):
-		if len(self.artwork) > 0: return self.artwork[0]
+		if len(self.artwork) > 0: return random.choice(self.artwork)
 		else: return None
 
 	def get_tracklist(self):
@@ -157,7 +159,7 @@ class Album(db.DBObject):
 		}
 
 	def get_artwork(self):
-		if len(self.artwork) > 0: return self.artwork[0]
+		if len(self.artwork) > 0: return random.choice(self.artwork)
 		else: return None
 
 
@@ -187,10 +189,10 @@ class Track(db.DBObject):
 		}
 
 	def get_artwork(self):
-		if len(self.artwork) > 0: return self.artwork[0]
+		if len(self.artwork) > 0: return random.choice(self.artwork)
 		else:
 			for a in self.albums:
-				if len(a.artwork) > 0: return a.artwork[0]
+				if len(a.artwork) > 0: return random.choice(a.artwork)
 		return None
 
 	def get_audio(self):

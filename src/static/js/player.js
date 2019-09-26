@@ -1,6 +1,6 @@
 var list = [];
 var idx = 0;
-var playing = false;
+var currently_playing = false;
 var loop = false;
 var random = false;
 var sound = null;
@@ -31,7 +31,10 @@ function stopClock() {
 }
 
 
-
+// need to do this for correct event listener below
+function nxt() {
+	next();
+}
 
 // function should always be called when new track becomes current one. inits sound object and fills in metadata
 function initSound(startplay=false) {
@@ -40,7 +43,7 @@ function initSound(startplay=false) {
 		src: ["/audioof/" + list[idx]],
 		format: "mp3"
 	});
-	sound.on("end",next)
+	sound.on("end",nxt);
 
 	document.getElementById("current_track_artwork").style.backgroundImage = "url('/imgof/" + list[idx] + "')";
 	document.getElementById("current_track_title").innerHTML = track.title;
@@ -48,7 +51,7 @@ function initSound(startplay=false) {
 
 	for (var i=1;i<5;i++) {
 		try {
-			var next = objs[list[idx+i]]
+			var next = objs[list[idx+i]];
 			document.getElementById("next_" + i).innerHTML = next.artist_names.join(", ") + " - " + next.title;
 		}
 		catch {
@@ -71,16 +74,17 @@ function initSound(startplay=false) {
 function uninitSound() {
 
 	stopClock();
-	xhttpreq("/api/play",{id:list[idx],seconds:played,time:now()},"POST");
-	//update local info, doesn't necessarily need to be exactly consistent with db, just for
-	//sorting and stuff
-	var track = objs[list[idx]];
-	track.last_played = now();
-	track.times_played += 1;
+
 
 
 	playing = false
 	if (sound != null) {
+		xhttpreq("/api/play",{id:list[idx],seconds:played,time:now()},"POST");
+		//update local info, doesn't necessarily need to be exactly consistent with db, just for
+		//sorting and stuff
+		var track = objs[list[idx]];
+		track.last_played = now();
+		track.times_played += 1;
 		playing = sound.playing;
 
 		if (sound.state() != "loaded") {
@@ -136,6 +140,7 @@ function pause() {
 
 function setPlaylist(lst) {
 	pause();
+	uninitSound();
 	list = lst;
 	idx = 0;
 	initSound();
