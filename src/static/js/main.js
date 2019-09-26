@@ -1,67 +1,43 @@
 
 var infos = {
-	"artists":{
+	"artist":{
+		type:"artist", //repeating so it's accessible from the object
 		url:"/api/artists",
+		detail_url:"/api/artist/%ID%",
 		primary:e=>e.name,
-		secondary:e=>[],
+		secondary_type:null,
+		secondary_source:e=>[],
 		change:e=>{
 			e.sorttitle = e.name.toLowerCase().replace("'","").replace('"','')
 		},
-		singular:"artist",
-		loaded:false
-	},
-	"albums":{
-		url:"/api/albums",
-		primary:e=>e.name,
-		secondary:e=>e.albumartist_names,
-		secondary_ids:e=>e.albumartist_ids,
-		change:e=>{
-			e.sorttitle = e.name.toLowerCase().replace("'","").replace('"','');
-		},
-		singular:"album",
-		secondary_singular:"artist",
-		loaded:false
-	},
-	"tracks":{
-		url:"/api/tracks",
-		primary:e=>e.title,
-		secondary:e=>e.artist_names,
-		secondary_ids:e=>e.artist_ids,
-		change:e=>{
-			e.sorttitle = e.title.toLowerCase().replace("'","").replace('"','');
-		},
-		singular:"track",
-		secondary_singular:"artist",
-		loaded:false
-	}
-}
-
-
-var detailinfos = {
-	"artist": {
-		url:"api/artist/%ID%",
-		primary:e=>e.artist.name,
-		secondary:e=>[],
-		page_parts:[
+		css_class:"artist",
+		loaded:false,
+		detail_info:[
 			{
 				name:"Albums",
-				type:"albums",
+				type:"album",
 				source:e=>e.albums
 			},
 			{
 				name:"Tracks",
-				type:"tracks",
+				type:"track",
 				source:e=>e.tracks
 			}
 		]
 	},
 	"album":{
-		url:"api/album/%ID%",
-		primary:e=>e.album.name,
-		secondary:e=>e.album.albumartist_names,
-		secondary_ids:e=>e.album.albumartist_ids,
-		secondary_singular:"artist",
-		page_parts:[
+		type: "album",
+		url:"/api/albums",
+		detail_url:"/api/album/%ID%",
+		primary:e=>e.name,
+		secondary_type:"artist",
+		secondary_source:e=>e.albumartists,
+		change:e=>{
+			e.sorttitle = e.name.toLowerCase().replace("'","").replace('"','');
+		},
+		css_class:"album",
+		loaded:false,
+		detail_info:[
 		//	{
 		//		name:"Artists",
 		//		type:"artists",
@@ -69,12 +45,39 @@ var detailinfos = {
 		//	},
 			{
 				name:"Tracks",
-				type:"tracks",
+				type:"track",
 				source:e=>e.tracks
+			}
+		]
+	},
+	"track":{
+		type: "track",
+		url:"/api/tracks",
+		detail_url:"/api/track/%ID%",
+		primary:e=>e.title,
+		secondary_type:"artist",
+		secondary_source:e=>e.artists,
+		change:e=>{
+			e.sorttitle = e.title.toLowerCase().replace("'","").replace('"','');
+		},
+		css_class:"track",
+		loaded:false,
+		detail_info:[
+			{
+				name:"Artists",
+				type:"artist",
+				source:e=>e.artists
+			},
+			{
+				name:"Albums",
+				type:"album",
+				source:e=>e.albums
 			}
 		]
 	}
 }
+
+
 
 var sortings = {
 	"alphabet":e=>e.sorttitle,
@@ -102,13 +105,13 @@ var data = {}
 var objs = [] //direct id mapping
 
 // populate data from server
-for (var view in infos) {
-	var info = infos[view]
+for (var type in infos) {
+	var info = infos[type]
 	var url = info.url
 
 	var xhttp = new XMLHttpRequest();
 	// need to save this local because of js late binding
-	xhttp.view = view;
+	xhttp.type = type;
 	xhttp.info = info;
 	xhttp.responseType = "json";
 	xhttp.onreadystatechange = function() {
@@ -117,7 +120,7 @@ for (var view in infos) {
 			var response = this.response;
 			//var elements = JSON.parse(response)["result"];
 			var elements = response.result
-			data[this.view] = elements;
+			data[this.type] = elements;
 			for (let el of elements) {
 				this.info.change(el); //apply all local data preparations
 				objs[el.uid] = el;
@@ -139,13 +142,16 @@ function renderElements(elements,info) {
 		 //console.log(element)
 
 		 secondary_info_html = [];
-		 for (var j=0;j<info.secondary(element).length;j++) {
-			 secondary_info_html.push(`<span onclick="lnk('view','` + info.secondary_singular + `','id',` + info.secondary_ids(element)[j] + `)">` +
-				 info.secondary(element)[j] + `</span>`)
+		 secondary_info = infos[info.secondary_type];
+		 for (var j=0;j<info.secondary_source(element).length;j++) {
+			 secondary_element = info.secondary_source(element)[j];
+			 secondary_info_html.push(
+				 `<span onclick="lnk('view','detail','type','` + secondary_info.type + `','id',` + secondary_element.id + `)">` +
+				 secondary_element.name + `</span>`)
 		 }
 
 		 elements_html += `
-		 <div class="content_element ` + info.singular + `">
+		 <div class="content_element ` + info.css_class + `">
 			<table>
 				 <tr class="image"><td onclick="setPlaylist([` + element.track_ids.join(",") + `])">
 					 <div class="artwork" style="background-image:url('/imgof/` + element.uid + `');"></div>
@@ -154,7 +160,7 @@ function renderElements(elements,info) {
 				 <tr class="secondary_info"><td>` + secondary_info_html.join(" | ") + `<span></span>
 				 </td></tr>
 				 <tr class="main_info"><td>
-					 <span onclick="lnk('view','` + info.singular + `','id',` + element.uid + `)" title="` + info.primary(element) + `">` + info.primary(element) + `</span>
+					 <span onclick="lnk('view','detail','type','` + info.type + `','id',` + element.uid + `)" title="` + info.primary(element) + `">` + info.primary(element) + `</span>
 				 </td></tr>
 			 </table>
 		 </div>
@@ -170,12 +176,13 @@ function showView() {
 
 	var url_string = window.location.href;
 	var url = new URL(url_string);
-	var view = url.searchParams.get("view") || "albums";
+	var view = url.searchParams.get("view") || "list";
+	var type = url.searchParams.get("type") || "album"
 	var sortby = url.searchParams.get("sort") || "alphabet";
 
-	if (["albums","artists","tracks"].includes(view)) {
-		var info = infos[view]
-		var elements = data[view]
+	if (view == "list") {
+		var info = infos[type]
+		var elements = data[type]
 
 		if (!info.loaded) {
 			setTimeout(showView,100);
@@ -194,14 +201,14 @@ function showView() {
 	}
 
 
-	else {
-		var info = detailinfos[view];
+	else if (view == "detail") {
+		var info = infos[type];
 		var id = url.searchParams.get("id");
-		var url = info.url.replace("%ID%",id)
+		var url = info.detail_url.replace("%ID%",id)
 
 		var xhttp = new XMLHttpRequest();
 		// need to save this local because of js late binding
-		xhttp.view = view;
+		xhttp.type = type;
 		xhttp.info = info;
 		xhttp.id = id;
 		xhttp.responseType = "json";
@@ -212,12 +219,17 @@ function showView() {
 				console.log(response)
 
 
-				var secondary_elements = []
-				for (var i=0;i<this.info.secondary(response).length;i++) {
-					secondary_elements.push(`<span onclick="lnk('view','` + this.info.secondary_singular + `','id',` + this.info.secondary_ids(response)[i] + `)">` + this.info.secondary(response)[i] + `</span>`)
+				element_info = response[type] //direct info is always saved in a subelement of same name in the dict
+
+				secondary_info_html = [];
+				secondary_info = infos[info.secondary_type];
+				for (var i=0;i<this.info.secondary_source(element_info).length;i++) {
+					secondary_element = this.info.secondary_source(element_info)[i];
+					secondary_info_html.push(
+						`<span onclick="lnk('view','detail','type','` + secondary_info.type + `','id',` + secondary_element.id + `)">` +
+						secondary_element.name + `</span>`)
 				}
-				var html = secondary_elements.join(" | ") + `
-					<h1>` + this.info.primary(response) + `</h1>`
+
 
 
 				var html = `
@@ -227,16 +239,16 @@ function showView() {
 							<div style="background-image:url('/imgof/` + this.id + `')"></div>
 						</td>
 						<td class="text">
-							<span>` + secondary_elements.join(" | ") + `</span><br/>
-							<h1>` + this.info.primary(response) + `</h1>
+							<span>` + secondary_info_html.join(" | ") + `</span><br/>
+							<h1>` + this.info.primary(element_info) + `</h1>
 						</td>
 					</tr>
 				</table>
 				`
 
 
-				for (var j=0;j<this.info.page_parts.length;j++) {
-					e = this.info.page_parts[j];
+				for (var j=0;j<this.info.detail_info.length;j++) {
+					e = this.info.detail_info[j];
 					html += `<h2>` + e.name + `</h2>`;
 					elements = e.source(response);
 					einfo = infos[e.type];

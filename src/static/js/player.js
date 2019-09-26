@@ -47,12 +47,12 @@ function initSound(startplay=false) {
 
 	document.getElementById("current_track_artwork").style.backgroundImage = "url('/imgof/" + list[idx] + "')";
 	document.getElementById("current_track_title").innerHTML = track.title;
-	document.getElementById("current_track_artists").innerHTML = track.artist_names.join(", ");
+	document.getElementById("current_track_artists").innerHTML = createLinks("artist",track.artists,", ");
 
 	for (var i=1;i<5;i++) {
 		try {
 			var next = objs[list[idx+i]];
-			document.getElementById("next_" + i).innerHTML = next.artist_names.join(", ") + " - " + next.title;
+			document.getElementById("next_" + i).innerHTML = createLinks("artist",next.artists,", ") + " - " + next.title;
 		}
 		catch {
 

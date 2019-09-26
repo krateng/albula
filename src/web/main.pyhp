@@ -5,9 +5,9 @@
 
 	<body onload="showView()">
 		<div id="top_bar">
-			<div onclick="lnk('view','artists')">Artists</div>
-			<div onclick="lnk('view','albums')">Albums</div>
-			<div onclick="lnk('view','tracks')">Tracks</div>
+			<div onclick="lnk('view','list','type','artist')">Artists</div>
+			<div onclick="lnk('view','list','type','album')">Albums</div>
+			<div onclick="lnk('view','list','type','track')">Tracks</div>
 			<br/>
 			<div onclick="lnk('sort','alphabet')">A-Z</div>
 			<div onclick="lnk('sort','last')">⏲️</div>

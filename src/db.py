@@ -35,6 +35,21 @@ class Artwork(db.DBObject):
 
 		return mime,stream
 
+# if no artwork is present, return default file
+class PA:
+	def __init__(self,type):
+		with open("static/png/unknown_" + type + ".png","rb") as imagefile:
+			self.stream = imagefile.read()
+	def read(self):
+		return "/image/png",self.stream
+
+pseudoartworks = {"artist":PA("artist"),"album":PA("album"),"track":PA("track")}
+def PseudoArtwork(type):
+	return pseudoartworks[type]
+
+
+
+
 class Audio(db.DBObject):
 	__primary__ = "path",
 	path: str
@@ -133,7 +148,7 @@ class Artist(db.DBObject):
 
 	def get_artwork(self):
 		if len(self.artwork) > 0: return random.choice(self.artwork)
-		else: return None
+		else: return PseudoArtwork("artist")
 
 	def get_tracklist(self):
 		return self.tracks
@@ -148,8 +163,9 @@ class Album(db.DBObject):
 	def __apidict__(self):
 		return {
 			"uid":self.uid,
-			"albumartist_ids":list(a.uid for a in self.albumartists),
-			"albumartist_names":list(a.name for a in self.albumartists),
+			"albumartists":[{"id":a.uid,"name":a.name} for a in self.albumartists],
+		#	"albumartist_ids":list(a.uid for a in self.albumartists),
+		#	"albumartist_names":list(a.name for a in self.albumartists),
 			"name":self.name,
 			#"sorttitle":self.name.lower(),
 			"artwork":[a.uid for a in self.artwork],
@@ -160,7 +176,7 @@ class Album(db.DBObject):
 
 	def get_artwork(self):
 		if len(self.artwork) > 0: return random.choice(self.artwork)
-		else: return None
+		else: return PseudoArtwork("album")
 
 
 class Track(db.DBObject):
@@ -180,8 +196,9 @@ class Track(db.DBObject):
 			"title":self.title,
 			"length":self.length,
 			#"sorttitle":self.title.lower(),
-			"artist_ids":list(a.uid for a in self.artists),
-			"artist_names":list(a.name for a in self.artists),
+			"artists":[{"id":a.uid,"name":a.name} for a in self.artists],
+		#	"artist_ids":list(a.uid for a in self.artists),
+		#	"artist_names":list(a.name for a in self.artists),
 			"artwork":[a.uid for a in self.artwork],
 			"last_played":self.lastplayed,
 			"times_played":self.timesplayed,
@@ -193,7 +210,7 @@ class Track(db.DBObject):
 		else:
 			for a in self.albums:
 				if len(a.artwork) > 0: return random.choice(a.artwork)
-		return None
+		return PseudoArtwork("track")
 
 	def get_audio(self):
 		if len(self.audiofiles) > 0: return self.audiofiles[0]
@@ -251,6 +268,16 @@ def get_album(id:int):
 			artisttracks[a] = artisttracks.setdefault(a,0) + 1
 	result["artists"] = sorted([a for a in artisttracks],key=lambda x: artisttracks[x],reverse=True)
 	#result["artists"] = list(set(a for t in result["tracks"] for a in t.artists))
+
+	return result
+
+@api.get("track/{id}")
+def get_track(id:int):
+	track = db.get(id)
+	result = {}
+	result["track"] = track
+	result["artists"] = list(track.artists)
+	result["albums"] = list(track.albums)
 
 	return result
 
