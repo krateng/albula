@@ -35,13 +35,15 @@ class Artwork(db.DBObject):
 
 		return mime,stream
 
+	def link(self):
+		return "/artwork/" + str(self.uid)
+
 # if no artwork is present, return default file
 class PA:
 	def __init__(self,type):
-		with open("static/png/unknown_" + type + ".png","rb") as imagefile:
-			self.stream = imagefile.read()
-	def read(self):
-		return "/image/png",self.stream
+		self.type = type
+	def link(self):
+		return "/artwork/" + self.type
 
 pseudoartworks = {"artist":PA("artist"),"album":PA("album"),"track":PA("track")}
 def PseudoArtwork(type):
@@ -133,21 +135,24 @@ class Audio(db.DBObject):
 class Artist(db.DBObject):
 	__primary__ = "name",
 	name: str
-	artwork: list = MultiRef(Artwork,exclusive=False,backref="artist")
+	artworks: list = MultiRef(Artwork,exclusive=False,backref="artist")
+	artwork_index: int
 
 	def __apidict__(self):
 		return {
 			"uid":self.uid,
 			"name":self.name,
 			#"sorttitle":self.name.lower(),
-			"artwork":[a.uid for a in self.artwork],
+		#	"artwork":[a.uid for a in self.artwork],
+			"artwork":self.get_artwork().link(),
+			"artwork_choices":[a.link() for a in self.artworks],
 			"last_played":max([t.lastplayed for t in self.tracks] + [0]),
 			"times_played":sum(t.timesplayed for t in self.tracks),
 			"track_ids":[track.uid for track in self.tracks]
 		}
 
 	def get_artwork(self):
-		if len(self.artwork) > 0: return random.choice(self.artwork)
+		if len(self.artworks) > 0: return self.artworks[self.artwork_index]
 		else: return PseudoArtwork("artist")
 
 	def get_tracklist(self):
@@ -158,7 +163,8 @@ class Album(db.DBObject):
 	__primary__ = "name","albumartists"
 	name: str
 	albumartists: list = MultiRef(Artist,exclusive=False,backref="albums")
-	artwork: list = MultiRef(Artwork,exclusive=False,backref="album")
+	artworks: list = MultiRef(Artwork,exclusive=False,backref="album")
+	artwork_index: int
 
 	def __apidict__(self):
 		return {
@@ -168,14 +174,16 @@ class Album(db.DBObject):
 		#	"albumartist_names":list(a.name for a in self.albumartists),
 			"name":self.name,
 			#"sorttitle":self.name.lower(),
-			"artwork":[a.uid for a in self.artwork],
+		#	"artwork":[a.uid for a in self.artwork],
+			"artwork":self.get_artwork().link(),
+			"artwork_choices":[a.link() for a in self.artworks],
 			"last_played":max([t.lastplayed for t in self.tracks] + [0]),
 			"times_played":sum(t.timesplayed for t in self.tracks),
 			"track_ids":[track.uid for track in self.tracks]
 		}
 
 	def get_artwork(self):
-		if len(self.artwork) > 0: return random.choice(self.artwork)
+		if len(self.artworks) > 0: return self.artworks[self.artwork_index]
 		else: return PseudoArtwork("album")
 
 
@@ -185,7 +193,8 @@ class Track(db.DBObject):
 	artists: list = MultiRef(Artist,backref="tracks",exclusive=False)
 	albums: list = MultiRef(Album,backref="tracks",exclusive=False)
 	audiofiles: list = MultiRef(Audio,exclusive=True,backref="track")
-	artwork: list = MultiRef(Artwork,exclusive=False,backref="track")
+	artworks: list = MultiRef(Artwork,exclusive=False,backref="track")
+	artwork_index: int
 	length: int
 	lastplayed: int
 	timesplayed: int
@@ -199,17 +208,19 @@ class Track(db.DBObject):
 			"artists":[{"id":a.uid,"name":a.name} for a in self.artists],
 		#	"artist_ids":list(a.uid for a in self.artists),
 		#	"artist_names":list(a.name for a in self.artists),
-			"artwork":[a.uid for a in self.artwork],
+		#	"artwork":[a.uid for a in self.artwork],
+			"artwork":self.get_artwork().link(),
+			"artwork_choices":[a.link() for a in self.artworks],
 			"last_played":self.lastplayed,
 			"times_played":self.timesplayed,
 			"track_ids":[self.uid]
 		}
 
 	def get_artwork(self):
-		if len(self.artwork) > 0: return random.choice(self.artwork)
+		if len(self.artworks) > 0: return self.artworks[self.artwork_index]
 		else:
 			for a in self.albums:
-				if len(a.artwork) > 0: return random.choice(a.artwork)
+				if len(a.artworks) > 0: return a.artworks[a.artwork_index]
 		return PseudoArtwork("track")
 
 	def get_audio(self):

@@ -154,7 +154,7 @@ function renderElements(elements,info) {
 		 <div class="content_element ` + info.css_class + `">
 			<table>
 				 <tr class="image"><td onclick="setPlaylist([` + element.track_ids.join(",") + `])">
-					 <div class="artwork" style="background-image:url('/imgof/` + element.uid + `');"></div>
+					 <div class="artwork" style="background-image:url('` + element.artwork + `');"></div>
 					 <div class="hover"></div>
 				 </td></tr>
 				 <tr class="secondary_info"><td>` + secondary_info_html.join(" | ") + `<span></span>
@@ -231,16 +231,28 @@ function showView() {
 				}
 
 
+				artworks_html = [];
+				for (var i=0;i<element_info.artwork_choices.length;i++) {
+					choice = element_info.artwork_choices[i];
+					artworks_html.push(`<td style="background-image:url('` + choice + `');"
+					onmouseover="document.getElementById('main_image').style.backgroundImage='url(\\'` + choice + `\\')';"
+					onmouseout="document.getElementById('main_image').style.backgroundImage='url(\\'` + element_info.artwork + `\\')';">
+					</td>`)
+				}
+
+
 
 				var html = `
 				<table class="top_info">
 					<tr>
 						<td class="image">
-							<div style="background-image:url('/imgof/` + this.id + `')"></div>
+							<div id="main_image" style="background-image:url('` + element_info.artwork + `')"></div>
 						</td>
 						<td class="text">
 							<span>` + secondary_info_html.join(" | ") + `</span><br/>
 							<h1>` + this.info.primary(element_info) + `</h1>
+							<br/><br/><br/>
+							<table class="image_row" id="image_choices"><tr>` + artworks_html.join("") + `</tr></table>
 						</td>
 					</tr>
 				</table>

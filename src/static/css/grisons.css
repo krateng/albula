@@ -28,3 +28,18 @@ table.top_info td.text h1 {
 	display:inline;
 	padding-right:5px;
 }
+
+
+table.top_info td.text table.image_row td {
+	height:50px;
+	width:50px;
+	background-size:cover;
+	background-position:center;
+	background-repeat: no-repeat;
+	opacity:0.5;
+	filter: grayscale(80%);
+}
+table.top_info td.text table.image_row td:hover {
+	opacity:1;
+	filter: grayscale(0%);
+}

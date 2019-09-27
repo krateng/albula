@@ -97,6 +97,7 @@ def scan_tree(d):
 			# if most files have no album artist metadata, guess from tracks
 			artists = {}
 			count = 0
+			#print(list(aud["albumartist"] for aud in audiofiles))
 			for audio in audiofiles:
 				if audio["albumartist"] in ["",None] and audio["album"] == commonalbum[1]:
 					count += 1
@@ -137,9 +138,11 @@ def scan_tree(d):
 		# if an image is here, just create the db object right now to append the artwork
 		# so we don't need to carry this stuff up the function stack
 		if "artist" in i.path.lower() and folder_artist is not None:
-			Artist(name=folder_artist).artwork.append(i)
+			a = Artist(name=folder_artist)
+			if i not in a.artworks: a.artworks.append(i)
 		elif "album" in i.path.lower() and folder_album is not None:
-			Album(name=folder_album[1],albumartists=[Artist(name=a) for a in cleanup.cleanartists([folder_album[0]])]).artwork.append(i)
+			a = Album(name=folder_album[1],albumartists=[Artist(name=a) for a in cleanup.cleanartists([folder_album[0]])])
+			if i not in a.artworks: a.artworks.append(i)
 
 	return audiofiles
 
@@ -192,5 +195,5 @@ def build_database(dirs):
 					with open("cache/" + imagefile,"wb") as fi:
 						fi.write(data)
 					#ref = AlbumArtRef(album_id=track.album.uid,path="cache/" + imagefile)
-				if artwork not in track.albums[0].artwork:
-					track.albums[0].artwork.append(Artwork(path="cache/" + imagefile))
+				if artwork not in track.albums[0].artworks:
+					track.albums[0].artworks.append(Artwork(path="cache/" + imagefile))

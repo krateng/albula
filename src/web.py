@@ -22,23 +22,39 @@ def server_handlers(server):
 		return result
 
 
-	@server.get("/imgof/<uid>")
+#	@server.get("/imgof/<uid>")
+#	@auth.authenticated
+#	def imageof(uid):
+#		uid = int(uid)
+#
+#		obj = db.db.get(uid)
+#		artwork = obj.get_artwork()
+#		if artwork is None: return ""
+#
+#		mime,stream = artwork.read()
+#		response.set_header('Content-type', mime)
+#		response.set_header("Cache-Control", "public, max-age=360000")
+#		return stream
+
+	@server.get("/artwork/<uid>")
 	@auth.authenticated
-	def imageof(uid):
-		uid = int(uid)
+	def image(uid):
+		try:
+			uid = int(uid)
+		except:
+			return static_file("/static/png/unknown_" + uid + ".png",root="")
 
-		obj = db.db.get(uid)
-		artwork = obj.get_artwork()
-		if artwork is None: return ""
-
+		artwork = db.db.get(uid)
 		mime,stream = artwork.read()
 		response.set_header('Content-type', mime)
 		response.set_header("Cache-Control", "public, max-age=360000")
 		return stream
 
+
 	@server.get("/audioof/<uid>")
 	@auth.authenticated
 	def audioof(uid):
+
 		uid = int(uid)
 
 		obj = db.db.get(uid)
