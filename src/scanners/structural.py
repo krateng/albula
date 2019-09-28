@@ -141,7 +141,7 @@ def scan_tree(d):
 		# if an image is here, just create the db object right now to append the artwork
 		# so we don't need to carry this stuff up the function stack
 		if "artist" in i.path.lower() and folder_artist is not None:
-			a = Artist(name=folder_artist)
+			a = Artist(name=cleanup.cleanartists([folder_artist])[0])
 			if i not in a.artworks: a.artworks.append(i)
 		elif "album" in i.path.lower() and folder_album is not None:
 			a = Album(name=folder_album[1],albumartists=[Artist(name=a) for a in cleanup.cleanartists([folder_album[0]])])
