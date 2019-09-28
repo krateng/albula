@@ -4,6 +4,7 @@ from db import db,Audio,Artwork,Album,Artist,Track,AUDIOFORMATS,IMAGEFORMATS
 
 import os
 import cleanup
+from doreah.settings import get_settings
 
 
 class Directory:
@@ -17,6 +18,8 @@ def scan_dir(dir):
 	subdirs = []
 	files = []
 	for f in os.listdir(dir):
+		if f in get_settings("IGNORE_FILES"): return ([],[])
+		if f.startswith("."): continue
 		fullpath = os.path.join(dir,f)
 		if os.path.isdir(fullpath):
 			subdirs.append(Directory(f,*scan_dir(fullpath)))

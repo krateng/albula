@@ -4,12 +4,13 @@ A minimalistic self-hosted music server.
 
 ## Current status
 
-Very early in development
+It ain't much, but it works!
+
+## Why not Plex / Subsonic / Airsonic / ...?
+
+I just made Albula for myself because I disliked several things about the other options. Most likely, it will not be better than them for you - unless you just happen to care about proper support for multiple artists or a less crowded interface.
 
 ## Requirements
 
-* [python3](https://www.python.org/) - [GitHub](https://github.com/python/cpython)
-* [bottle.py](https://bottlepy.org/) - [GitHub](https://github.com/bottlepy/bottle)
-* [waitress](https://docs.pylonsproject.org/projects/waitress/) - [GitHub](https://github.com/Pylons/waitress)
-* [nimrodel](https://pypi.org/project/nimrodel/) - [GitHub](https://github.com/krateng/nimrodel) (at least Version 0.5.5)
-* [doreah](https://pypi.org/project/doreah/) - [GitHub](https://github.com/krateng/doreah) (at least Version 0.11.4)
+* Python 3
+* Pip packages specified in `requirements.txt`

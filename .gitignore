@@ -2,6 +2,7 @@
 *.xcf
 *.pyc
 *.txt
+!/requirements.txt
 
 # user files
 *.db
