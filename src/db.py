@@ -16,7 +16,7 @@ import zlib
 from doreah.database import Database, Ref, MultiRef
 from doreah.settings import get_settings
 
-db = Database(file="database.ddb")
+db = Database(file="database.ddb",ignore_capitalization=True)
 
 
 class Artwork(db.DBObject):

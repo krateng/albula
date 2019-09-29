@@ -68,3 +68,9 @@ function checkAuth(response) {
 		location.assign("/");
 	}
 }
+
+function enterpress(evt) {
+	if (evt.keyCode === 13) {
+		auth();
+	}
+}

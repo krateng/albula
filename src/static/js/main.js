@@ -200,6 +200,8 @@ function showView() {
 	   elements_html = renderElements(elements,info);
 
 		document.getElementById("content_area").innerHTML = elements_html;
+
+		document.title = "Albula";
 	}
 
 
@@ -274,6 +276,10 @@ function showView() {
 				}
 
 				document.getElementById("content_area").innerHTML = html;
+
+				document.getElementById("content_area").scrollTo(0,0);
+
+				document.title = this.info.primary(element_info) + " - Albula";
 
 
 
