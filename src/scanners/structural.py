@@ -85,7 +85,7 @@ def scan_tree(d):
 
 
 	# determine folder artist / album
-	if len(artistlist) > 0 and artists[artistlist[0]] > len(audiofiles)/1.5:
+	if len(artistlist) > 0 and artists[artistlist[0]]+albumartists[artistlist[0]] > len(audiofiles)/1.5:
 		#folder_artist = Artist(name=artistlist[0])
 		folder_artist = artistlist[0]
 
@@ -140,6 +140,7 @@ def scan_tree(d):
 
 
 	## check artwork files
+
 	for i in images:
 		# if an image is here, just create the db object right now to append the artwork
 		# so we don't need to carry this stuff up the function stack
@@ -147,8 +148,11 @@ def scan_tree(d):
 			a = Artist(name=cleanup.cleanartists([folder_artist])[0])
 			if i not in a.artworks: a.artworks.append(i)
 		elif "album" in i.path.lower() and folder_album is not None:
+
 			a = Album(name=folder_album[1],albumartists=[Artist(name=a) for a in cleanup.cleanartists([folder_album[0]])])
 			if i not in a.artworks: a.artworks.append(i)
+
+		else: db.delete(i)
 
 	return audiofiles
 

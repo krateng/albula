@@ -333,6 +333,8 @@ IMAGEFORMATS = ["jpeg","jpg","png"]
 from scanners.structural import build_database
 
 def prune_database():
+
+	# remove file references that have no objects
 	artworks = db.getall(Artwork)
 	referenced_artworks = set().union(*[set(entity.artworks) for entity in db.getall(Track) + db.getall(Album) + db.getall(Artist)])
 	for a in artworks:
@@ -346,6 +348,8 @@ def prune_database():
 		if a not in referenced_audiofiles:
 			print(a.path,"no longer referenced, removing...")
 			db.delete(a)
+
+	# remove tracks that have no audiofiles
 
 def save_database():
 	db.save()
