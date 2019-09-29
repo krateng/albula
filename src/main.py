@@ -18,6 +18,7 @@ THREADS = 12
 
 #db.load_database()
 db.build_database(DIRECTORIES)
+db.prune_database()
 
 #thread_web = Thread(target=server.runserver,args=(PORT,))
 #thread_web.daemon = True
