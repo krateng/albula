@@ -45,7 +45,7 @@ function initSound(startplay=false) {
 	});
 	sound.on("end",nxt);
 
-	document.getElementById("current_track_artwork").style.backgroundImage = "url('/imgof/" + list[idx] + "')";
+	document.getElementById("current_track_artwork").style.backgroundImage = "url('" + track.artwork + "')";
 	document.getElementById("current_track_title").innerHTML = track.title;
 	document.getElementById("current_track_artists").innerHTML = createLinks("artist",track.artists,", ");
 
