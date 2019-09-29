@@ -61,12 +61,14 @@ body {
 	font-weight: bold;
 }
 
-
-[onclick]:hover {
-	//text-decoration: underline;
+a {
+	color:inherit;
+	text-decoration: none;
+}
+[onclick]:hover, a:hover {
 	cursor: pointer;
 }
-span[onclick]:hover {
+span[onclick]:hover, a:hover {
 	text-decoration: underline;
 }
 

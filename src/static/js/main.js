@@ -146,8 +146,10 @@ function renderElements(elements,info) {
 		 for (var j=0;j<info.secondary_source(element).length;j++) {
 			 secondary_element = info.secondary_source(element)[j];
 			 secondary_info_html.push(
-				 `<span onclick="lnk('view','detail','type','` + secondary_info.type + `','id',` + secondary_element.id + `)">` +
-				 secondary_element.name + `</span>`)
+			//	 `<span onclick="lnk('view','detail','type','` + secondary_info.type + `','id',` + secondary_element.id + `)">` +
+			//	 secondary_element.name + `</span>`)
+				`<a href="?view=detail&type=` + secondary_info.type + "&id=" + secondary_element.id + `">` +
+				secondary_element.name + `</a>`)
 		 }
 
 		 elements_html += `
@@ -160,7 +162,7 @@ function renderElements(elements,info) {
 				 <tr class="secondary_info"><td>` + secondary_info_html.join(" | ") + `<span></span>
 				 </td></tr>
 				 <tr class="main_info"><td>
-					 <span onclick="lnk('view','detail','type','` + info.type + `','id',` + element.uid + `)" title="` + info.primary(element) + `">` + info.primary(element) + `</span>
+					 <span title="` + info.primary(element) + `"><a href="?view=detail&type=` + info.type + `&id=` + element.uid + `">` + info.primary(element) + `</a></span>
 				 </td></tr>
 			 </table>
 		 </div>
@@ -226,8 +228,10 @@ function showView() {
 				for (var i=0;i<this.info.secondary_source(element_info).length;i++) {
 					secondary_element = this.info.secondary_source(element_info)[i];
 					secondary_info_html.push(
-						`<span onclick="lnk('view','detail','type','` + secondary_info.type + `','id',` + secondary_element.id + `)">` +
-						secondary_element.name + `</span>`)
+				//		`<span onclick="lnk('view','detail','type','` + secondary_info.type + `','id',` + secondary_element.id + `)">` +
+				//		secondary_element.name + `</span>`)
+						`<a href="?view=detail&type=` + secondary_info.type + `&id=` + secondary_element.id + `">` +
+						secondary_element.name + `</a>`);
 				}
 
 
