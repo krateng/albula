@@ -1,6 +1,8 @@
 import re
 import unicodedata
 from doreah.settings import get_settings
+import yaml
+import os
 
 def fullclean(artists_,title):
 	artists = []
@@ -35,6 +37,12 @@ delimiters = ["vs.","vs","&"]											#Delimiters in informal artist strings, 
 delimiters = get_settings("ARTIST_DELIMITERS")							#risk of false positives. user has control over tagging
 delimiters_formal = ["; ",";","/"]										#Delimiters used specifically to tag multiple artists when only one tag field is available, no spaces used
 
+safe_artists = []
+for f in os.listdir("rules"):
+	if not f.startswith("."):
+		with open("rules/" + f,"r") as fil:
+			d = yaml.safe_load(fil)
+			safe_artists += d["artists"]
 
 def parseArtists(a):
 
@@ -47,8 +55,8 @@ def parseArtists(a):
 	if " performing " in a.lower():
 		return parseArtists(re.split(" [Pp]erforming",a)[0])
 
-#		if a.strip() in rules_belongtogether:
-#			return [a.strip()]
+	if a.strip() in safe_artists:
+		return [a.strip()]
 #		if a.strip() in rules_replaceartist:
 #			return rules_replaceartist[a.strip()].split("␟")
 

@@ -9,6 +9,10 @@
 *.ddb
 /testlibrary
 /src/cache
+/src/rules/*
+!/src/rules/.examplerules.yaml
+/src/settings/*
+!/src/settings/default.ini
 
 # only for development, normally external
 /src/nimrodel

@@ -1,0 +1,10 @@
+# dotfiles (like this one) will be ignored
+# all other files in this folder will be used
+
+# syntax is yaml
+
+# the rule
+artists: #artists that should be excluded from further interpreting
+# the entries
+- Selena Gomez & The Scene
+- Darth & Vader

@@ -218,7 +218,7 @@ function showView() {
 			if (this.readyState == 4 && this.status == 200) {
 				//var response = xhttp.responseText;
 				var response = this.response;
-				console.log(response)
+				//console.log(response)
 
 
 				element_info = response[type] //direct info is always saved in a subelement of same name in the dict

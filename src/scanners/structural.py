@@ -109,14 +109,17 @@ def scan_tree(d):
 			commonartists = []
 			#print("artists",artists)
 			artists_in_album = [a for a in artists]
-			artists_in_album.sort(key=lambda x:artists[x],reverse=True)
-			while len(artists_in_album) > 0:
-
-				if artists[artists_in_album[0]] > count/2 or len(commonartists) == 0:
-					commonartists.append(artists_in_album.pop(0))
-					#print("adding, now",commonartists)
-				else:
-					break
+	#		artists_in_album.sort(key=lambda x:artists[x],reverse=True)
+			commonartists = [a for a in artists_in_album if artists[a] > count/2]
+			if len(commonartists) == 0:
+				commonartists = ["Various Artists"]
+		#	while len(artists_in_album) > 0:
+#
+#				if artists[artists_in_album[0]] > count/2 or len(commonartists) == 0:
+#					commonartists.append(artists_in_album.pop(0))
+#					#print("adding, now",commonartists)
+#				else:
+#					break
 			commonalbum = ";".join(commonartists), commonalbum[1]
 
 		#folder_album = Album(name=commonalbum[1],albumartist=commonalbum[0])
