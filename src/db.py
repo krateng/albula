@@ -2,6 +2,7 @@
 
 from nimrodel import EAPI
 import requests
+import os
 
 import random
 
@@ -66,6 +67,38 @@ class Audio(db.DBObject):
 
 		return mime,stream
 
+
+	# extracts artwork, saves it and returns reference
+	def get_embedded_artworks(self):
+		ext = self.path.split(".")[-1].lower()
+		if ext in ["flac"]:
+			audio = FLAC(self.path)
+			imgs = audio.pictures
+
+		elif ext in ["mp3"]:
+			audio = MP3(self.path)
+			tags = audio.tags
+			imgs = tags.getall("APIC")
+
+		artworks = {"album":[],"track":[],"artist":[]}
+		for i in imgs:
+
+			data = i.data
+			imghash = str(zlib.adler32(data))
+			mime = i.mime
+
+			imagefile = imghash[:3] + "/" + imghash[3:] + "." + mime.split("/")[-1]
+			artwork = Artwork(path="cache/" + imagefile)
+			if not os.path.exists("cache/" + imagefile):
+				os.makedirs("cache/" + imagefile.split("/")[0],exist_ok=True)
+				with open("cache/" + imagefile,"wb") as fi:
+					fi.write(data)
+
+
+			if i.type == 3: artworks["album"].append(artwork)
+
+		return artworks
+
 	def metadata(self):
 		try:
 			return self.cached_metadata
@@ -92,7 +125,6 @@ class Audio(db.DBObject):
 				albumartist = None
 
 			length = int(audio.info.length)
-			imgs = audio.pictures
 
 		elif ext in ["mp3"]:
 			audio = MP3(self.path)
@@ -116,7 +148,6 @@ class Audio(db.DBObject):
 				albumartist = None
 
 			length = int(audio.info.length)
-			imgs = tags.getall("APIC")
 
 		self.cached_metadata = {
 			"title":title,
@@ -124,9 +155,7 @@ class Audio(db.DBObject):
 			"album":album,
 			"albumartist":albumartist,
 			"length":length,
-			"embedded_artwork":{
-				"album":[{"hash":zlib.adler32(i.data),"mime":i.mime,"data":i.data} for i in imgs if i.type == 3]
-			}
+
 		}
 
 		return self.cached_metadata

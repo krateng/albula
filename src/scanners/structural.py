@@ -195,15 +195,6 @@ def build_database(dirs):
 			)
 
 			# embedded artwork
-			for pic in f["embedded_artwork"]["album"]:
-				imghash,mime,data = str(pic["hash"]),pic["mime"],pic["data"]
-
-				imagefile = imghash[:3] + "/" + imghash[3:] + "." + mime.split("/")[-1]
-				artwork = Artwork(path="cache/" + imagefile)
-				if not os.path.exists("cache/" + imagefile):
-					os.makedirs("cache/" + imagefile.split("/")[0],exist_ok=True)
-					with open("cache/" + imagefile,"wb") as fi:
-						fi.write(data)
-					#ref = AlbumArtRef(album_id=track.album.uid,path="cache/" + imagefile)
-				if artwork not in track.albums[0].artworks:
-					track.albums[0].artworks.append(Artwork(path="cache/" + imagefile))
+			for aw in aud.get_embedded_artworks()["album"]:
+				if aw not in track.albums[0].artworks:
+						track.albums[0].artworks.append(aw)

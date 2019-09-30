@@ -1,1 +1,4 @@
-settings.files = [ "settings/default.ini" , "settings/settings.ini" ]
+settings:
+   files:
+   - "settings/default.ini"
+   - "settings/settings.ini"
