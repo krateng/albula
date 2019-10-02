@@ -138,8 +138,19 @@ for (var type in infos) {
 
 function playTrack(id,played) {
 	xhttpreq("/api/play",{id:id,seconds:played,time:now()},"POST");
+	time = now()
 	//update local info
 	var track = objs[id];
-	track.last_played = now();
+	track.last_played = time;
 	track.times_played += 1;
+	for (var i=0;i<track.artists.length;i++) {
+		id = track.artists[i].id;
+		objs[id].last_played = time;
+		objs[id].times_played += 1;
+	}
+	for (var i=0;i<track.albums.length;i++) {
+		id = track.albums[i].id;
+		objs[id].last_played = time;
+		objs[id].times_played += 1;
+	}
 }

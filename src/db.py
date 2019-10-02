@@ -235,6 +235,7 @@ class Track(db.DBObject):
 			"length":self.length,
 			#"sorttitle":self.title.lower(),
 			"artists":[{"id":a.uid,"name":a.name} for a in self.artists],
+			"albums":[{"id":a.uid,"name":a.name} for a in self.albums],
 		#	"artist_ids":list(a.uid for a in self.artists),
 		#	"artist_names":list(a.name for a in self.artists),
 		#	"artwork":[a.uid for a in self.artwork],
