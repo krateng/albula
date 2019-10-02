@@ -2,3 +2,6 @@ settings:
    files:
    - "settings/default.ini"
    - "settings/settings.ini"
+auth:
+   multiuser: false
+   cookieprefix: "albula"

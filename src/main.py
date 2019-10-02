@@ -6,7 +6,8 @@ from threading import *
 import time
 import os
 from doreah.settings import get_settings
-import auth
+from doreah import auth
+#import auth
 import signal
 
 

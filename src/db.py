@@ -263,7 +263,7 @@ class Track(db.DBObject):
 
 
 
-import auth
+from doreah import auth
 
 api = EAPI(path="api",delay=True,auth=auth.check)
 

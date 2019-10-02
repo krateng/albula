@@ -2,8 +2,8 @@ from bottle import Bottle, route, get, post, error, run, template, static_file, 
 from importlib.machinery import SourceFileLoader
 from doreah.pyhp import file as pyhpfile
 import db
-import auth
-
+#import auth
+from doreah import auth
 
 def server_handlers(server):
 
@@ -17,7 +17,8 @@ def server_handlers(server):
 		if auth.check(request):
 			result = pyhpfile("web/main.pyhp",{"db":db})
 		else:
-			result = pyhpfile("web/login.pyhp",{"db":db,"auth":auth})
+			#result = pyhpfile("web/login.pyhp",{"db":db,"auth":auth})
+			result = auth.get_login_page(stylesheets=["/grisons.css"])
 
 		return result
 

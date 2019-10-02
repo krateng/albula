@@ -64,31 +64,13 @@ a {
 	color:inherit;
 	text-decoration: none;
 }
-[onclick]:hover, a:hover {
-	cursor: pointer;
-}
+
 span[onclick]:hover, a:hover {
 	text-decoration: underline;
 }
 
 
 
-/** scrollbar **/
-
-::-webkit-scrollbar {
-  width: 8px;
-  cursor: pointer;
-}
-::-webkit-scrollbar-track {
-  background: grey;
-  background-color:rgba(0,255,255,0.1);
-}
-::-webkit-scrollbar-thumb {
-background-color:rgba(103,85,0,0.7);
-}
-::-webkit-scrollbar-thumb:hover {
-  background: gold;
-}
 
 
 
