@@ -287,7 +287,7 @@ def get_artist(id:int):
 	result = {}
 	result["artist"] = artist
 	result["tracks"] = list(artist.tracks)
-	result["albums"] = []
+	result["albums"] = list(artist.albums)
 	for t in result["tracks"]:
 		result["albums"] += t.albums
 	result["albums"] = list(set(result["albums"]))
