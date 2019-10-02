@@ -357,7 +357,7 @@ def play_track(id:int,seconds:int,time:int):
 		requests.post(url, data=data)
 
 AUDIOFORMATS = ["mp3","flac"]
-IMAGEFORMATS = ["jpeg","jpg","png"]
+IMAGEFORMATS = ["jpeg","jpg","png","webp"]
 
 from scanners.structural import build_database
 

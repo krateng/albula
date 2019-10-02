@@ -4,6 +4,7 @@ from db import db,Audio,Artwork,Album,Artist,Track,AUDIOFORMATS,IMAGEFORMATS
 
 import os
 import cleanup
+import yaml
 from doreah.settings import get_settings
 
 
@@ -27,6 +28,12 @@ def scan_dir(dir):
 			ext = f.split(".")[-1].lower()
 			if ext in AUDIOFORMATS: files.append(Audio(path=fullpath))
 			elif ext in IMAGEFORMATS: files.append(Artwork(path=fullpath))
+			elif f in ["artist.yml","artist.yaml"]:
+				with open(fullpath,"r") as fil:
+					files.append({**yaml.safe_load(fil),"type":"artist"})
+			elif f in ["album.yml","album.yaml"]:
+				with open(fullpath,"r") as fil:
+					files.append({**yaml.safe_load(fil),"type":"album"})
 			else: print("File",f,"has unknown format")
 
 	return (subdirs,files)
@@ -40,21 +47,35 @@ def scan_tree(d):
 		audiofiles += scan_tree(sd)
 
 
-
+	info = []
 	images = []
 	for f in files:
 		if isinstance(f,Audio):
 			audiofiles.append({**f.metadata(),"obj":f})
-		if isinstance(f,Artwork):
+		elif isinstance(f,Artwork):
 			images.append(f)
+		elif isinstance(f,dict):
+			info.append(f)
+
+	folder_album = None
+	folder_artist = None
+
+	folder_album_info = None
+	folder_artist_info = None
+
+	for inf in info:
+		if inf.get("type") == "album":
+			folder_album = ";".join(inf.get("albumartists")),inf.get("name")
+			folder_album_info = inf
+		if inf.get("type") == "artist":
+			folder_artist = inf.get("name")
+			folder_artist_info = inf
 
 
 	# look at all files in this subtree and check if they seem to have an album or an
 	# artist in common
-	folder_album = None
-	folder_artist = None
 
-	# check if common album
+
 	albums = {}
 	artists = {}
 	albumartists = {}
@@ -85,45 +106,46 @@ def scan_tree(d):
 
 
 	# determine folder artist / album
-	if len(artistlist) > 0 and artists[artistlist[0]]+albumartists[artistlist[0]] > len(audiofiles)/1.5:
-		#folder_artist = Artist(name=artistlist[0])
-		folder_artist = artistlist[0]
+	if folder_artist is None:
+		if len(artistlist) > 0 and artists[artistlist[0]]+albumartists[artistlist[0]] > len(audiofiles)/1.5:
+			#folder_artist = Artist(name=artistlist[0])
+			folder_artist = artistlist[0]
 
-	#print("finding album for folder",d.name)
-	#print(albums)
-	if len(albumlist) > 0 and albums[albumlist[0]] > len(audiofiles)/1.5:
-		#print("common album",commonalbum)
-		commonalbum = albumlist[0]
-		#if commonalbum[0] is None: commonalbum = [],commonalbum[1]
-		#commonalbum = cleanup.cleanartists(commonalbum[0]),commonalbum[1]
-		if commonalbum[0] in [[],"",None]:
-			# if most files have no album artist metadata, guess from tracks
-			artists = {}
-			count = 0
-			#print(list(aud["albumartist"] for aud in audiofiles))
-			for audio in audiofiles:
-				if audio["albumartist"] in ["",None] and audio["album"] == commonalbum[1]:
-					count += 1
-					for a in audio["artists"]:
-						artists[a] = artists.setdefault(a,0) + 1
-			commonartists = []
-			#print("artists",artists)
-			artists_in_album = [a for a in artists]
-	#		artists_in_album.sort(key=lambda x:artists[x],reverse=True)
-			commonartists = [a for a in artists_in_album if artists[a] > count/2]
-			if len(commonartists) == 0:
-				commonartists = ["Various Artists"]
-		#	while len(artists_in_album) > 0:
-#
-#				if artists[artists_in_album[0]] > count/2 or len(commonartists) == 0:
-#					commonartists.append(artists_in_album.pop(0))
-#					#print("adding, now",commonartists)
-#				else:
-#					break
-			commonalbum = ";".join(commonartists), commonalbum[1]
 
-		#folder_album = Album(name=commonalbum[1],albumartist=commonalbum[0])
-		folder_album = commonalbum
+	if folder_album is None:
+		if len(albumlist) > 0 and albums[albumlist[0]] > len(audiofiles)/1.5:
+			#print("common album",commonalbum)
+			commonalbum = albumlist[0]
+			#if commonalbum[0] is None: commonalbum = [],commonalbum[1]
+			#commonalbum = cleanup.cleanartists(commonalbum[0]),commonalbum[1]
+			if commonalbum[0] in [[],"",None]:
+				# if most files have no album artist metadata, guess from tracks
+				artists = {}
+				count = 0
+				#print(list(aud["albumartist"] for aud in audiofiles))
+				for audio in audiofiles:
+					if audio["albumartist"] in ["",None] and audio["album"] == commonalbum[1]:
+						count += 1
+						for a in audio["artists"]:
+							artists[a] = artists.setdefault(a,0) + 1
+				commonartists = []
+				#print("artists",artists)
+				artists_in_album = [a for a in artists]
+		#		artists_in_album.sort(key=lambda x:artists[x],reverse=True)
+				commonartists = [a for a in artists_in_album if artists[a] > count/2]
+				if len(commonartists) == 0:
+					commonartists = ["Various Artists"]
+			#	while len(artists_in_album) > 0:
+	#
+	#				if artists[artists_in_album[0]] > count/2 or len(commonartists) == 0:
+	#					commonartists.append(artists_in_album.pop(0))
+	#					#print("adding, now",commonartists)
+	#				else:
+	#					break
+				commonalbum = ";".join(commonartists), commonalbum[1]
+
+			#folder_album = Album(name=commonalbum[1],albumartist=commonalbum[0])
+			folder_album = commonalbum
 
 
 
