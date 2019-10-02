@@ -32,3 +32,8 @@ function xhttpreq(url,data={},method="GET",callback=function(){},json=true) {
 	xhttp.send(body);
 	console.log("Sent!")
 }
+
+
+function now() {
+	return Math.floor(Date.now() / 1000);
+}

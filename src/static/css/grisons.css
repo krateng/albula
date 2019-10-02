@@ -43,3 +43,23 @@ table.top_info td.text table.image_row td:hover {
 	opacity:1;
 	filter: grayscale(0%);
 }
+
+
+
+
+/** SCROLLBAR **/
+
+::-webkit-scrollbar {
+  width: 8px;
+  cursor: pointer;
+}
+::-webkit-scrollbar-track {
+  background: grey;
+  background-color:rgba(0,255,255,0.1);
+}
+::-webkit-scrollbar-thumb {
+background-color:rgba(103,85,0,0.7);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: gold;
+}

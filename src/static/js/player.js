@@ -11,9 +11,7 @@ var played = 0;
 // helper functions to abstract timekeeping into a clock analogy
 var lastUpdate = 0;
 var ticking = false;
-function now() {
-	return Math.floor(Date.now() / 1000);
-}
+
 function startClock() {
 	if (!ticking) {
 		ticking = true;
@@ -79,12 +77,8 @@ function uninitSound() {
 
 	playing = false
 	if (sound != null) {
-		xhttpreq("/api/play",{id:list[idx],seconds:played,time:now()},"POST");
-		//update local info, doesn't necessarily need to be exactly consistent with db, just for
-		//sorting and stuff
-		var track = objs[list[idx]];
-		track.last_played = now();
-		track.times_played += 1;
+		playTrack(list[idx],played);
+
 		playing = sound.playing;
 
 		if (sound.state() != "loaded") {
