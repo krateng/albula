@@ -43,6 +43,16 @@ function initSound(startplay=false) {
 	});
 	sound.on("end",nxt);
 
+	// preloading next sound for smooth transition, don't need to actually keep reference,
+	// just make sure howler has it loaded once
+	if (list.length > idx+1) {
+		nextsound = new Howl({
+			src: ["/audioof/" + list[idx+1]],
+			format: "mp3"
+		});
+	}
+
+
 	document.getElementById("current_track_artwork").style.backgroundImage = "url('" + track.artwork + "')";
 	document.getElementById("current_track_title").innerHTML = track.title;
 	document.getElementById("current_track_artists").innerHTML = createLinks("artist",track.artists,", ");

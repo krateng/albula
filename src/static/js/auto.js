@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			var [element, func] = entry
 			window[func](element); //call function on that element
 		}
-		setTimeout(supervisor,300);
+		setTimeout(supervisor,40);
 	}
 	supervisor();
 
