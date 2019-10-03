@@ -90,6 +90,7 @@ function uninitSound() {
 		}
 		sound = null;
 	}
+	pause();
 
 	document.getElementById("current_track_artwork").style.backgroundImage = "none";
 	document.getElementById("current_track_title").innerHTML = "";

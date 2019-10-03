@@ -144,13 +144,14 @@ function playTrack(id,played) {
 	track.last_played = time;
 	track.times_played += 1;
 	for (var i=0;i<track.artists.length;i++) {
-		id = track.artists[i].id;
+		var id = track.artists[i].id;
 		objs[id].last_played = time;
 		objs[id].times_played += 1;
 	}
 	for (var i=0;i<track.albums.length;i++) {
-		id = track.albums[i].id;
+		var id = track.albums[i].id;
 		objs[id].last_played = time;
 		objs[id].times_played += 1;
 	}
+
 }

@@ -211,12 +211,23 @@ def build_database(dirs):
 			track = Track(
 				title=title,
 				artists=[Artist(name=a) for a in artists],
-				albums=[Album(name=f["album"],albumartists=[Artist(name=a) for a in albumartists])],
+			#	albums=[Album(name=f["album"],albumartists=[Artist(name=a) for a in albumartists])],
 				audiofiles=[aud],
 				length=f["length"]
 			)
+			album = Album(
+				name=f["album"],
+				albumartists=[Artist(name=a) for a in albumartists]
+			)
 
-			# embedded artwork
+			album.tracks_preliminary = getattr(album,"tracks_preliminary",[]) + [(f["position"],track)]
+
+
 			for aw in aud.get_embedded_artworks()["album"]:
-				if aw not in track.albums[0].artworks:
-						track.albums[0].artworks.append(aw)
+				if aw not in album.artworks:
+						album.artworks.append(aw)
+
+
+	for al in db.getall(Album):
+		al.tracks = [e[1] for e in sorted(al.tracks_preliminary,key=lambda x:x[0])]
+		del al.tracks_preliminary

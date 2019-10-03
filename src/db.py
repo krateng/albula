@@ -123,6 +123,10 @@ class Audio(db.DBObject):
 				albumartist = [entry[1] for entry in tags if entry[0] == "ALBUMARTIST"][0]
 			except:
 				albumartist = None
+			try:
+				pos = [entry[1] for entry in tags if entry[0] == "TRACKNUMBER"][0]
+			except:
+				pos = 0
 
 			length = int(audio.info.length)
 
@@ -147,6 +151,11 @@ class Audio(db.DBObject):
 			except:
 				albumartist = None
 
+			try:
+				pos = tags.get("TRCK").text[0].split("/")[0]
+			except:
+				pos = 0
+
 			length = int(audio.info.length)
 
 		self.cached_metadata = {
@@ -155,6 +164,7 @@ class Audio(db.DBObject):
 			"album":album,
 			"albumartist":albumartist,
 			"length":length,
+			"position":int(pos)
 
 		}
 
@@ -188,39 +198,14 @@ class Artist(db.DBObject):
 		return self.tracks
 
 
-class Album(db.DBObject):
-	__primary__ = "name","albumartists"
-	name: str
-	albumartists: list = MultiRef(Artist,exclusive=False,backref="albums")
-	artworks: list = MultiRef(Artwork,exclusive=False,backref="album")
-	artwork_index: int
 
-	def __apidict__(self):
-		return {
-			"uid":self.uid,
-			"albumartists":[{"id":a.uid,"name":a.name} for a in self.albumartists],
-		#	"albumartist_ids":list(a.uid for a in self.albumartists),
-		#	"albumartist_names":list(a.name for a in self.albumartists),
-			"name":self.name,
-			#"sorttitle":self.name.lower(),
-		#	"artwork":[a.uid for a in self.artwork],
-			"artwork":self.get_artwork().link(),
-			"artwork_choices":[a.link() for a in self.artworks],
-			"last_played":max([t.lastplayed for t in self.tracks] + [0]),
-			"times_played":sum(t.timesplayed for t in self.tracks),
-			"track_ids":[track.uid for track in self.tracks]
-		}
-
-	def get_artwork(self):
-		if len(self.artworks) > 0: return self.artworks[self.artwork_index]
-		else: return PseudoArtwork("album")
 
 
 class Track(db.DBObject):
 	__primary__ = "title","artists"
 	title: str
 	artists: list = MultiRef(Artist,backref="tracks",exclusive=False)
-	albums: list = MultiRef(Album,backref="tracks",exclusive=False)
+	#albums: list = MultiRef(Album,backref="tracks",exclusive=False)
 	audiofiles: list = MultiRef(Audio,exclusive=True,backref="track")
 	artworks: list = MultiRef(Artwork,exclusive=False,backref="track")
 	artwork_index: int
@@ -261,6 +246,34 @@ class Track(db.DBObject):
 		return [self]
 
 
+
+class Album(db.DBObject):
+	__primary__ = "name","albumartists"
+	name: str
+	albumartists: list = MultiRef(Artist,exclusive=False,backref="albums")
+	tracks: list = MultiRef(Track,exclusive=False,backref="albums")
+	artworks: list = MultiRef(Artwork,exclusive=False,backref="album")
+	artwork_index: int
+
+	def __apidict__(self):
+		return {
+			"uid":self.uid,
+			"albumartists":[{"id":a.uid,"name":a.name} for a in self.albumartists],
+		#	"albumartist_ids":list(a.uid for a in self.albumartists),
+		#	"albumartist_names":list(a.name for a in self.albumartists),
+			"name":self.name,
+			#"sorttitle":self.name.lower(),
+		#	"artwork":[a.uid for a in self.artwork],
+			"artwork":self.get_artwork().link(),
+			"artwork_choices":[a.link() for a in self.artworks],
+			"last_played":max([t.lastplayed for t in self.tracks] + [0]),
+			"times_played":sum(t.timesplayed for t in self.tracks),
+			"track_ids":[track.uid for track in self.tracks]
+		}
+
+	def get_artwork(self):
+		if len(self.artworks) > 0: return self.artworks[self.artwork_index]
+		else: return PseudoArtwork("album")
 
 
 
