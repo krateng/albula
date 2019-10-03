@@ -26,7 +26,7 @@ function renderElements(elements,info) {
 					 <div class="artwork" style="background-image:url('` + element.artwork + `');"></div>
 					 <div class="hover"></div>
 				 </td></tr>
-				 <tr class="secondary_info"><td>` + secondary_info_html.join(" | ") + `<span></span>
+				 <tr class="secondary_info"><td>` + secondary_info_html.join(" | ") + `<span>&nbsp;</span>
 				 </td></tr>
 				 <tr class="main_info"><td>
 					 <span title="` + info.primary(element) + `"><a href="?view=detail&type=` + info.type + `&id=` + element.uid + `">` + info.primary(element) + `</a></span>

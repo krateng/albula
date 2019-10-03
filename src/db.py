@@ -164,7 +164,7 @@ class Audio(db.DBObject):
 		if title is None:
 			filename = self.path.split("/")[-1].split(".")[0]
 			num, name = re.match(r"([0-9]*)[ -]*(.*)",filename).groups()
-			if pos == 0: pos = int(num)
+			if pos == 0 and num != "": pos = int(num)
 			title = name
 
 		self.cached_metadata = {
@@ -386,22 +386,62 @@ from scanners.structural import build_database
 
 def prune_database():
 
-	# remove file references that have no objects
-	artworks = db.getall(Artwork)
-	referenced_artworks = set().union(*[set(entity.artworks) for entity in db.getall(Track) + db.getall(Album) + db.getall(Artist)])
-	for a in artworks:
+	referenced_audiofiles = set()
+	referenced_artworks = set()
+
+	for t in db.getall(Track):
+		# remove track if it has no audio files
+		if t.audiofiles == []:
+			print(t,"has no music file associated, removing...")
+			db.delete(t)
+
+		# list all refrenced files
+		for af in t.audiofiles:
+			referenced_audiofiles.add(af)
+		for aw in t.artworks:
+			referenced_artworks.add(aw)
+
+	for e in db.getall(Album) + db.getall(Artist):
+		# remove album / artist if no tracks / albums
+		if e.tracks == [] and getattr(e,"albums",[]) == []:
+			print(e,"has no tracks, removing...")
+			db.delete(e)
+
+		for aw in e.artworks:
+			referenced_artworks.add(aw)
+
+
+	for a in db.getall(Artwork):
 		if a not in referenced_artworks:
 			print(a.path,"no longer referenced, removing...")
 			db.delete(a)
-
-	audiofiles = db.getall(Audio)
-	referenced_audiofiles = set().union(*[set(entity.audiofiles) for entity in db.getall(Track)])
-	for a in audiofiles:
+	for a in db.getall(Audio):
 		if a not in referenced_audiofiles:
 			print(a.path,"no longer referenced, removing...")
 			db.delete(a)
 
-	# remove tracks that have no audiofiles
+
+	# remove file references that have no objects
+#	artworks = db.getall(Artwork)
+#	referenced_artworks = set().union(*[set(entity.artworks) for entity in db.getall(Track) + db.getall(Album) + db.getall(Artist)])
+#	for a in artworks:
+#		if a not in referenced_artworks:
+#			print(a.path,"no longer referenced, removing...")
+#			db.delete(a)
+#
+#	audiofiles = db.getall(Audio)
+#	referenced_audiofiles = set().union(*[set(entity.audiofiles) for entity in db.getall(Track)])
+#	for a in audiofiles:
+#		if a not in referenced_audiofiles:
+#			print(a.path,"no longer referenced, removing...")
+#			db.delete(a)
+#
+#	# remove tracks that have no audiofiles
+#	tracks = db.getall(Track)
+#	for t in tracks:
+#		if t.audiofiles == []:
+#			print(t,"has no music file associated, removing...")
+#			db.delete(t)
 
 def save_database():
 	db.save()

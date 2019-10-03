@@ -204,6 +204,13 @@ def build_database(dirs):
 		for f in files:
 			aud = f["obj"]
 
+			# remove from previously attached track (in case metadata changed we don't want the
+			# old track to keep pretending it's still real)
+			try:
+				aud.track.audiofiles.remove(aud)
+			except:
+				pass
+
 			artists,title = cleanup.fullclean(f["artists"],f["title"])
 			albumartists = cleanup.cleanartists([f["albumartist"]])
 
@@ -229,5 +236,8 @@ def build_database(dirs):
 
 
 	for al in db.getall(Album):
-		al.tracks = [e[1] for e in sorted(al.tracks_preliminary,key=lambda x:x[0])]
-		del al.tracks_preliminary
+		try:
+			al.tracks = [e[1] for e in sorted(al.tracks_preliminary,key=lambda x:x[0])]
+			del al.tracks_preliminary
+		except:
+			pass
