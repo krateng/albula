@@ -3,6 +3,7 @@
 from nimrodel import EAPI
 import requests
 import os
+import re
 
 import random
 
@@ -117,7 +118,7 @@ class Audio(db.DBObject):
 			try:
 				title = [entry[1] for entry in tags if entry[0] == "TITLE"][0]
 			except:
-				title = self.path.split("/")[-1].split(".")[0]
+				title = None
 			artists = [entry[1] for entry in tags if entry[0] == "ARTIST"]
 			try:
 				albumartist = [entry[1] for entry in tags if entry[0] == "ALBUMARTIST"][0]
@@ -141,7 +142,7 @@ class Audio(db.DBObject):
 			try:
 				title = tags.get("TIT2").text[0]
 			except:
-				title = self.path.split("/")[-1].split(".")[0]
+				title = None
 
 			#artists = [set(obj.text) for obj in tags.getall("TPE1") + tags.getall("TPE2") + tags.getall("TPE3") + tags.getall("TPE4")]
 			artists = [set(obj.text) for obj in tags.getall("TPE1")]
@@ -157,6 +158,14 @@ class Audio(db.DBObject):
 				pos = 0
 
 			length = int(audio.info.length)
+
+
+
+		if title is None:
+			filename = self.path.split("/")[-1].split(".")[0]
+			num, name = re.match(r"([0-9]*)[ -]*(.*)",filename).groups()
+			if pos == 0: pos = int(num)
+			title = name
 
 		self.cached_metadata = {
 			"title":title,
