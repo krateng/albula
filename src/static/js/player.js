@@ -123,7 +123,7 @@ function play() {
 		sound.play();
 		startClock();
 	}
-	console.log("Playing element",idx,"of",list)
+	//console.log("Playing element",idx,"of",list)
 
 	button = document.getElementById("play_pause_button");
 	button.className = "button_pause";

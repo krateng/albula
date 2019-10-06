@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+
+from db import db, Track
+from doreah.settings import get_settings
+import requests
+import urllib
+
+# credit to StackOverflow user Greenstick
+def printProgressBar(iteration, total, prefix = '', suffix = '', decimals = 0, length = 100, fill = '█'):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+    """
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '-' * (length - filledLength)
+    print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = '\r')
+    # Print New Line on Complete
+    if iteration == total:
+        print()
+
+tracks = db.getall(Track)
+
+tracks = {(frozenset(a.name.lower() for a in t.artists),t.title.lower()):t for t in tracks}
+matched_tracks = {}
+
+malserver = get_settings("MALOJA_SERVER")
+if malserver is None:
+	malserver = input("Please enter the URL of your Maloja server: ")
+
+# list of tracks
+url = malserver + "/api/tracks"
+result = requests.get(url)
+result = result.json()["list"]
+for r in result:
+	tr = (frozenset(a.lower() for a in r["artists"]),r["title"].lower())
+	if tr in tracks:
+		matched_tracks[tracks[tr]] = r
+
+#print(matched_tracks)
+
+
+url = malserver + "/api/trackinfo"
+i = 0
+tracknumber = len(matched_tracks)
+for t in matched_tracks:
+	i += 1
+	trackinfo = matched_tracks[t]
+	info = []
+	for a in trackinfo["artists"]: info.append(("artist",a))
+	info.append(("title",trackinfo["title"]))
+#	trackurl = url + "?" + "&".join(["artist=" + a for a in trackinfo["artists"]]) + "&title=" + trackinfo["title"]
+	trackurl = url + "?" + urllib.parse.urlencode(info)
+#	print("Making request",trackurl)
+	result = requests.get(trackurl)
+	result = result.json()
+	#print(t,"has",result["scrobbles"],"scrobbles")
+	printProgressBar(i,tracknumber,prefix="Importing Maloja data")
+	t.timesplayed = result["scrobbles"]
+
+db.save()
