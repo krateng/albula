@@ -12,6 +12,9 @@
 			<div onclick="lnk('sort','alphabet')">A-Z</div>
 			<div onclick="lnk('sort','last')">⏲️</div>
 			<div onclick="lnk('sort','most')">#</div>
+			<br/>
+			<div onclick="setPlaylistRandom(data.track.map(function(o){return o.uid}))">🔀</div>
+			<div onclick="setPlaylistWeightedRandom(data.track.map(function(o){return o.uid}))">📻</div>
 		</div>
 
 

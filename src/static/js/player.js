@@ -153,6 +153,23 @@ function setPlaylist(lst) {
 	initSound();
 	play();
 }
+function setPlaylistRandom(lst) {
+	for (var i = lst.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        [lst[i],lst[j]] = [lst[j],lst[i]];
+    }
+	setPlaylist(lst);
+}
+function setPlaylistWeightedRandom(lst) {
+	len = lst.length;
+	for (var i=0;i<len;i++) {
+		var track = objs[lst[i]]
+		for (var j=0;j<track.times_played;j++) {
+			lst.push(lst[i])
+		}
+	}
+	setPlaylistRandom(lst);
+}
 
 
 // change current track. init sound object and put metadata in etc

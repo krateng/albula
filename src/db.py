@@ -359,8 +359,9 @@ def get_artwork_of(uid):
 @api.post("play")
 def play_track(id:int,seconds:int,time:int):
 	track = db.get(id)
-	track.timesplayed += 1
-	track.lastplayed = time
+	if seconds > 5:
+		track.timesplayed += 1
+		track.lastplayed = time
 
 	if seconds > (track.length / 2):
 		print("Scrobbling!")
