@@ -70,3 +70,18 @@ background-color:rgba(103,85,0,0.7);
 [onclick]:hover, a:hover {
 	cursor: pointer;
 }
+
+
+/** HOVERABLE LOAD/PROGRESS BAR **/
+
+
+div.grisons_bar {
+	background-color:rgba(0,255,255,0.1);
+}
+div.grisons_bar>div {
+	height:100%;
+	background-color:rgba(103,85,0,0.7);
+}
+div.grisons_bar:hover>div {
+	background-color:gold;
+}

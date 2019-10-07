@@ -155,14 +155,6 @@ span[onclick]:hover, a:hover {
 #playback_bar #progressbar {
 	width:100%;
 	height:15px;
-	background-color:rgba(0,255,255,0.1);
-}
-#playback_bar #progressbar #progressed {
-	height:100%;
-	background-color:rgba(103,85,0,0.7);
-}
-#playback_bar #progressbar:hover #progressed {
-	background-color:gold;
 }
 
 #playback_bar>table {
@@ -219,18 +211,11 @@ span[onclick]:hover, a:hover {
 }
 
 #volumecontrol {
-	background-color:rgba(0,255,255,0.1);
 	display:inline-block;
 	width:100px;
 	height:30px;
 }
-#volumecontrol #volume {
-	height:30px;
-	background-color:rgba(103,85,0,0.7);
-}
-#volumecontrol:hover #volume {
-	background-color:gold;
-}
+
 
 #playback_bar #metadata table {
 	table-layout: fixed;

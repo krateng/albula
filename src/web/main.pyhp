@@ -1,6 +1,9 @@
 <html>
 	<head>
 		<pyhp include="common/head.html" />
+		<script>
+			function getUid(o) {return o.uid}
+		</script>
 	</head>
 
 	<body onload="showView()">
@@ -13,8 +16,8 @@
 			<div onclick="lnk('sort','last')">⏲️</div>
 			<div onclick="lnk('sort','most')">#</div>
 			<br/>
-			<div onclick="setPlaylistRandom(data.track.map(function(o){return o.uid}))">🔀</div>
-			<div onclick="setPlaylistWeightedRandom(data.track.map(function(o){return o.uid}))">📻</div>
+			<div onclick="setPlaylistRandom(data.track.map(getUid))">🔀</div>
+			<div onclick="setPlaylistWeightedRandom(data.track.map(getUid))">📻</div>
 		</div>
 
 
@@ -23,7 +26,7 @@
 		</div>
 
 		<div id="playback_bar">
-			<div id="progressbar" onclick="seek(event,this)">
+			<div id="progressbar" class="grisons_bar" onclick="seek(event,this)">
 				<div id="progressed" style="width:0%;" class="update" data-updatefrom="updateProgressBar"></div>
 			</div>
 			<table><tr>
@@ -67,7 +70,7 @@
 					<div id="next_button" class="button_next" onclick="next()"></div>
 				</td>
 				<td id="settings">
-					<div id="volumecontrol" class="seekable" data-seekcallback="changeVolume">
+					<div id="volumecontrol" class="seekable grisons_bar" data-seekcallback="changeVolume">
 						<div id="volume" style="width:50%;"></div>
 					</div>
 				</td>
