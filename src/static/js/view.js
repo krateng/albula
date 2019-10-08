@@ -116,7 +116,7 @@ function showView() {
 
 
 				var html = `
-				<table class="top_info">
+				<table class="top_info ` + this.type + `_info">
 					<tr>
 						<td class="image">
 							<div id="main_image" style="background-image:url('` + element_info.artwork + `')"></div>

@@ -129,8 +129,15 @@ span[onclick]:hover, a:hover {
 }
 
 
-.content_element table tr.image td div.artwork {
+.content_element.artist table tr.image td div.artwork , .top_info.artist_info #main_image {
+	border-radius: 50%;
 }
+.content_element.album table tr.image td div.artwork , .top_info.album_info #main_image {
+}
+.content_element.track table tr.image td div.artwork , .top_info.track_info #main_image {
+	border-radius: 25% 5%;
+}
+
 .content_element table tr.image td div.hover {
 }
 .content_element table tr.image td:hover div.artwork {
