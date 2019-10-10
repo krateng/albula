@@ -221,7 +221,16 @@ function seek(ev,element) {
 
 function changeVolume(prct) {
 	Howler.volume(prct);
+	setCookie("volume",prct);
 }
+function getVolume() {
+	return Howler._volume;
+}
+changeVolume(getCookie("volume"));
+document.addEventListener("DOMContentLoaded",function() {
+	document.getElementById("volume").style="width:" + Number(getCookie("volume"))*100 + "%;";
+});
+
 
 
 function updateProgressBar(element) {
