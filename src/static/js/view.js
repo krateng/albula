@@ -125,7 +125,7 @@ function showView() {
 						</td>
 						<td class="text">
 							<span>` + secondary_info_html.join(" | ") + `</span><br/>
-							<h1>` + this.info.primary(element_info) + `</h1>
+							<h1 contenteditable="true" onfocusout="setName(` + this.id + `,this.innerHTML)">` + this.info.primary(element_info) + `</h1>
 							<br/><br/><br/>
 							<table class="image_row" id="image_choices"><tr>` + artworks_html.join("") + `</tr></table>
 						</td>

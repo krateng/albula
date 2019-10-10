@@ -172,3 +172,11 @@ function setArtwork(id,awid) {
 	//update local info
 	objs[id].artwork = "/artwork/" + awid;
 }
+
+function setName(id,name) {
+	xhttpreq("/api/setname",{element:id,name:name},"POST");
+
+	//update local info
+	objs[id].name = name;
+	objs[id].title = name;
+}

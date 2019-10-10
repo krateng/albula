@@ -386,6 +386,14 @@ def set_artwork(element:int,artwork:int):
 	assert artwork in element.artworks
 	element.artwork_index = element.artworks.index(artwork)
 
+@api.post("setname")
+def set_name(element:int,name:str):
+	element = db.get(element)
+	if isinstance(element,Artist) or isinstance(element,Album):
+		element.name = name
+	elif isinstance(element,Track):
+		element.title = name
+
 
 AUDIOFORMATS = ["mp3","flac"]
 IMAGEFORMATS = ["jpeg","jpg","png","webp"]
