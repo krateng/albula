@@ -364,7 +364,6 @@ def play_track(id:int,seconds:int,time:int):
 		track.lastplayed = time
 
 	if seconds > (track.length / 2):
-		print("Scrobbling!")
 
 		if get_settings("MALOJA_SCROBBLE"):
 			server = get_settings("MALOJA_SERVER")
@@ -380,12 +379,22 @@ def play_track(id:int,seconds:int,time:int):
 
 		requests.post(url, data=data)
 
+@api.post("setartwork")
+def set_artwork(element:int,artwork:int):
+	element = db.get(element)
+	artwork = db.get(artwork)
+	assert artwork in element.artworks
+	element.artwork_index = element.artworks.index(artwork)
+
+
 AUDIOFORMATS = ["mp3","flac"]
 IMAGEFORMATS = ["jpeg","jpg","png","webp"]
 
 from scanners.structural import build_database
 
 def prune_database():
+
+	print("Pruning database...")
 
 	referenced_audiofiles = set()
 	referenced_artworks = set()

@@ -107,9 +107,11 @@ function showView() {
 				artworks_html = [];
 				for (var i=0;i<element_info.artwork_choices.length;i++) {
 					choice = element_info.artwork_choices[i];
+					id = choice.split("/").slice(-1)[0]
 					artworks_html.push(`<td style="background-image:url('` + choice + `');"
 					onmouseover="document.getElementById('main_image').style.backgroundImage='url(\\'` + choice + `\\')';"
-					onmouseout="document.getElementById('main_image').style.backgroundImage='url(\\'` + element_info.artwork + `\\')';">
+					onmouseout="document.getElementById('main_image').style.backgroundImage='url(\\'` + element_info.artwork + `\\')';"
+					onclick="setArtwork(` + this.id + `,` + id + `);showView();">
 					</td>`)
 				}
 

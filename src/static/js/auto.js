@@ -1,5 +1,11 @@
 // functions that are automatically assined based on html attributes
 
+SMOOTH_UPDATE = false;
+
+
+
+var update_delay = SMOOTH_UPDATE ? 40 : 500;
+
 document.addEventListener('DOMContentLoaded', function() {
 	elements = document.getElementsByClassName("seekable");
 	for (var i=0;i<elements.length;i++) {
@@ -25,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			var [element, func] = entry
 			window[func](element); //call function on that element
 		}
-		setTimeout(supervisor,40);
+		setTimeout(supervisor,update_delay);
 	}
 	supervisor();
 

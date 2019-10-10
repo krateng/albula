@@ -137,8 +137,9 @@ for (var type in infos) {
 
 
 function playTrack(id,played) {
-	xhttpreq("/api/play",{id:id,seconds:played,time:now()},"POST");
-	time = now()
+	var time = now()
+	xhttpreq("/api/play",{id:id,seconds:played,time:time},"POST");
+
 	//update local info
 	var track = objs[id];
 	if (played > 5) {
@@ -160,4 +161,14 @@ function playTrack(id,played) {
 
 
 
+}
+
+
+
+
+function setArtwork(id,awid) {
+	xhttpreq("/api/setartwork",{element:id,artwork:awid},"POST");
+
+	//update local info
+	objs[id].artwork = "/artwork/" + awid;
 }
