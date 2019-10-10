@@ -1,50 +1,21 @@
 # scanner that takes folder structure into account
 
-from db import db,Audio,Artwork,Album,Artist,Track,AUDIOFORMATS,IMAGEFORMATS
+from db import db,Audio,Artwork,Album,Artist,Track
 
 import os
 import cleanup
 import yaml
-from doreah.settings import get_settings
+#from doreah.settings import get_settings
+#from doreah.io import NestedProgressBar
 
 
-class Directory:
-	def __init__(self,name,subdirs,files):
-		self.name = name
-		self.subdirs = list(subdirs)
-		self.files = list(files)
-
-# build directory tree
-def scan_dir(dir):
-	subdirs = []
-	files = []
-	for f in os.listdir(dir):
-		if f in get_settings("IGNORE_FILES"): return ([],[])
-		if f.startswith("."): continue
-		fullpath = os.path.join(dir,f)
-		if os.path.isdir(fullpath):
-			subdirs.append(Directory(f,*scan_dir(fullpath)))
-		else:
-			ext = f.split(".")[-1].lower()
-			if ext in AUDIOFORMATS: files.append(Audio(path=fullpath))
-			elif ext in IMAGEFORMATS: files.append(Artwork(path=fullpath))
-			elif f in ["artist.yml","artist.yaml"]:
-				with open(fullpath,"r") as fil:
-					files.append({**yaml.safe_load(fil),"type":"artist"})
-			elif f in ["album.yml","album.yaml"]:
-				with open(fullpath,"r") as fil:
-					files.append({**yaml.safe_load(fil),"type":"album"})
-			else: print("File",f,"has unknown format")
-
-	return (subdirs,files)
-
-def scan_tree(d):
+def scan_tree(d,prog):
 	subdirs,files = d.subdirs, d.files
 
 	# gather all audiofile references in this folder + subfolders (to check what this folder might be about)
 	audiofiles = []
 	for sd in subdirs:
-		audiofiles += scan_tree(sd)
+		audiofiles += scan_tree(sd,prog)
 
 
 	info = []
@@ -56,6 +27,8 @@ def scan_tree(d):
 			images.append(f)
 		elif isinstance(f,dict):
 			info.append(f)
+
+		prog.progress()
 
 	folder_album = None
 	folder_artist = None
@@ -182,58 +155,61 @@ def scan_tree(d):
 
 
 
-def build_database(dirs):
-	scanned = 0
+def parse(dirs,prog_parse,prog_build):
 
-	#alreadydone = set(a.path for a in db.getall(Audio)).union(set(a.path for a in db.getall(Artwork)))
+	files = []
+
 	for dir in dirs:
+		files += scan_tree(dir,prog_parse)
 
-		d = Directory(dir,*scan_dir(dir))
-		files = scan_tree(d)
+	prog_parse.done()
 
-		# all tracks that have no albumartist yet get their artist as albumartist
-		# all tracks that have no album get their own title as album
-		for f in files:
-			if f["albumartist"] is None:
-				#print("no albumartist:",f)
-				f["albumartist"] = ", ".join(f["artists"])
-			if f["album"] is None:
-				f["album"] = f["title"]
+	# all tracks that have no albumartist yet get their artist as albumartist
+	# all tracks that have no album get their own title as album
+	for f in files:
+		if f["albumartist"] is None:
+			#print("no albumartist:",f)
+			f["albumartist"] = ", ".join(f["artists"])
+		if f["album"] is None:
+			f["album"] = f["title"]
 
-		# create objects from metadata
-		for f in files:
-			aud = f["obj"]
+	# create objects from metadata
+	for f in files:
+		aud = f["obj"]
 
-			# remove from previously attached track (in case metadata changed we don't want the
-			# old track to keep pretending it's still real)
-			try:
-				aud.track.audiofiles.remove(aud)
-			except:
-				pass
+		# remove from previously attached track (in case metadata changed we don't want the
+		# old track to keep pretending it's still real)
+		try:
+			aud.track.audiofiles.remove(aud)
+		except:
+			pass
 
-			artists,title = cleanup.fullclean(f["artists"],f["title"])
-			albumartists = cleanup.cleanartists([f["albumartist"]])
-
-
-			track = Track(
-				title=title,
-				artists=[Artist(name=a) for a in artists],
-			#	albums=[Album(name=f["album"],albumartists=[Artist(name=a) for a in albumartists])],
-				audiofiles=[aud],
-				length=f["length"]
-			)
-			album = Album(
-				name=f["album"],
-				albumartists=[Artist(name=a) for a in albumartists]
-			)
-
-			album.tracks_preliminary = getattr(album,"tracks_preliminary",[]) + [(f["position"],track)]
+		artists,title = cleanup.fullclean(f["artists"],f["title"])
+		albumartists = cleanup.cleanartists([f["albumartist"]])
 
 
-			for aw in aud.get_embedded_artworks()["album"]:
-				if aw not in album.artworks:
-						album.artworks.append(aw)
+		track = Track(
+			title=title,
+			artists=[Artist(name=a) for a in artists],
+		#	albums=[Album(name=f["album"],albumartists=[Artist(name=a) for a in albumartists])],
+			audiofiles=[aud],
+			length=f["length"]
+		)
+		album = Album(
+			name=f["album"],
+			albumartists=[Artist(name=a) for a in albumartists]
+		)
 
+		album.tracks_preliminary = getattr(album,"tracks_preliminary",[]) + [(f["position"],track)]
+
+
+		for aw in aud.get_embedded_artworks()["album"]:
+			if aw not in album.artworks:
+					album.artworks.append(aw)
+
+		prog_build.progress()
+
+	prog_build.done()
 
 	for al in db.getall(Album):
 		try:

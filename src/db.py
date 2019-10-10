@@ -17,6 +17,7 @@ import zlib
 #from db_oo_helper import Ref, MultiRef, DBObject, db, save_database, load_database
 from doreah.database import Database, Ref, MultiRef
 from doreah.settings import get_settings
+from doreah.io import ProgressBar
 
 db = Database(file="database.ddb",ignore_capitalization=True)
 
@@ -395,22 +396,51 @@ def set_name(element:int,name:str):
 		element.title = name
 
 
-AUDIOFORMATS = ["mp3","flac"]
-IMAGEFORMATS = ["jpeg","jpg","png","webp"]
 
-from scanners.structural import build_database
+
+from parsers.structural import parse
+from scanner import scan
+
+def build_database(dirs):
+	trees = scan(dirs)
+
+	num_files = 0
+	for t in trees:
+		num_files += t.total_files()
+
+	prog_parse = ProgressBar(
+		num_files,
+		prefix="Parsing files       "
+	)
+	prog_build = ProgressBar(
+		num_files,
+		prefix="Building database   "
+	)
+	parse(trees,prog_parse,prog_build)
+
+
 
 def prune_database():
 
-	print("Pruning database...")
+	alltracks = db.getall(Track)
+	allalbums = db.getall(Album)
+	allartists = db.getall(Artist)
+
+	allartworks = db.getall(Artwork)
+	allaudios = db.getall(Audio)
+
+	prog = ProgressBar(
+		len(alltracks) + len(allalbums) + len(allartists) + len(allartworks) + len(allaudios),
+		prefix="Pruning database    "
+	)
 
 	referenced_audiofiles = set()
 	referenced_artworks = set()
 
-	for t in db.getall(Track):
+	for t in alltracks:
 		# remove track if it has no audio files
 		if t.audiofiles == []:
-			print(t,"has no music file associated, removing...")
+			#print(t,"has no music file associated, removing...")
 			db.delete(t)
 
 		# list all refrenced files
@@ -419,24 +449,32 @@ def prune_database():
 		for aw in t.artworks:
 			referenced_artworks.add(aw)
 
-	for e in db.getall(Album) + db.getall(Artist):
+		prog.progress()
+
+	for e in allalbums + allartists:
 		# remove album / artist if no tracks / albums
 		if e.tracks == [] and getattr(e,"albums",[]) == []:
-			print(e,"has no tracks, removing...")
+			#print(e,"has no tracks, removing...")
 			db.delete(e)
 
 		for aw in e.artworks:
 			referenced_artworks.add(aw)
 
+		prog.progress()
 
-	for a in db.getall(Artwork):
+
+	for a in allartworks:
 		if a not in referenced_artworks:
-			print(a.path,"no longer referenced, removing...")
+			#print(a.path,"no longer referenced, removing...")
 			db.delete(a)
-	for a in db.getall(Audio):
+		prog.progress()
+	for a in allaudios:
 		if a not in referenced_audiofiles:
-			print(a.path,"no longer referenced, removing...")
+			#print(a.path,"no longer referenced, removing...")
 			db.delete(a)
+		prog.progress()
+
+	prog.done()
 
 
 	# remove file references that have no objects
