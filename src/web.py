@@ -18,7 +18,7 @@ def server_handlers(server):
 			result = pyhpfile("web/main.pyhp",{"db":db})
 		else:
 			#result = pyhpfile("web/login.pyhp",{"db":db,"auth":auth})
-			result = auth.get_login_page(stylesheets=["/grisons.css"])
+			result = auth.get_login_page(stylesheets=["/style.css"])
 
 		return result
 

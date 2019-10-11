@@ -4,3 +4,4 @@ doreah>=1.1.2
 nimrodel>=0.5.6
 mutagen>=1.42
 pyyaml>=5.1
+lesscpy>=0.13

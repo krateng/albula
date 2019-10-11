@@ -27,7 +27,14 @@ db.prune_database()
 
 
 
+import lesscpy
+css = ""
+for f in os.listdir("static/less"):
+	css += lesscpy.compile("static/less/" + f,minify=True)
 
+os.makedirs("static/css",exist_ok=True)
+with open("static/css/style.css","w") as f:
+	f.write(css)
 
 
 def graceful_exit(sig=None,frame=None):
