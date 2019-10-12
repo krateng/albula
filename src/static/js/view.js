@@ -45,9 +45,24 @@ function showView() {
 
 	var url_string = window.location.href;
 	var url = new URL(url_string);
-	var view = url.searchParams.get("view") || "list";
-	var type = url.searchParams.get("type") || "album"
-	var sortby = url.searchParams.get("sort") || "alphabet";
+
+	if (!url.searchParams.get("view") ||
+		!url.searchParams.get("type") ||
+		(!url.searchParams.get("sort")) && url.searchParams.get("view") == "list") {
+			url.searchParams.set("view",url.searchParams.get("view") || "list");
+			url.searchParams.set("type",url.searchParams.get("type") || "album");
+			url.searchParams.set("sort",url.searchParams.get("sort") || getCookie("sort") || "alphabet");
+
+			history.pushState({},"","?" + url.searchParams.toString());
+	}
+
+
+
+	var view = url.searchParams.get("view");
+	var type = url.searchParams.get("type");
+	var sortby = url.searchParams.get("sort");
+
+	if (sortby != null) { setCookie("sort",sortby); }
 
 	if (view == "list") {
 		var info = infos[type]
