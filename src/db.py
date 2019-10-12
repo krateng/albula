@@ -403,8 +403,11 @@ def set_name(element:int,name:str):
 
 
 
-from parsers.structural import parse
-from scanner import scan
+#from parsers.structural import parse
+#from scanner import scan
+
+from dbbuild.parser import parse
+from dbbuild.scanner import scan
 
 def build_database(dirs):
 	trees = scan(dirs)
@@ -412,6 +415,8 @@ def build_database(dirs):
 	num_files = 0
 	for t in trees:
 		num_files += t.total_files()
+
+	new_files = len([a for a in db.getall(Audio) if a.track is None])
 
 	prog_parse = ProgressBar(
 		num_files,
