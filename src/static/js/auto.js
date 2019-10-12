@@ -1,6 +1,6 @@
 // functions that are automatically assined based on html attributes
 
-SMOOTH_UPDATE = false;
+SMOOTH_UPDATE = true;
 
 
 

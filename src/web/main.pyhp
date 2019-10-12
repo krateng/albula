@@ -13,7 +13,8 @@
 			<div onclick="lnk('view','list','type','track')">Tracks</div>
 			<br/>
 			<div onclick="lnk('sort','alphabet')">A-Z</div>
-			<div onclick="lnk('sort','last')">⏲️</div>
+			<div onclick="lnk('sort','last')">📅</div>
+			<div onclick="lnk('sort','duration')">⏲️</div>
 			<div onclick="lnk('sort','most')">#</div>
 			<br/>
 			<div onclick="setPlaylistRandom(data.track.map(getUid))">🔀</div>

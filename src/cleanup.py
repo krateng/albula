@@ -26,6 +26,7 @@ def cleanartists(artists_):
 	return artists
 
 def removespecial(s):
+	if s is None: return ""
 	s = s.replace("\t","").replace("␟","").replace("\n","")
 	s = re.sub(" +"," ",s)
 	return "".join(ch for ch in s if unicodedata.category(ch)[0]!="C")

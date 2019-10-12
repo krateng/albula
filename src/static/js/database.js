@@ -86,7 +86,8 @@ var infos = {
 var sortings = {
 	"alphabet":e=>e.sorttitle,
 	"last":e=>-e.last_played,
-	"most":e=>-e.times_played
+	"most":e=>-e.times_played,
+	"duration":e=>-e.length
 }
 
 var sortingfuncs = {}

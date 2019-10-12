@@ -19,7 +19,7 @@ from doreah.database import Database, Ref, MultiRef
 from doreah.settings import get_settings
 from doreah.io import ProgressBar
 
-db = Database(file="database.ddb",ignore_capitalization=True)
+db = Database(file="database.ddb")
 
 
 class Artwork(db.DBObject):
@@ -183,6 +183,7 @@ class Audio(db.DBObject):
 
 class Artist(db.DBObject):
 	__primary__ = "name",
+	__dbsettings__ = {"ignore_capitalization":True}
 	name: str
 	artworks: list = MultiRef(Artwork,exclusive=False,backref="artist")
 	artwork_index: int
@@ -197,6 +198,7 @@ class Artist(db.DBObject):
 			"artwork_choices":[a.link() for a in self.artworks],
 			"last_played":max([t.lastplayed for t in self.tracks] + [0]),
 			"times_played":sum(t.timesplayed for t in self.tracks),
+			"length":sum(t.length for t in self.tracks),
 			"track_ids":[track.uid for track in self.tracks]
 		}
 
@@ -213,6 +215,7 @@ class Artist(db.DBObject):
 
 class Track(db.DBObject):
 	__primary__ = "title","artists"
+	__dbsettings__ = {"ignore_capitalization":True}
 	title: str
 	artists: list = MultiRef(Artist,backref="tracks",exclusive=False)
 	#albums: list = MultiRef(Album,backref="tracks",exclusive=False)
@@ -259,6 +262,7 @@ class Track(db.DBObject):
 
 class Album(db.DBObject):
 	__primary__ = "name","albumartists"
+	__dbsettings__ = {"ignore_capitalization":True}
 	name: str
 	albumartists: list = MultiRef(Artist,exclusive=False,backref="albums")
 	tracks: list = MultiRef(Track,exclusive=False,backref="albums")
@@ -278,6 +282,7 @@ class Album(db.DBObject):
 			"artwork_choices":[a.link() for a in self.artworks],
 			"last_played":max([t.lastplayed for t in self.tracks] + [0]),
 			"times_played":sum(t.timesplayed for t in self.tracks),
+			"length":sum(t.length for t in self.tracks),
 			"track_ids":[track.uid for track in self.tracks]
 		}
 

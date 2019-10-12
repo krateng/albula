@@ -29,7 +29,7 @@ function renderElements(elements,info) {
 				 <tr class="secondary_info"><td>` + secondary_info_html.join(" | ") + `<span>&nbsp;</span>
 				 </td></tr>
 				 <tr class="main_info"><td>
-					 <span title="` + info.primary(element) + `"><a href="?view=detail&type=` + info.type + `&id=` + element.uid + `">` + info.primary(element) + `</a></span>
+					 <span title="` + info.primary(element).replace(/"/g,'&quot;') + `"><a href="?view=detail&type=` + info.type + `&id=` + element.uid + `">` + info.primary(element) + `</a></span>
 				 </td></tr>
 			 </table>
 		 </div>
@@ -50,7 +50,7 @@ function showView() {
 		!url.searchParams.get("type") ||
 		(!url.searchParams.get("sort")) && url.searchParams.get("view") == "list") {
 			url.searchParams.set("view",url.searchParams.get("view") || "list");
-			url.searchParams.set("type",url.searchParams.get("type") || "album");
+			url.searchParams.set("type",url.searchParams.get("type") || getCookie("viewtype") || "album");
 			url.searchParams.set("sort",url.searchParams.get("sort") || getCookie("sort") || "alphabet");
 
 			history.pushState({},"","?" + url.searchParams.toString());
@@ -63,6 +63,7 @@ function showView() {
 	var sortby = url.searchParams.get("sort");
 
 	if (sortby != null) { setCookie("sort",sortby); }
+	if (type != null) { setCookie("viewtype",type); }
 
 	if (view == "list") {
 		var info = infos[type]
