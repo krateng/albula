@@ -166,13 +166,27 @@ span[onclick]:hover, a:hover {
 /* sub-divs for different background images stacked */
 .content_element table tr.image td div {
 	position:absolute;
-	background-size:cover;
+	background-size:contain;
 	background-position: center;
 	background-repeat: no-repeat;
 	width:160px;
 	height:160px;
 	top:0px;
 	left:0px;
+}
+.content_element table tr.image td div.element_play {
+	height:130px;
+}
+.content_element table tr.image td div.element_append {
+	top:130px;
+	height:30px;
+	width:50%;
+}
+.content_element table tr.image td div.element_insert {
+	top:130px;
+	height:30px;
+	left:50%;
+	width:50%;
 }
 
 
@@ -185,13 +199,19 @@ span[onclick]:hover, a:hover {
 	border-radius: 25% 5%;
 }
 
-.content_element table tr.image td div.hover {
+.content_element table tr.image td div.element_play {
 }
 .content_element table tr.image td:hover div.artwork {
 	opacity: 0.5;
 }
-.content_element table tr.image td:hover div.hover {
+.content_element table tr.image td div.element_play:hover {
 	background-image: url("/play.png");
+}
+.content_element table tr.image td div.element_append:hover {
+	background-image: url("/listadd.png");
+}
+.content_element table tr.image td div.element_insert:hover {
+	background-image: url("/listinsert.png");
 }
 
 .content_element tr.secondary_info {

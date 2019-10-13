@@ -25,9 +25,11 @@ function renderElements(elements,info) {
 		 elements_html += `
 		 <div class="content_element ` + info.css_class + `">
 			<table>
-				 <tr class="image"><td onclick="setPlaylist([` + element.track_ids.join(",") + `])">
-					 <div class="artwork" style="background-image:url('` + element.artwork + `');"></div>
-					 <div class="hover"></div>
+				<tr class="image"><td>
+				 	<div class="artwork" style="background-image:url('` + element.artwork + `');"></div>
+					<div title="Play" class="element_play" onclick="setPlaylist(` + element.uid + `)"></div>
+					<div title="Add to queue"  class="element_append" onclick="appendPlaylist(` + element.uid + `)"></div>
+ 					<div title="Play next" class="element_insert" onclick="insertPlaylist(` + element.uid + `)"></div>
 				 </td></tr>
 				 <tr class="secondary_info"><td>` + secondary_info_html.join(" | ") + `<span>&nbsp;</span>
 				 </td></tr>

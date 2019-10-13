@@ -28,11 +28,24 @@ function stopClock() {
 
 }
 
+function updateList() {
+	for (var i=1;i<5;i++) {
+		try {
+			var next = objs[list[idx+i]];
+			document.getElementById("next_" + i).innerHTML = createLinks("artist",next.artists,", ") + " - " + next.title;
+		}
+		catch {
+
+		}
+	}
+}
+
 
 // need to do this for correct event listener below
 function nxt() {
 	next();
 }
+
 
 // function should always be called when new track becomes current one. inits sound object and fills in metadata
 function initSound(startplay=false) {
@@ -50,15 +63,7 @@ function initSound(startplay=false) {
 	document.getElementById("current_track_title").innerHTML = track.title;
 	document.getElementById("current_track_artists").innerHTML = createLinks("artist",track.artists,", ");
 
-	for (var i=1;i<5;i++) {
-		try {
-			var next = objs[list[idx+i]];
-			document.getElementById("next_" + i).innerHTML = createLinks("artist",next.artists,", ") + " - " + next.title;
-		}
-		catch {
-
-		}
-	}
+	updateList();
 
 
 
@@ -145,7 +150,12 @@ function pause() {
 	button.onclick = play;
 }
 
+
+// if these receive a single number instead of a playlist, they interpret it as the object
 function setPlaylist(lst) {
+	if (!Array.isArray(lst)) {
+		lst = objs[lst].track_ids;
+	}
 	pause();
 	uninitSound();
 	list = lst;
@@ -153,7 +163,24 @@ function setPlaylist(lst) {
 	initSound();
 	play();
 }
+function appendPlaylist(lst) {
+	if (!Array.isArray(lst)) {
+		lst = objs[lst].track_ids;
+	}
+	list = list.concat(lst);
+	updateList();
+}
+function insertPlaylist(lst) {
+	if (!Array.isArray(lst)) {
+		lst = objs[lst].track_ids;
+	}
+	list = list.slice(0,idx+1).concat(lst).concat(list.slice(idx+1));
+	updateList();
+}
 function setPlaylistRandom(lst) {
+	if (!Array.isArray(lst)) {
+		lst = objs[lst].track_ids;
+	}
 	for (var i = lst.length - 1; i > 0; i--) {
         var j = Math.floor(Math.random() * (i + 1));
         [lst[i],lst[j]] = [lst[j],lst[i]];
@@ -161,6 +188,9 @@ function setPlaylistRandom(lst) {
 	setPlaylist(lst);
 }
 function setPlaylistWeightedRandom(lst) {
+	if (!Array.isArray(lst)) {
+		lst = objs[lst].track_ids;
+	}
 	len = lst.length;
 	for (var i=0;i<len;i++) {
 		var track = objs[lst[i]]
