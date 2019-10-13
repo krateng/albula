@@ -20,10 +20,10 @@
 		</div>
 
 		<div class="content_controls" id="content_controls_sort">
-			<pyhp include="../static/svg/sort_alphabet.svg"    onclick="lnk('sort','alphabet')" /><br/>
-			<pyhp include="../static/svg/sort_lastplayed.svg"  onclick="lnk('sort','last')" /><br/>
-			<pyhp include="../static/svg/sort_duration.svg"    onclick="lnk('sort','duration')" /><br/>
-			<pyhp include="../static/svg/sort_love.svg"        onclick="lnk('sort','most')" />
+			<pyhp include="../static/svg/sort_alphabet.svg"    onclick="lnk('sort','alphabet')" id="icon_sort_alphabet" /><br/>
+			<pyhp include="../static/svg/sort_lastplayed.svg"  onclick="lnk('sort','last')"     id="icon_sort_last" /><br/>
+			<pyhp include="../static/svg/sort_duration.svg"    onclick="lnk('sort','duration')" id="icon_sort_duration" /><br/>
+			<pyhp include="../static/svg/sort_love.svg"        onclick="lnk('sort','most')"     id="icon_sort_most" />
 
 		</div>
 

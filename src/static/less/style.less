@@ -83,9 +83,7 @@ body {
 #content_controls_play div:hover {
 	background-color: @FOCUS_COLOR;
 }
-.hide {
-	display:none;
-}
+
 
 #playback_bar {
 	background-color: black;
@@ -106,6 +104,13 @@ body {
 	font-weight: bold;
 }
 
+.hide {
+	display:none;
+}
+.active {
+	color:@TEXT_COLOR_SELECTED !important;
+	fill:@TEXT_COLOR_SELECTED !important;
+}
 
 span[onclick]:hover, a:hover {
 	text-decoration: underline;

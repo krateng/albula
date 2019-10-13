@@ -53,7 +53,7 @@ function showView() {
 
 	if (!url.searchParams.get("view") ||
 		!url.searchParams.get("type") ||
-		(!url.searchParams.get("sort")) && url.searchParams.get("view") == "list") {
+		(!url.searchParams.get("sort"))) {
 			url.searchParams.set("view",url.searchParams.get("view") || "list");
 			url.searchParams.set("type",url.searchParams.get("type") || getCookie("viewtype") || "album");
 			url.searchParams.set("sort",url.searchParams.get("sort") || getCookie("sort") || "alphabet");
@@ -69,6 +69,12 @@ function showView() {
 
 	if (sortby != null) { setCookie("sort",sortby); }
 	if (type != null) { setCookie("viewtype",type); }
+
+	sortcontrols = document.getElementById("content_controls_sort").children;
+	for (var i=0;i<sortcontrols.length;i++) {
+		sortcontrols[i].classList.remove("active");
+	}
+	document.getElementById("icon_sort_" + sortby).classList.add("active");
 
 	if (view == "list") {
 		currentObj = null
