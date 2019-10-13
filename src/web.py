@@ -7,6 +7,18 @@ from doreah import auth
 
 def server_handlers(server):
 
+	@server.get("/style.css")
+	def generate_style():
+
+		import lesscpy
+		import os
+		css = ""
+		for f in os.listdir("static/less"):
+			css += lesscpy.compile("static/less/" + f,minify=True)
+
+		response.content_type = 'text/css'
+		return css
+
 	@server.get("/<file>.<ext>")
 	def file(file,ext):
 		return static_file("static/" + ext + "/" + file + "." + ext,root="")

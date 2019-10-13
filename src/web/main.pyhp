@@ -12,10 +12,7 @@
 			<div onclick="lnk('view','list','type','album')">Albums</div>
 			<div onclick="lnk('view','list','type','track')">Tracks</div>
 			<br/>
-			<div onclick="lnk('sort','alphabet')">A-Z</div>
-			<div onclick="lnk('sort','last')">📅</div>
-			<div onclick="lnk('sort','duration')">⏲️</div>
-			<div onclick="lnk('sort','most')">#</div>
+
 			<br/>
 			<div onclick="setPlaylistRandom(data.track.map(getUid))">🔀</div>
 			<div onclick="setPlaylistWeightedRandom(data.track.map(getUid))">📻</div>
@@ -24,6 +21,13 @@
 
 		<div id="content_area" class="content_area">
 
+		</div>
+
+		<div id="content_controls">
+			<div onclick="lnk('sort','alphabet')">A-Z</div>
+			<div onclick="lnk('sort','last')">📅</div>
+			<div onclick="lnk('sort','duration')">⏲️</div>
+			<div onclick="lnk('sort','most')">#</div>
 		</div>
 
 		<div id="playback_bar">

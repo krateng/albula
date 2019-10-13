@@ -43,7 +43,7 @@ for t in matched_tracks:
 	result = requests.get(trackurl)
 	result = result.json()
 	#print(t,"has",result["scrobbles"],"scrobbles")
-	print_progress_bar(i,tracknumber,prefix="Importing Maloja data")
+	print_progress_bar(num=(i,tracknumber),prefix="Importing Maloja data")
 	t.timesplayed = result["scrobbles"]
 
 db.save()

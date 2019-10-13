@@ -153,8 +153,14 @@ function showView() {
 				for (var j=0;j<this.info.detail_info.length;j++) {
 					e = this.info.detail_info[j];
 					html += `<h2>` + e.name + `</h2>`;
-					elements = e.source(response);
+
 					einfo = infos[e.type];
+					elements = e.source(response);
+					for (let el of elements) {
+						einfo.change(el); //apply all local data preparations
+					}
+					elements.sort(sortingfuncs[sortby]);
+
 
 					html += renderElements(elements,einfo);
 
