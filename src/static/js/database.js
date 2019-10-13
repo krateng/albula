@@ -164,6 +164,15 @@ function playTrack(id,played) {
 
 }
 
+function allTracksOf(id) {
+	if (id == null) {
+		return data.track.map(getUid);
+	}
+	else {
+		return objs[id].track_ids;
+	}
+}
+
 
 
 

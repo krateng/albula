@@ -1,3 +1,6 @@
+var currentObj = null;
+
+function getCurrent() { return currentObj; }
 
 
 function renderElements(elements,info) {
@@ -66,6 +69,7 @@ function showView() {
 	if (type != null) { setCookie("viewtype",type); }
 
 	if (view == "list") {
+		currentObj = null
 		var info = infos[type]
 		var elements = data[type]
 
@@ -92,6 +96,7 @@ function showView() {
 		var info = infos[type];
 		var id = url.searchParams.get("id");
 		var url = info.detail_url.replace("%ID%",id)
+		currentObj = id
 
 		var xhttp = new XMLHttpRequest();
 		// need to save this local because of js late binding

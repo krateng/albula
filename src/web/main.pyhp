@@ -28,8 +28,8 @@
 		</div>
 
 		<div class="content_controls" id="content_controls_play">
-			<pyhp include="../static/svg/play_random.svg"      onclick="setPlaylistRandom(data.track.map(getUid))" /><br/>
-			<pyhp include="../static/svg/play_radio.svg"       onclick="setPlaylistWeightedRandom(data.track.map(getUid))" /><br/>
+			<pyhp include="../static/svg/play_random.svg"      onclick="setPlaylistRandom(allTracksOf(getCurrent()))" /><br/>
+			<pyhp include="../static/svg/play_radio.svg"       onclick="setPlaylistWeightedRandom(allTracksOf(getCurrent()))" /><br/>
 
 		</div>
 
