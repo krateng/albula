@@ -47,7 +47,7 @@ body {
 	position:fixed;
 }
 #content_controls_play {
-	bottom:155px;
+	bottom:135px;
 	padding:20px;
 	right:30px;
 
@@ -61,14 +61,27 @@ body {
 
 	fill: @TEXT_COLOR;
 }
-#content_controls_play svg {
-	height:40px;
-	width:40px;
-	margin-top:20px;
+#content_controls_play div {
+	height:60px;
+	width:60px;
+	margin-top:0px;
+	border-radius: 50px;
+	background-color: @TEXT_COLOR;
+
+	text-align: center;
+}
+#content_controls_play div svg {
+	margin-top:15px;
+	fill: @BASE_COLOR;
+	height:30px;
+	width:30px;
 }
 
-.content_controls svg:hover {
+#content_controls_sort svg:hover {
 	fill: @FOCUS_COLOR;
+}
+#content_controls_play div:hover {
+	background-color: @FOCUS_COLOR;
 }
 .hide {
 	display:none;
