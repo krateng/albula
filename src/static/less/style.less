@@ -46,8 +46,15 @@ body {
 
 	position:fixed;
 }
-#content_controls div {
-	margin-top:20px;
+#content_controls svg {
+	height:20px;
+	width:20px;
+	margin-top:10px;
+
+	fill: @TEXT_COLOR;
+}
+#content_controls svg:hover {
+	fill: @FOCUS_COLOR;
 }
 .hide {
 	display:none;
