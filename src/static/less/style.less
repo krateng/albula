@@ -21,7 +21,7 @@ body {
 	top:0px;
 	text-align: center;
 
-	height:130px;
+	height:70px;
 	padding-top:25px;
 	padding-left:15px;
 	padding-right: 15px;
@@ -31,7 +31,7 @@ body {
 
 	left:5px;
 	right:5px;
-	top:155px;
+	top:95px;
 	bottom:120px;
 
 	padding:20px;
@@ -39,21 +39,29 @@ body {
 	position:fixed;
 	overflow-y: scroll;
 }
-#content_controls {
-	top:155px;
+#content_controls_sort {
+	top:95px;
 	padding:20px;
 	right:30px;
 
 	position:fixed;
 }
-#content_controls svg {
+#content_controls_play {
+	bottom:155px;
+	padding:20px;
+	right:30px;
+
+	position:fixed;
+}
+
+.content_controls svg {
 	height:20px;
 	width:20px;
 	margin-top:10px;
 
 	fill: @TEXT_COLOR;
 }
-#content_controls svg:hover {
+.content_controls svg:hover {
 	fill: @FOCUS_COLOR;
 }
 .hide {

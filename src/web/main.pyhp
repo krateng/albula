@@ -12,10 +12,6 @@
 			<div onclick="lnk('view','list','type','album')">Albums</div>
 			<div onclick="lnk('view','list','type','track')">Tracks</div>
 			<br/>
-
-			<br/>
-			<div onclick="setPlaylistRandom(data.track.map(getUid))">🔀</div>
-			<div onclick="setPlaylistWeightedRandom(data.track.map(getUid))">📻</div>
 		</div>
 
 
@@ -23,11 +19,18 @@
 
 		</div>
 
-		<div id="content_controls">
+		<div class="content_controls" id="content_controls_sort">
 			<pyhp include="../static/svg/sort_alphabet.svg"    onclick="lnk('sort','alphabet')" /><br/>
 			<pyhp include="../static/svg/sort_lastplayed.svg"  onclick="lnk('sort','last')" /><br/>
 			<pyhp include="../static/svg/sort_duration.svg"    onclick="lnk('sort','duration')" /><br/>
 			<pyhp include="../static/svg/sort_love.svg"        onclick="lnk('sort','most')" />
+
+		</div>
+
+		<div class="content_controls" id="content_controls_play">
+			<pyhp include="../static/svg/play_random.svg"      onclick="setPlaylistRandom(data.track.map(getUid))" /><br/>
+			<pyhp include="../static/svg/play_radio.svg"       onclick="setPlaylistWeightedRandom(data.track.map(getUid))" /><br/>
+
 		</div>
 
 		<div id="playback_bar">
