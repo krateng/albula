@@ -1,8 +1,8 @@
 from doreah.settings import get_settings
-from doreah.io import NestedProgressBar
+from doreah.io import NestedProgressBar, ProgressBar
 import os
 import yaml
-from db import Audio, Artwork, Artist, Album
+from db import Audio, Artwork, Artist, Album, Track, db
 
 
 AUDIOFORMATS = ["mp3","flac"]
@@ -72,10 +72,34 @@ def scan_dir(dir,progressbar):
 
 
 def scan(dirs):
+	old_audiofiles = db.getall(Audio)
+	for a in old_audiofiles:
+		if not os.path.exists(a.path):
+			a.track.audiofiles.remove(a)
+			db.delete(a)
+
+
 	scan_dir_prog = NestedProgressBar(len(dirs),prefix="Scanning directories",manual=True)
-	results = []
+	trees = []
+	new_audiofiles = []
 	for dir in dirs:
 		d = scan_dir(dir,progressbar=scan_dir_prog)
-		results.append(d)
+		trees.append(d)
 
-	return results
+	new_audiofiles = [a for a in db.getall(Audio) if a not in old_audiofiles]
+
+	old_tracks = db.getall(Track)
+
+	#when scanning, also call metadata refresher for newly added files
+	from dbbuild.parser import build_metadata
+	build_metadata(new_audiofiles,trees)
+
+	new_tracks = [t for t in db.getall(Track) if t not in old_tracks]
+
+	# import maloja data for new tracks
+	malserver = get_settings("MALOJA_SERVER")
+	if malserver is not None:
+		from dbbuild.malojareader import get_scrobbles
+		get_scrobbles(new_tracks)
+
+	return trees

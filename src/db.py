@@ -162,11 +162,11 @@ class Audio(db.DBObject):
 
 
 
-		if title is None:
+		if title is None or pos is 0:
 			filename = self.path.split("/")[-1].split(".")[0]
 			num, name = re.match(r"([0-9]*)[ -]*(.*)",filename).groups()
 			if pos == 0 and num != "": pos = int(num)
-			title = name
+			if title is None: title = name
 
 		self.cached_metadata = {
 			"title":title,
@@ -403,31 +403,24 @@ def set_name(element:int,name:str):
 
 
 
-#from parsers.structural import parse
-#from scanner import scan
 
-from dbbuild.parser import parse
-from dbbuild.scanner import scan
+@api.post("scan")
+def scan_new():
+	dirs = get_settings("MUSIC_DIRECTORIES")
+	from dbbuild.scanner import scan
 
-def build_database(dirs):
 	trees = scan(dirs)
 
-	num_files = 0
-	for t in trees:
-		num_files += t.total_files()
 
-	new_files = len([a for a in db.getall(Audio) if a.track is None])
+@api.post("refresh_metadata")
+def refresh_metadata(audio_ids=None):
+	if audio_ids is None:
+		audios = db.getall(Audio)
+	else:
+		audios = [db.get(id) for id in audio_ids]
 
-	prog_parse = ProgressBar(
-		num_files,
-		prefix="Parsing files       "
-	)
-	prog_build = ProgressBar(
-		num_files,
-		prefix="Building database   "
-	)
-	parse(trees,prog_parse,prog_build)
-
+	from dbbuild.parse import build_metadata
+	build_metadata(audios)
 
 
 def prune_database():
