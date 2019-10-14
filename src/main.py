@@ -19,7 +19,6 @@ THREADS = 12
 
 #db.load_database()
 db.scan_new()
-db.prune_database()
 
 
 

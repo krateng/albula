@@ -102,4 +102,8 @@ def scan(dirs):
 		from dbbuild.malojareader import get_scrobbles
 		get_scrobbles(new_tracks)
 
+
+	from dbbuild.pruner import prune_database
+	prune_database()
+
 	return trees

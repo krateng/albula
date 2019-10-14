@@ -20,9 +20,10 @@ def build_metadata(filelist,trees):
 	)
 
 	todo = []
-	for t in trees:
-		td, _ = scan_tree_for(filelist,t,prog_build)
-		todo += td
+	if len(filelist) > 0:
+		for t in trees:
+			td, _ = scan_tree_for(filelist,t,prog_build)
+			todo += td
 
 
 
@@ -56,12 +57,12 @@ def build_metadata(filelist,trees):
 
 
 	prog_imag = ProgressBar(
-		len(db.getall(Audio)),
+		len(filelist),
 		prefix="Extracting artwork  "
 	)
 
 
-	for aud in db.getall(Audio):
+	for aud in filelist:
 		prog_imag.progress()
 		for aw in aud.get_embedded_artworks()["album"]:
 			if aw not in aud.track.albums[0].artworks:
