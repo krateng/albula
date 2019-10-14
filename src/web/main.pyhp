@@ -81,7 +81,7 @@
 				</td>
 				<td id="controls">
 					<div id="prev_button" class="button_prev" onclick="prev()"></div>
-					<div id="play_pause_button" class="button_play" onclick="play"></div>
+					<div id="play_pause_button" class="button_play" onclick="play" data-hotkey="Space"></div>
 					<div id="next_button" class="button_next" onclick="next()"></div>
 				</td>
 				<td id="settings">
