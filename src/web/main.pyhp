@@ -32,7 +32,7 @@
 				<pyhp include="../static/svg/play_random.svg" />
 			</div>
 			<br/>
-			<div onclick="setPlaylistWeightedRandom(allTracksOf(getCurrent()))">
+			<div onclick="setPlaylistWeightedRandom(allTracksOf(getCurrent()))" data-hotkey="KeyR">
 				<pyhp include="../static/svg/play_radio.svg" />
 			</div>
 
@@ -80,9 +80,9 @@
 					</table>
 				</td>
 				<td id="controls">
-					<div id="prev_button" class="button_prev" onclick="prev()"></div>
+					<div id="prev_button" class="button_prev" onclick="prev()" data-hotkey="ArrowLeft"></div>
 					<div id="play_pause_button" class="button_play" onclick="play" data-hotkey="Space"></div>
-					<div id="next_button" class="button_next" onclick="next()"></div>
+					<div id="next_button" class="button_next" onclick="next()" data-hotkey="ArrowRight"></div>
 				</td>
 				<td id="settings">
 					<div id="volumecontrol" class="seekable grisons_bar" data-seekcallback="changeVolume">
