@@ -181,6 +181,7 @@ function setPlaylistRandom(lst) {
 	if (!Array.isArray(lst)) {
 		lst = objs[lst].track_ids;
 	}
+	lst = lst.slice()
 	for (var i = lst.length - 1; i > 0; i--) {
         var j = Math.floor(Math.random() * (i + 1));
         [lst[i],lst[j]] = [lst[j],lst[i]];
@@ -191,6 +192,7 @@ function setPlaylistWeightedRandom(lst) {
 	if (!Array.isArray(lst)) {
 		lst = objs[lst].track_ids;
 	}
+	lst = lst.slice()
 	len = lst.length;
 	for (var i=0;i<len;i++) {
 		var track = objs[lst[i]]
