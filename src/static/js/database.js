@@ -190,3 +190,52 @@ function setName(id,name) {
 	objs[id].name = name;
 	objs[id].title = name;
 }
+
+const searchresults = {};
+function search(query) {
+	query = query.toLowerCase().replace("'","").replace('"','');
+	var results = searchresults;
+	if (!results.hasOwnProperty("hits")) {
+		results.hits = data;
+	}
+
+
+	var partquery = ""
+	for (let char of query) {
+		partquery += char;
+		if (results.hasOwnProperty(char)) {
+			results = results[char];
+		}
+		else {
+			hits = [];
+			results[char] = {hits:{}};
+			for (var type in infos) {
+				results[char].hits[type] = []
+				for (let entry of results.hits[type]) {
+					if (entry.sorttitle.includes(partquery)) {
+						results[char].hits[type].push(entry);
+					}
+				}
+			}
+			results = results[char];
+		}
+	}
+	return results.hits;
+}
+
+function searchCurrentView(query) {
+	p = new Promise(function() {
+		var url = new URL(window.location.href)
+		var params = url.searchParams;
+		var view = params.get("view")
+		var type = params.get("type")
+		var sort = params.get("sort")
+
+		var results = search(query);
+		results = results[type];
+		results.sort(sortingfuncs[sort]);
+		document.getElementById("content_area").innerHTML = renderElements(results,infos[type]);
+	});
+	return;
+
+}

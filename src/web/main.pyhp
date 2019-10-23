@@ -11,7 +11,8 @@
 			<div onclick="lnk('view','list','type','artist')">Artists</div>
 			<div onclick="lnk('view','list','type','album')">Albums</div>
 			<div onclick="lnk('view','list','type','track')">Tracks</div>
-			<br/>
+			<br/><br/>
+			<input id="search" placeholder="Search..." oninput="searchCurrentView(this.value)" />
 		</div>
 
 

@@ -87,7 +87,10 @@ function showView() {
 		}
 
 
-
+		if (document.getElementById("search").value != "") {
+			searchCurrentView(document.getElementById("search").value);
+			return;
+		}
 
 		elements.sort(sortingfuncs[sortby]);
 		//console.log(elements)
