@@ -3,10 +3,10 @@ cookiesloaded=true;}
 document.addEventListener("load",getCookies);function setCookie(key,val,session=true){if(!cookiesloaded){getCookies();}
 cookies[key]=val;if(!session){var d=new Date();d.setTime(d.getTime()+(500*24*60*60*1000));expirestr="expires="+d.toUTCString();}
 else{expirestr=""}
-document.cookie=encodeURIComponent(key)+'="'+encodeURIComponent(val)+'";'+expirestr;}
+document.cookie=encodeURIComponent(key)+'='+encodeURIComponent(val)+';'+expirestr;}
 function getCookie(key){if(!cookiesloaded){getCookies();}
 return cookies[key];}
-function saveCookies(){for(var c in cookies){document.cookie=encodeURIComponent(c)+'="'+encodeURIComponent(cookies[c])*'"';}}
+function saveCookies(){for(var c in cookies){document.cookie=encodeURIComponent(c)+'='+encodeURIComponent(cookies[c])*'';}}
 function xhttpreq(url,data={},method="GET",callback=function(){},json=true){xhttp=new XMLHttpRequest();function curry(){if(this.readyState==4){callback(this);}}
 xhttp.onreadystatechange=curry;xhttp.open(method,url,true);body=""
 if(method=="GET"){url+="?";for(var key in data){url+=encodeURIComponent(key)+"="+encodeURIComponent(data[key])+"&";}}

@@ -138,8 +138,8 @@ for (var type in infos) {
 
 
 function playTrack(id,played) {
-	var time = now()
-	xhttpreq("/api/play",{id:id,seconds:played,time:time},"POST");
+	var time = neo.now()
+	neo.xhttpreq("/api/play",{id:id,seconds:played,time:time},"POST");
 
 	//update local info
 	var track = objs[id];
@@ -177,14 +177,14 @@ function allTracksOf(id) {
 
 
 function setArtwork(id,awid) {
-	xhttpreq("/api/setartwork",{element:id,artwork:awid},"POST");
+	neo.xhttpreq("/api/setartwork",{element:id,artwork:awid},"POST");
 
 	//update local info
 	objs[id].artwork = "/artwork/" + awid;
 }
 
 function setName(id,name) {
-	xhttpreq("/api/setname",{element:id,name:name},"POST");
+	neo.xhttpreq("/api/setname",{element:id,name:name},"POST");
 
 	//update local info
 	objs[id].name = name;
@@ -224,6 +224,7 @@ function search(query) {
 }
 
 function searchCurrentView(query) {
+	if (query == "") {showView();}
 	p = new Promise(function() {
 		var url = new URL(window.location.href)
 		var params = url.searchParams;

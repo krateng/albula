@@ -3,12 +3,14 @@ var currentObj = null;
 function getCurrent() { return currentObj; }
 
 
-function renderElements(elements,info) {
+function renderElements(elements,info,filter) {
 
 	var elements_html = ""
 
 	for (var i=0;i<elements.length;i++) {
+
 		 element = elements[i]
+		 if (filter != undefined && !filter(element)) { continue; }
 		 //console.log(element)
 
 		 secondary_info_html = [];
