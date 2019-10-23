@@ -53,10 +53,10 @@ function showView() {
 
 	if (!url.searchParams.get("view") ||
 		!url.searchParams.get("type") ||
-		(!url.searchParams.get("sort"))) {
+		!url.searchParams.get("sort")) {
 			url.searchParams.set("view",url.searchParams.get("view") || "list");
-			url.searchParams.set("type",url.searchParams.get("type") || getCookie("viewtype") || "album");
-			url.searchParams.set("sort",url.searchParams.get("sort") || getCookie("sort") || "alphabet");
+			url.searchParams.set("type",url.searchParams.get("type") || neo.getCookie("viewtype") || "album");
+			url.searchParams.set("sort",url.searchParams.get("sort") || neo.getCookie("sort") || "alphabet");
 
 			history.pushState({},"","?" + url.searchParams.toString());
 	}
@@ -67,8 +67,8 @@ function showView() {
 	var type = url.searchParams.get("type");
 	var sortby = url.searchParams.get("sort");
 
-	if (sortby != null) { setCookie("sort",sortby); }
-	if (type != null) { setCookie("viewtype",type); }
+	if (sortby != null) { neo.setCookie("sort",sortby); }
+	if (type != null) { neo.setCookie("viewtype",type); }
 
 	sortcontrols = document.getElementById("content_controls_sort").children;
 	for (var i=0;i<sortcontrols.length;i++) {

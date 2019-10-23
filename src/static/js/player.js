@@ -15,13 +15,13 @@ var ticking = false;
 function startClock() {
 	if (!ticking) {
 		ticking = true;
-		lastUpdate = now();
+		lastUpdate = neo.now();
 	}
 
 }
 function stopClock() {
 	if (ticking) {
-		var passed = now() - lastUpdate;
+		var passed = neo.now() - lastUpdate;
 		played += passed;
 		ticking = false;
 	}
@@ -46,6 +46,14 @@ function nxt() {
 	next();
 }
 
+function preloadNext() {
+	if (list.length > idx+1) {
+		nextsound = new Howl({
+			src: ["/audioof/" + list[idx+1]],
+			format: "mp3"
+		});
+	}
+}
 
 // function should always be called when new track becomes current one. inits sound object and fills in metadata
 function initSound(startplay=false) {
@@ -75,12 +83,7 @@ function initSound(startplay=false) {
 
 	// preloading next sound for smooth transition, don't need to actually keep reference,
 	// just make sure howler has it loaded once
-	if (list.length > idx+1) {
-		nextsound = new Howl({
-			src: ["/audioof/" + list[idx+1]],
-			format: "mp3"
-		});
-	}
+	preloadNext();
 }
 
 
@@ -169,6 +172,7 @@ function appendPlaylist(lst) {
 	}
 	list = list.concat(lst);
 	updateList();
+	preloadNext();
 }
 function insertPlaylist(lst) {
 	if (!Array.isArray(lst)) {
@@ -176,6 +180,7 @@ function insertPlaylist(lst) {
 	}
 	list = list.slice(0,idx+1).concat(lst).concat(list.slice(idx+1));
 	updateList();
+	preloadNext();
 }
 function setPlaylistRandom(lst) {
 	if (!Array.isArray(lst)) {
@@ -253,14 +258,14 @@ function seek(ev,element) {
 
 function changeVolume(prct) {
 	Howler.volume(prct);
-	setCookie("volume",prct);
+	neo.setCookie("volume",prct);
 }
 function getVolume() {
 	return Howler._volume;
 }
-changeVolume(getCookie("volume"));
+changeVolume(neo.getCookie("volume"));
 document.addEventListener("DOMContentLoaded",function() {
-	document.getElementById("volume").style="width:" + Number(getCookie("volume"))*100 + "%;";
+	document.getElementById("volume").style="width:" + Number(neo.getCookie("volume"))*100 + "%;";
 });
 
 
