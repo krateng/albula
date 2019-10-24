@@ -38,6 +38,12 @@ function updateList() {
 
 		}
 	}
+	if (idx + 1 >= list.length) {
+		document.getElementById("next_tracks_label").classList.add("hide");
+	}
+	else {
+		document.getElementById("next_tracks_label").classList.remove("hide");
+	}
 }
 
 

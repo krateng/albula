@@ -225,18 +225,19 @@ function search(query) {
 
 function searchCurrentView(query) {
 	if (query == "") {showView();}
-	p = new Promise(function() {
-		var url = new URL(window.location.href)
-		var params = url.searchParams;
-		var view = params.get("view")
-		var type = params.get("type")
-		var sort = params.get("sort")
+	else {
+		p = new Promise(function() {
+			var url = new URL(window.location.href)
+			var params = url.searchParams;
+			var view = params.get("view")
+			var type = params.get("type")
+			var sort = params.get("sort")
 
-		var results = search(query);
-		results = results[type];
-		results.sort(sortingfuncs[sort]);
-		document.getElementById("content_area").innerHTML = renderElements(results,infos[type]);
-	});
-	return;
+			var results = search(query);
+			results = results[type];
+			results.sort(sortingfuncs[sort]);
+			document.getElementById("content_area").innerHTML = renderElements(results,infos[type]);
+		});
+	}
 
 }

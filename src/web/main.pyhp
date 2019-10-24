@@ -12,7 +12,7 @@
 			<div onclick="lnk('view','list','type','album')">Albums</div>
 			<div onclick="lnk('view','list','type','track')">Tracks</div>
 			<br/><br/>
-			<input id="search" placeholder="Search..." oninput="searchCurrentView(this.value)" />
+			<input id="search" autocomplete="off" placeholder="Search..." oninput="searchCurrentView(this.value)" />
 		</div>
 
 
@@ -68,7 +68,7 @@
 								<span id="current_track_artists"></span>
 							</td>
 							<td id="next_tracks">
-								<span>Up Next</span>
+								<span id="next_tracks_label" class="hide">Up Next</span>
 								<table>
 									<tr><td id="next_1"></td></tr>
 									<tr><td id="next_2"></td></tr>
