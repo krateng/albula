@@ -45,6 +45,7 @@ class Artwork(db.DBObject):
 class PA:
 	def __init__(self,type):
 		self.type = type
+		self.uid = -1
 	def link(self):
 		return "/artwork/" + self.type
 
