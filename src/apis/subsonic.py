@@ -39,12 +39,10 @@ base_response = {
 }
 
 @api.get("ping.view")
-#@xmlify
 def ping(**kwargs):
 	return base_response
 
 @api.get("getUser.view")
-#@xmlify
 def getuser(**kwargs):
 	return {**base_response, **{
 		"user":{
@@ -66,7 +64,6 @@ def getuser(**kwargs):
 	}}
 
 @api.get("getRandomSongs.view")
-#@xmlify
 def getrandomsongs(size:int=10,**kwargs):
 	return {**base_response, **{
 		"randomSongs":{
@@ -78,7 +75,6 @@ def getrandomsongs(size:int=10,**kwargs):
 	}}
 
 @api.get("getArtists.view")
-#@xmlify
 def getartists(**kwargs):
 	return {**base_response, **{
 		"artists":{

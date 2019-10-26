@@ -2,6 +2,7 @@ from bottle import Bottle, run
 import waitress
 import web
 import db
+from apis import subsonic
 from threading import *
 import time
 import os
@@ -35,6 +36,7 @@ server = Bottle()
 
 db.api.mount(server=server)
 auth.authapi.mount(server=server)
+subsonic.api.mount(server=server)
 web.server_handlers(server=server)
 
 #run(server, host='::', port=PORT, server='waitress',threads=24)
