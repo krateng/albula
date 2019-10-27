@@ -127,6 +127,7 @@ for (var type in infos) {
 			for (let el of elements) {
 				this.info.change(el); //apply all local data preparations
 				objs[el.uid] = el;
+				el.node = createElement(el,this.info);
 			}
 			this.info.loaded = true
 		}

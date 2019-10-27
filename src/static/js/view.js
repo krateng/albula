@@ -3,48 +3,78 @@ var currentObj = null;
 function getCurrent() { return currentObj; }
 
 
+function renderElement(element,info) {
+	secondary_info_html = [];
+	secondary_info = infos[info.secondary_type];
+	for (var j=0;j<info.secondary_source(element).length;j++) {
+		secondary_element = info.secondary_source(element)[j];
+		secondary_info_html.push(
+	   //	 `<span onclick="lnk('view','detail','type','` + secondary_info.type + `','id',` + secondary_element.id + `)">` +
+	   //	 secondary_element.name + `</span>`)
+		   `<a href="?view=detail&type=` + secondary_info.type + "&id=" + secondary_element.id + `">` +
+		   secondary_element.name + `</a>`)
+	}
+
+	element_html = `
+	<div class="content_element ` + info.css_class + `">
+	   <table>
+		   <tr class="image"><td>
+			   <div class="artwork" style="background-image:url('` + element.artwork + `');"></div>
+			   <div title="Play" class="element_play" onclick="setPlaylist(` + element.uid + `)"></div>
+			   <div title="Add to queue"  class="element_append" onclick="appendPlaylist(` + element.uid + `)"></div>
+			   <div title="Play next" class="element_insert" onclick="insertPlaylist(` + element.uid + `)"></div>
+			</td></tr>
+			<tr class="secondary_info"><td>` + secondary_info_html.join(" | ") + `<span>&nbsp;</span>
+			</td></tr>
+			<tr class="main_info"><td>
+				<span title="` + info.primary(element).replace(/"/g,'&quot;') + `"><a href="?view=detail&type=` + info.type + `&id=` + element.uid + `">` + info.primary(element) + `</a></span>
+			</td></tr>
+		</table>
+	</div>
+	`
+
+	return element_html;
+}
+
+
+function createElement(element,info) {
+
+//	var node = document.createElement("div");
+//	node.classList.add("content_element");
+//	node.classList.add(info.css_class);
+//		var table = document.createElement("table")
+//		node.appendChild(table)
+//			var imagerow = document.createElement("tr")
+//			imagerow.classList.add("image")
+//			table.appendChild(imagerow)
+
+	var node = document.createElement("template");
+	node.innerHTML = renderElement(element,info);
+	return node.content;
+}
+
+
 function renderElements(elements,info,filter) {
-
 	var elements_html = ""
-
 	for (var i=0;i<elements.length;i++) {
-
 		 element = elements[i]
 		 if (filter != undefined && !filter(element)) { continue; }
 		 //console.log(element)
-
-		 secondary_info_html = [];
-		 secondary_info = infos[info.secondary_type];
-		 for (var j=0;j<info.secondary_source(element).length;j++) {
-			 secondary_element = info.secondary_source(element)[j];
-			 secondary_info_html.push(
-			//	 `<span onclick="lnk('view','detail','type','` + secondary_info.type + `','id',` + secondary_element.id + `)">` +
-			//	 secondary_element.name + `</span>`)
-				`<a href="?view=detail&type=` + secondary_info.type + "&id=" + secondary_element.id + `">` +
-				secondary_element.name + `</a>`)
-		 }
-
-		 elements_html += `
-		 <div class="content_element ` + info.css_class + `">
-			<table>
-				<tr class="image"><td>
-				 	<div class="artwork" style="background-image:url('` + element.artwork + `');"></div>
-					<div title="Play" class="element_play" onclick="setPlaylist(` + element.uid + `)"></div>
-					<div title="Add to queue"  class="element_append" onclick="appendPlaylist(` + element.uid + `)"></div>
- 					<div title="Play next" class="element_insert" onclick="insertPlaylist(` + element.uid + `)"></div>
-				 </td></tr>
-				 <tr class="secondary_info"><td>` + secondary_info_html.join(" | ") + `<span>&nbsp;</span>
-				 </td></tr>
-				 <tr class="main_info"><td>
-					 <span title="` + info.primary(element).replace(/"/g,'&quot;') + `"><a href="?view=detail&type=` + info.type + `&id=` + element.uid + `">` + info.primary(element) + `</a></span>
-				 </td></tr>
-			 </table>
-		 </div>
-		 `
-
+		 elements_html += renderElement(element,info)
 	 }
-
 	 return elements_html;
+}
+
+
+function createElements(elements,info,filter) {
+	var nodes = document.createDocumentFragment();
+	for (var i=0;i<elements.length;i++) {
+		 element = elements[i]
+		 if (filter != undefined && !filter(element)) { continue; }
+		 //nodes.appendChild(createElement(element,info))
+		 nodes.appendChild(element.node.cloneNode(true))
+	 }
+	 return nodes;
 }
 
 
@@ -97,9 +127,15 @@ function showView() {
 		elements.sort(sortingfuncs[sortby]);
 		//console.log(elements)
 
-	   elements_html = renderElements(elements,info);
+//	   elements_html = renderElements(elements,info);
+//		document.getElementById("content_area").innerHTML = elements_html;
 
-		document.getElementById("content_area").innerHTML = elements_html;
+		var content_area = document.getElementById("content_area");
+
+		while (content_area.firstChild) {
+			content_area.removeChild(content_area.firstChild);
+		}
+		content_area.appendChild(createElements(elements,info))
 
 		document.title = "Albula";
 	}
