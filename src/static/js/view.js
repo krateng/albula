@@ -1,5 +1,7 @@
 var currentObj = null;
 
+var inactiveNodes = document.createDocumentFragment();
+
 function getCurrent() { return currentObj; }
 
 
@@ -50,7 +52,7 @@ function createElement(element,info) {
 
 	var node = document.createElement("template");
 	node.innerHTML = renderElement(element,info);
-	return node.content;
+	return node.content.firstElementChild;
 }
 
 
@@ -72,7 +74,8 @@ function createElements(elements,info,filter) {
 		 element = elements[i]
 		 if (filter != undefined && !filter(element)) { continue; }
 		 //nodes.appendChild(createElement(element,info))
-		 nodes.appendChild(element.node.cloneNode(true))
+		 //nodes.appendChild(element.node.cloneNode(true))
+		 nodes.appendChild(element.node)
 	 }
 	 return nodes;
 }
@@ -133,7 +136,8 @@ function showView() {
 		var content_area = document.getElementById("content_area");
 
 		while (content_area.firstChild) {
-			content_area.removeChild(content_area.firstChild);
+	//		content_area.removeChild(content_area.firstChild);
+			inactiveNodes.appendChild(content_area.firstChild)
 		}
 		content_area.appendChild(createElements(elements,info))
 

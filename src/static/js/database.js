@@ -237,7 +237,11 @@ function searchCurrentView(query) {
 			var results = search(query);
 			results = results[type];
 			results.sort(sortingfuncs[sort]);
-			document.getElementById("content_area").innerHTML = renderElements(results,infos[type]);
+			//document.getElementById("content_area").innerHTML = renderElements(results,infos[type]);
+			while (content_area.firstChild) {
+				inactiveNodes.appendChild(content_area.firstChild)
+			}
+			document.getElementById("content_area").appendChild(createElements(results,infos[type]));
 		});
 	}
 
