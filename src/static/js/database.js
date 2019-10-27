@@ -81,6 +81,20 @@ var infos = {
 	}
 }
 
+function dbloaded(type) {
+	if (type == undefined) {
+		for (var t in infos) {
+			if (!infos[t].loaded) {
+				return false;
+			}
+		}
+		return true;
+	}
+	else {
+		return infos[type].loaded;
+	}
+}
+
 
 
 var sortings = {
@@ -127,7 +141,7 @@ for (var type in infos) {
 			for (let el of elements) {
 				this.info.change(el); //apply all local data preparations
 				objs[el.uid] = el;
-				el.node = createElement(el,this.info);
+				el.node = entityElement(el,this.info);
 			}
 			this.info.loaded = true
 		}
@@ -241,7 +255,7 @@ function searchCurrentView(query) {
 			while (content_area.firstChild) {
 				inactiveNodes.appendChild(content_area.firstChild)
 			}
-			document.getElementById("content_area").appendChild(createElements(results,infos[type]));
+			document.getElementById("content_area").appendChild(entityElements(results,infos[type]));
 		});
 	}
 

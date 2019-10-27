@@ -39,7 +39,7 @@ function renderElement(element,info) {
 }
 
 
-function createElement(element,info) {
+function entityElement(element,info) {
 
 //	var node = document.createElement("div");
 //	node.classList.add("content_element");
@@ -68,7 +68,7 @@ function renderElements(elements,info,filter) {
 }
 
 
-function createElements(elements,info,filter) {
+function entityElements(elements,info,filter) {
 	var nodes = document.createDocumentFragment();
 	for (var i=0;i<elements.length;i++) {
 		 element = elements[i]
@@ -82,6 +82,8 @@ function createElements(elements,info,filter) {
 
 
 function showView() {
+
+
 
 	var url_string = window.location.href;
 	var url = new URL(url_string);
@@ -111,12 +113,13 @@ function showView() {
 	}
 	document.getElementById("icon_sort_" + sortby).classList.add("active");
 
+
 	if (view == "list") {
 		currentObj = null
 		var info = infos[type]
 		var elements = data[type]
 
-		if (!info.loaded) {
+		if (!dbloaded(type)) {
 			setTimeout(showView,100);
 			return;
 		}
@@ -139,13 +142,19 @@ function showView() {
 	//		content_area.removeChild(content_area.firstChild);
 			inactiveNodes.appendChild(content_area.firstChild)
 		}
-		content_area.appendChild(createElements(elements,info))
+		content_area.appendChild(entityElements(elements,info))
 
 		document.title = "Albula";
 	}
 
 
 	else if (view == "detail") {
+
+		if (!dbloaded()) {
+			setTimeout(showView,100);
+			return;
+		}
+
 		var info = infos[type];
 		var id = url.searchParams.get("id");
 		var url = info.detail_url.replace("%ID%",id)
@@ -208,23 +217,35 @@ function showView() {
 				`
 
 
+				document.getElementById("content_area").innerHTML = html;
+
 				for (var j=0;j<this.info.detail_info.length;j++) {
-					e = this.info.detail_info[j];
-					html += `<h2>` + e.name + `</h2>`;
+					var e = this.info.detail_info[j];
+					var header = document.createElement("h2")
+					header.innerHTML = e.name;
+					var area = document.createElement("span")
 
 					einfo = infos[e.type];
-					elements = e.source(response);
-					for (let el of elements) {
-						einfo.change(el); //apply all local data preparations
+					var elements = [];
+					for (let el of e.source(response)) {
+						elements.push(objs[el.uid]);
 					}
+
+				//	for (let el of elements) {
+				//		einfo.change(el); //apply all local data preparations
+				//	}
 					elements.sort(sortingfuncs[sortby]);
 
+					area.appendChild(entityElements(elements,einfo))
 
-					html += renderElements(elements,einfo);
+
+					document.getElementById("content_area").appendChild(header)
+					document.getElementById("content_area").appendChild(area)
+
 
 				}
 
-				document.getElementById("content_area").innerHTML = html;
+
 
 				document.getElementById("content_area").scrollTo(0,0);
 
