@@ -63,13 +63,16 @@ function preloadNext() {
 
 // function should always be called when new track becomes current one. inits sound object and fills in metadata
 function initSound(startplay=false) {
-	track = objs[list[idx]];
+
 	sound = new Howl({
 		src: ["/audioof/" + list[idx]],
 		format: "mp3"
 	});
+	if (startplay) {
+		play()
+	}
 	sound.on("end",nxt);
-
+	track = objs[list[idx]];
 
 
 
@@ -83,9 +86,7 @@ function initSound(startplay=false) {
 
 	played = 0;
 
-	if (startplay) {
-		play()
-	}
+
 
 	// preloading next sound for smooth transition, don't need to actually keep reference,
 	// just make sure howler has it loaded once
@@ -99,23 +100,15 @@ function uninitSound() {
 
 	stopClock();
 
+	wasplaying = false
 
+	// queue non-urgent things asynchronously for better gapless playback
+	post = postUninit.bind(null,sound,list,idx,played);
+	setTimeout(post,1000);
 
-	playing = false
 	if (sound != null) {
-		playTrack(list[idx],played);
-
-		playing = sound.playing;
-
-	//	if (sound.state() != "loaded") {
-	//		// Stopping a sound before it's loaded will mean it will still play later
-	//		sound.unload();
-	//	}
-	//	else {
-	//		sound.stop();
-	//	}
-		// always unload to free memory?
-		sound.unload();
+		wasplaying = sound.playing;
+		sound.stop();
 		sound = null;
 	}
 	pause();
@@ -129,7 +122,16 @@ function uninitSound() {
 	document.getElementById("next_3").innerHTML = "";
 	document.getElementById("next_4").innerHTML = "";
 
-	return playing;
+	return wasplaying;
+}
+
+function postUninit(sound,list,idx,played) {
+	if (sound != null) {
+		// always unload to free memory
+		sound.unload();
+		playTrack(list[idx],played);
+
+	}
 }
 
 
