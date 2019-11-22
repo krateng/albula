@@ -107,13 +107,15 @@ function uninitSound() {
 
 		playing = sound.playing;
 
-		if (sound.state() != "loaded") {
-			// Stopping a sound before it's loaded will mean it will still play later
-			sound.unload();
-		}
-		else {
-			sound.stop();
-		}
+	//	if (sound.state() != "loaded") {
+	//		// Stopping a sound before it's loaded will mean it will still play later
+	//		sound.unload();
+	//	}
+	//	else {
+	//		sound.stop();
+	//	}
+		// always unload to free memory?
+		sound.unload();
 		sound = null;
 	}
 	pause();
@@ -258,8 +260,9 @@ function prev() {
 
 
 
-function seek(ev,element) {
-	 sound.seek(sound.duration() * ev.offsetX / element.offsetWidth);
+function seek(prct) {
+	var element = document.getElementById("progressbar")
+	 sound.seek(sound.duration() * prct);
 }
 
 function changeVolume(prct) {

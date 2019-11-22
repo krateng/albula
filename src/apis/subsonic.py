@@ -6,9 +6,7 @@ import db
 
 
 def subsonicauth(request):
-	print(request.url)
-	for k in request.query:
-		print(k, "=",request.query.get(k))
+
 	try:
 		token = request.query.get("t")
 		salt = request.query.get("s")
@@ -30,7 +28,7 @@ def subsonicauth(request):
 
 
 
-api = EAPI(path="subsonicapi/rest",delay=True,auth=subsonicauth,type="xml",root_node="subsonic-response")
+api = EAPI(path="subsonicapi/rest",delay=True,auth=subsonicauth,type="xml",root_node="subsonic-response",debug=True)
 
 base_response = {
 	"xmlns":"http://subsonic.org/restapi",

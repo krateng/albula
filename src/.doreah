@@ -5,3 +5,5 @@ settings:
 auth:
    multiuser: false
    cookieprefix: "albula"
+pyhp:
+   version: 2

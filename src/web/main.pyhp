@@ -13,6 +13,11 @@
 			<div onclick="lnk('view','list','type','track')">Tracks</div>
 			<br/><br/>
 			<input id="search" autocomplete="off" placeholder="Search..." oninput="searchCurrentView(this.value)" />
+
+			<div id="admin_controls">
+				<pyhp include="../static/svg/action_scanlibrary.svg" onclick="" id="icon_action_scanlibrary" />
+				<pyhp include="../static/svg/action_refreshmetadata.svg" onclick="" id="icon_action_refreshmetadata" />
+			</div>
 		</div>
 
 
@@ -42,7 +47,7 @@
 		</div>
 
 		<div id="playback_bar">
-			<div id="progressbar" class="grisons_bar" onclick="seek(event,this)">
+			<div id="progressbar" class="grisons_bar seekable scrollseekable" data-seekcallback="seek" data-scrollsensitivity="0.1">
 				<div id="progressed" style="width:0%;" class="update" data-updatefrom="updateProgressBar"></div>
 			</div>
 			<table><tr>
@@ -86,7 +91,7 @@
 					<div id="next_button" class="button_next" onclick="next()" data-hotkey="ArrowRight"></div>
 				</td>
 				<td id="settings">
-					<div id="volumecontrol" class="seekable grisons_bar" data-seekcallback="changeVolume">
+					<div id="volumecontrol" class="seekable scrollseekable grisons_bar" data-seekcallback="changeVolume">
 						<div id="volume" style="width:50%;"></div>
 					</div>
 				</td>

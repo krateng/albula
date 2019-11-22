@@ -247,7 +247,7 @@ function showView() {
 
 
 
-				document.getElementById("content_area").scrollTo(0,0);
+				//document.getElementById("content_area").scrollTo(0,0);
 
 				document.title = this.info.primary(element_info) + " - Albula";
 

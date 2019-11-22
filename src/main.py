@@ -15,6 +15,14 @@ import signal
 HOST, PORT = get_settings("HOST","PORT")
 THREADS = 12
 
+__version__ = 0,3
+__versionstr__ = ".".join(str(n) for n in __version__)
+__author__ = {
+	"name":"Johannes Krattenmacher",
+	"email":"albula@krateng.dev",
+	"github":"krateng"
+}
+
 
 
 

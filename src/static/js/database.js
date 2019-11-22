@@ -175,6 +175,8 @@ function playTrack(id,played) {
 
 	}
 
+	showView();
+
 
 
 }
@@ -196,6 +198,7 @@ function setArtwork(id,awid) {
 
 	//update local info
 	objs[id].artwork = "/artwork/" + awid;
+	//objs[id].node = entityElement(objs[id],infos);
 }
 
 function setName(id,name) {
