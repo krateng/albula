@@ -7,15 +7,15 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name=module.name,
-    version=".".join(str(n) for n in module.version),
-    author=module.author["name"],
-    author_email=module.author["email"],
-    description=module.desc,
+    name=module.__name__,
+    version=".".join(str(n) for n in module.__version__),
+    author=module.__author__["name"],
+    author_email=module.__author__["email"],
+    description=module.__desc__,
 	license="GPLv3",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/" + module.author["github"] + "/" + module.name,
+    url="https://github.com/" + module.__author__["github"] + "/" + module.__name__,
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -23,13 +23,13 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
 	python_requires=">=3.5",
-	install_requires=module.requires,
-	package_data={'': module.resources},
+	install_requires=module.__requires__,
+	package_data={'': module.__resources__},
 	include_package_data=True,
 	entry_points = {
 		"console_scripts":[
-			cmd + " = " + module.name + "." + module.commands[cmd]
-			for cmd in module.commands
+			cmd + " = " + module.__name__ + "." + module.__commands__[cmd]
+			for cmd in module.__commands__
 		]
 	}
 )

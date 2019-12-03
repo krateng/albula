@@ -2,6 +2,8 @@
 
 A minimalist self-hosted music server.
 
+Install with `pip install albula`.
+
 ## Current status
 
 The library build is still wonky, I need to untangle scanning, metadata extraction etc and clean up. For now, complete rebuild is often the better option.
@@ -19,4 +21,8 @@ I just made Albula for myself because I disliked several things about the other 
 ## Requirements
 
 * Python 3
-* Pip packages specified in `requirements.txt`
+* Several Pip packages (automatically downloaded)
+
+## Library guidelines
+
+Albula is fairly good at filling in missing metadata from folder structure. Generally, if you follow the default pattern with folders for each album artist that contain folders for each album, you can have pictures named `album.ext` and `artist.ext` in the appropriate folders and they should be correctly assigned.

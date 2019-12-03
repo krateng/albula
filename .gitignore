@@ -2,13 +2,9 @@
 *.xcf
 *.pyc
 *.txt
+*.sh
 !/requirements.txt
+*.egg-info
 
 # user files
-*.db
-*.ddb
 /testlibrary
-
-# only for development, normally external
-/nimrodel
-/doreah

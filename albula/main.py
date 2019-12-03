@@ -1,3 +1,7 @@
+import os
+from .__init__ import DATA_DIR
+os.chdir(DATA_DIR)
+
 from bottle import Bottle, run
 import waitress
 from . import web
@@ -5,7 +9,6 @@ from . import db
 from .apis import subsonic
 from threading import *
 import time
-import os
 from doreah.settings import get_settings
 from doreah import auth
 #import auth

@@ -10,7 +10,7 @@ __author__ = {
 	"github":"krateng"
 }
 
-requires = [
+__requires__ = [
 	"bottle>=0.12.16",
 	"waitress>=1.3",
 	"doreah>=1.2.10",
@@ -19,14 +19,14 @@ requires = [
 	"pyyaml>=5.1",
 	#"lesscpy>=0.13"
 ]
-resources = [
+__resources__ = [
 	"web/*/*",
 	"web/*",
 	"static/*/*",
 	"data_files/*/*"
 ]
 
-commands = {
+__commands__ = {
 	#"albula":"controller:main"
 }
 
@@ -66,7 +66,7 @@ except:
 DATA_DIR = os.path.join(DATA_DIR,"albula")
 os.makedirs(DATA_DIR,exist_ok=True)
 
-os.chdir(DATA_DIR)
+
 
 def copy_initial_local_files():
 	folder = pkg_resources.resource_filename(__name__,"data_files")
