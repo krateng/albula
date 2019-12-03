@@ -7,15 +7,8 @@
 # user files
 *.db
 *.ddb
-*.css
 /testlibrary
-/src/cache
-/src/rules/*
-!/src/rules/.examplerules.yaml
-/src/settings/*
-!/src/settings/default.ini
-/src/logs
 
 # only for development, normally external
-/src/nimrodel
-/src/doreah
+/nimrodel
+/doreah

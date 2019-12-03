@@ -1,7 +1,7 @@
 from nimrodel import EAPI
 from doreah import auth, settings
 import hashlib
-import db
+from .. import db
 
 
 

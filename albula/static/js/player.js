@@ -35,7 +35,7 @@ function updateList() {
 			document.getElementById("next_" + i).innerHTML = createLinks("artist",next.artists,", ") + " - " + next.title;
 		}
 		catch {
-
+			document.getElementById("next_" + i).innerHTML = "";
 		}
 	}
 	if (idx + 1 >= list.length) {
@@ -104,7 +104,7 @@ function uninitSound() {
 
 	// queue non-urgent things asynchronously for better gapless playback
 	post = postUninit.bind(null,sound,list,idx,played);
-	setTimeout(post,1000);
+	setTimeout(post,300);
 
 	if (sound != null) {
 		wasplaying = sound.playing;
@@ -117,10 +117,6 @@ function uninitSound() {
 	document.getElementById("current_track_title").innerHTML = "";
 	document.getElementById("current_track_artists").innerHTML = "";
 
-	document.getElementById("next_1").innerHTML = "";
-	document.getElementById("next_2").innerHTML = "";
-	document.getElementById("next_3").innerHTML = "";
-	document.getElementById("next_4").innerHTML = "";
 
 	return wasplaying;
 }
@@ -129,6 +125,7 @@ function postUninit(sound,list,idx,played) {
 	if (sound != null) {
 		// always unload to free memory
 		sound.unload();
+		updateList();
 		playTrack(list[idx],played);
 
 	}

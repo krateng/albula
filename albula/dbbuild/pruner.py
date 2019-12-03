@@ -1,4 +1,4 @@
-from db import db, Track, Album, Artist, Audio, Artwork
+from ..db import db, Track, Album, Artist, Audio, Artwork
 from doreah.io import ProgressBar
 
 def prune_database():

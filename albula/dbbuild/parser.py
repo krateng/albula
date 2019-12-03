@@ -1,11 +1,11 @@
 # scanner that takes folder structure into account
 
-from db import db,Audio,Artwork,Album,Artist,Track
+from ..db import db,Audio,Artwork,Album,Artist,Track
 
 from doreah.io import NestedProgressBar, ProgressBar
 
 import os
-import cleanup
+from .. import cleanup
 import yaml
 #from doreah.settings import get_settings
 #from doreah.io import NestedProgressBar
@@ -79,7 +79,7 @@ def build_metadata(filelist,trees):
 	)
 
 	for alb in affected_albums:
-		tracks = alb.tracks
+		tracks = list(set(alb.tracks))
 		numstracks = [(t.audiofiles[0].metadata()["position"],t) for t in tracks]
 		numstracks.sort(key=lambda x:x[0])
 		alb.tracks = [nt[1] for nt in numstracks]
@@ -96,6 +96,8 @@ def scan_tree_for(files,tree,progressbar):
 		td,sc = scan_tree_for(files,sd,progressbar)
 		todo_audiofiles += td
 		scanned_audiofiles += sc
+
+	#print("todo",[af.path for af in todo_audiofiles],"scanned",[af.path for af in scanned_audiofiles])
 
 
 	for af in audiofiles:
@@ -115,19 +117,24 @@ def scan_tree_for(files,tree,progressbar):
 
 		for af in scanned_audiofiles:
 			track = af.track
-			album = track.albums[0]
 			artists = track.artists
-			albumartists = album.albumartists
-
-			pos = af.metadata()["position"]
-
-			possible_folder_albums[album] = possible_folder_albums.setdefault(album,0) + 1
-			for artist in albumartists:
-				possible_folder_albumartists[artist] = possible_folder_albumartists.setdefault(artist,0) + 1
-				possible_folder_artists[artist] = possible_folder_artists.setdefault(artist,0) # set to 0 so it's there
 			for artist in artists:
 				possible_folder_artists[artist] = possible_folder_artists.setdefault(artist,0) + 1
 				possible_folder_albumartists[artist] = possible_folder_albumartists.setdefault(artist,0) # set to 0 so it's there
+			try:
+				album = track.albums[0]
+				albumartists = album.albumartists
+
+				possible_folder_albums[album] = possible_folder_albums.setdefault(album,0) + 1
+				for artist in albumartists:
+					possible_folder_albumartists[artist] = possible_folder_albumartists.setdefault(artist,0) + 1
+					possible_folder_artists[artist] = possible_folder_artists.setdefault(artist,0) # set to 0 so it's there
+			except:
+				#print(track,"has no albums")
+				pass
+
+
+
 
 
 
@@ -193,9 +200,15 @@ def scan_tree_for(files,tree,progressbar):
 		if len(albumlist) > 0 and possible_folder_albums[albumlist[0]] >= total_files/1.5:
 			#print("common album",commonalbum)
 			tree.album = albumlist[0]
-			if tree.album.albumartists in [[],"",None]:
-				if tree.artist is not None:
-					tree.album.albumartists = [tree.artist]
+			#print("assigned",albumlist[0],"to folder, artist is",tree.artist)
+			#if tree.album.albumartists in [[],"",None]:
+			#	if tree.artist is not None:
+			#		#tree.album.albumartists = [tree.artist]
+			#		al = Album(name=tree.album.name,albumartists=[tree.artist])
+			#		print("new album",al)
+			#		al.tracks += tree.album.tracks
+			#		tree.album.tracks = []
+			#		tree.album = al
 					# set folder artist as albumartist
 
 
@@ -208,10 +221,6 @@ def scan_tree_for(files,tree,progressbar):
 		if af.track.albums == [] and tree.album is not None:
 			tree.album.tracks.append(af.track)
 
-		if af.track.artists != [] and af.track.albums != []:
-			progressbar.progress(step=af.path)
-			scanned_audiofiles.append(af)
-			todo_audiofiles.remove(af)
 
 		if af.track.albums != [] and af.track.albums[0].albumartists == [] and \
 				tree.album is not None and af.track.albums[0].name == tree.album.name:
@@ -219,8 +228,16 @@ def scan_tree_for(files,tree,progressbar):
 			tree.album.tracks.append(af.track)
 
 
-		if af.track.albums != [] and af.track.albums[0].albumartists == [] and tree.artist is not None:
-			af.track.albums[0].albumartists = [tree.artist]
+	#	if af.track.albums != [] and af.track.albums[0].albumartists == [] and tree.artist is not None:
+	#		al = Album(name=af.track.albums[0].name,albumartists=[tree.artist])
+	#		af.track.albums[0].tracks.remove(af.track)
+	#		al.tracks.append(af.track)
+
+
+		if af.track.artists != [] and af.track.albums != [] and af.track.albums[0].albumartists != []:
+			progressbar.progress(step=af.path)
+			scanned_audiofiles.append(af)
+			todo_audiofiles.remove(af)
 
 
 

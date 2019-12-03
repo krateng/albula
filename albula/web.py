@@ -1,33 +1,29 @@
 from bottle import Bottle, route, get, post, error, run, template, static_file, request, response, FormsDict, redirect, template
 from importlib.machinery import SourceFileLoader
 from doreah.pyhp import file as pyhpfile
-import db
+from . import db
 #import auth
 from doreah import auth
+import pkg_resources
+import os
+
+
+WEBFOLDER = pkg_resources.resource_filename(__name__,"web")
+STATICFOLDER = pkg_resources.resource_filename(__name__,"static")
 
 def server_handlers(server):
 
-	@server.get("/style.css")
-	def generate_style():
 
-		import lesscpy
-		import os
-		css = ""
-		for f in os.listdir("static/less"):
-			css += lesscpy.compile("static/less/" + f,minify=True)
-
-		response.content_type = 'text/css'
-		return css
 
 	@server.get("/<file>.<ext>")
 	def file(file,ext):
-		return static_file("static/" + ext + "/" + file + "." + ext,root="")
+		return static_file(ext + "/" + file + "." + ext,root=STATICFOLDER)
 
 
 	@server.get("/")
 	def start():
 		if auth.check(request):
-			result = pyhpfile("web/main.pyhp",{"db":db})
+			result = pyhpfile(os.path.join(WEBFOLDER,"main.pyhp"),{"db":db})
 		else:
 			#result = pyhpfile("web/login.pyhp",{"db":db,"auth":auth})
 			result = auth.get_login_page(stylesheets=["/style.css"])

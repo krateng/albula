@@ -404,12 +404,13 @@ def set_name(element:int,name:str):
 
 
 
+from .dbbuild.scanner import scan
+from .dbbuild.parser import build_metadata
+from .dbbuild.pruner import prune_database
 
 @api.post("scan")
 def scan_new():
 	dirs = get_settings("MUSIC_DIRECTORIES")
-	from dbbuild.scanner import scan
-
 	trees = scan(dirs)
 
 
@@ -420,13 +421,13 @@ def refresh_metadata(audio_ids=None):
 	else:
 		audios = [db.get(id) for id in audio_ids]
 
-	from dbbuild.parse import build_metadata
-	build_metadata(audios)
+	dirs = get_settings("MUSIC_DIRECTORIES")
+	trees = scan(dirs)
+	build_metadata(audios,trees)
 
 
 @api.post("clean_database")
 def clean_database():
-	from dbbuild.pruner import prune_database
 	prune_database()
 
 

@@ -1,0 +1,93 @@
+@font-face{font-family:'Ubuntu';font-style:normal;font-weight:400;src:local('Ubuntu Regular'),local('Ubuntu-Regular'),url(https://fonts.gstatic.com/s/ubuntu/v14/4iCs6KVjbNBYlgoKcg72j00.woff2) format('woff2');}
+@font-face{font-family:'Ubuntu';font-style:normal;font-weight:400;src:local('Ubuntu Regular'),local('Ubuntu-Regular'),url(https://fonts.gstatic.com/s/ubuntu/v14/4iCs6KVjbNBYlgoKew72j00.woff2) format('woff2');unicode-range:U + 0400 -045F,U + 0490 -0491,U + 04 B0-04B1,U + 2116;}
+@font-face{font-family:'Ubuntu';font-style:normal;font-weight:400;src:local('Ubuntu Regular'),local('Ubuntu-Regular'),url(https://fonts.gstatic.com/s/ubuntu/v14/4iCs6KVjbNBYlgoKcw72j00.woff2) format('woff2');unicode-range:U + 1 F00-1FFF;}
+@font-face{font-family:'Ubuntu';font-style:normal;font-weight:400;src:local('Ubuntu Regular'),local('Ubuntu-Regular'),url(https://fonts.gstatic.com/s/ubuntu/v14/4iCs6KVjbNBYlgoKfA72j00.woff2) format('woff2');unicode-range:U + 0370 -03FF;}
+@font-face{font-family:'Ubuntu';font-style:normal;font-weight:400;src:local('Ubuntu Regular'),local('Ubuntu-Regular'),url(https://fonts.gstatic.com/s/ubuntu/v14/4iCs6KVjbNBYlgoKcQ72j00.woff2) format('woff2');}
+@font-face{font-family:'Ubuntu';font-style:normal;font-weight:400;src:local('Ubuntu Regular'),local('Ubuntu-Regular'),url(https://fonts.gstatic.com/s/ubuntu/v14/4iCs6KVjbNBYlgoKfw72.woff2) format('woff2');}
+body{margin:0px;padding-top:70px;padding-left:20px;padding-right:20px;padding-bottom:20px;}
+#top_bar{background-color:black;position:fixed;left:0px;right:0px;top:0px;text-align:center;height:70px;padding-top:25px;padding-bottom:25px;padding-left:15px;padding-right:15px;}
+#content_area{left:5px;right:5px;top:120px;bottom:120px;padding:20px;position:fixed;overflow-y:scroll;}
+.content_controls{padding:20px;right:10px;position:fixed;}
+#content_controls_sort{top:95px;}
+#content_controls_play{bottom:135px;}
+.content_controls svg{height:20px;width:20px;margin-top:10px;fill:beige;}
+#content_controls_play div{height:60px;width:60px;margin-top:0px;border-radius:50px;background-color:beige;text-align:center;}
+#content_controls_play div svg{margin-top:15px;fill:#333337;height:30px;width:30px;}
+#content_controls_sort svg:hover{fill:yellow;}
+#content_controls_play div:hover{background-color:yellow;}
+#playback_bar{background-color:black;position:fixed;left:0px;right:0px;bottom:0px;text-align:center;height:120px;}
+#top_bar>div{display:inline;padding-left:30px;padding-right:30px;font-size:30px;font-weight:bold;}
+#admin_controls{position:fixed;top:20px;right:20px;}
+#admin_controls svg{fill:beige;}
+#admin_controls svg:hover{fill:yellow;}
+.hide{display:none;}
+.active{color:rgba(245,245,220,0.4) !important;fill:rgba(245,245,220,0.4) !important;}
+span[onclick]:hover,a:hover{text-decoration:underline;}
+[contenteditable]:focus{outline:none;color:yellow;}
+.content_element{display:inline-block;width:160px;margin-right:10px;margin-bottom:20px;}
+.content_element table{table-layout:fixed;width:160px;white-space:nowrap;border-collapse:collapse;}
+.content_element table td{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;}
+.content_element table tr.image{height:170px;width:160px;}
+.content_element table tr.image td{position:relative;border-bottom:10px solid transparent;}
+.content_element table tr.image td div{position:absolute;background-size:contain;background-position:center;background-repeat:no-repeat;width:160px;height:160px;top:0px;left:0px;}
+.content_element table tr.image td div.artwork{background-size:cover;}
+.content_element table tr.image td div.element_play{height:130px;}
+.content_element table tr.image td div.element_append{top:130px;height:30px;width:50%;}
+.content_element table tr.image td div.element_insert{top:130px;height:30px;left:50%;width:50%;}
+.content_element.artist table tr.image td div.artwork,.top_info.artist_info #main_image{border-radius:50%;}
+.content_element.track table tr.image td div.artwork,.top_info.track_info #main_image{border-radius:25% 5%;}
+.content_element table tr.image td:hover div.artwork{opacity:0.5;}
+.content_element table tr.image td div.element_play:hover{background-image:url("/play.png");}
+.content_element table tr.image td div.element_append:hover{background-image:url("/listadd.png");}
+.content_element table tr.image td div.element_insert:hover{background-image:url("/listinsert.png");}
+.content_element tr.secondary_info{font-size:75%;}
+.content_element tr.main_info{font-weight:bold;font-size:90%;}
+#playback_bar #progressbar{width:100%;height:15px;}
+#playback_bar>table{width:100%;height:105px;padding:0px;border-collapse:collapse;}
+#playback_bar>table tr td{width:33%;padding:0px;}
+#playback_bar>table tr td#metadata{text-align:left;}
+#playback_bar>table tr td#controls{text-align:center;}
+#playback_bar>table tr td#settings{text-align:right;padding-right:25px;}
+#playback_bar #controls div{display:inline-block;background-position:center;background-repeat:no-repeat;width:40px;height:40px;}
+#playback_bar #play_pause_button{background-size:contain;}
+#play_pause_button.button_play{background-image:url("/play.png");}
+#play_pause_button.button_pause{background-image:url("/pause.png");}
+#prev_button{background-image:url("/prev.png");background-size:70%;}
+#next_button{background-image:url("/next.png");background-size:70%;}
+#volumecontrol{display:inline-block;width:100px;height:30px;}
+#playback_bar #metadata table{table-layout:fixed;width:100%;}
+#playback_bar #metadata table #current_track_artwork{width:105px;height:105px;background-size:cover;background-repeat:no-repeat;background-position:center;}
+#playback_bar #metadata table #current_track_data{width:340px;padding:25px;}
+#playback_bar #metadata table #next_tracks{width:200px;opacity:0.7;}
+#playback_bar #metadata table #next_tracks table tr:nth-child(2){opacity:0.8;}
+#playback_bar #metadata table #next_tracks table tr:nth-child(3){opacity:0.6;}
+#playback_bar #metadata table #next_tracks table tr:nth-child(4){opacity:0.4;}
+#playback_bar #metadata table #next_tracks>span{font-size:70%;text-transform:uppercase;color:lightgrey;}
+#playback_bar #metadata table #next_tracks table{table-layout:fixed;height:100%;}
+#playback_bar #metadata table #next_tracks table tr{height:20%;white-space:nowrap;}
+#playback_bar #metadata table #next_tracks table tr td:empty:after{content:"\00a0";}
+#playback_bar #metadata #current_track_data span{display:inline-block;padding-top:0px;padding-bottom:0px;margin:0px;}
+#playback_bar #metadata #current_track_data span#current_track_title{font-weight:bold;font-size:120%;width:400px;white-space:nowrap;}
+#playback_bar #metadata #current_track_data span#current_track_artists{font-size:95%;}
+#playback_bar #metadata>div{display:inline-block;vertical-align:top;}
+input#search{font-size:150%;}
+body{background-color:#333337;color:beige;font-family:"Ubuntu";}
+table.top_info td.image div{margin-right:20px;margin-bottom:20px;background-size:cover;background-position:center;height:174px;width:174px;}
+table.top_info td.text{vertical-align:top;}
+table.top_info td.text h1{display:inline;padding-right:5px;}
+table.top_info td.text table.image_row td{height:50px;width:50px;background-size:cover;background-position:center;background-repeat:no-repeat;opacity:0.5;filter:grayscale(80%);}
+table.top_info td.text table.image_row td:hover{opacity:1;filter:grayscale(0%);}
+::-webkit-scrollbar{width:8px;cursor:pointer;}
+::-webkit-scrollbar-track{background:grey;background-color:rgba(0,255,255,0.1);}
+::-webkit-scrollbar-thumb{background-color:rgba(103,85,0,0.7);}
+::-webkit-scrollbar-thumb:hover{background:gold;}
+[onclick]:hover,a:hover{cursor:pointer;}
+div.grisons_bar{background-color:rgba(0,255,255,0.1);cursor:pointer;}
+div.grisons_bar>div{height:100%;background-color:rgba(103,85,0,0.7);}
+div.grisons_bar:hover>div{background-color:gold;}
+a{color:inherit;text-decoration:none;}
+a.textlink{color:yellow;}
+a.hidelink:hover{text-decoration:none;}
+a:hover{text-decoration:underline;}
+input{background-color:inherit;color:inherit;border:0px;border-bottom:1px solid beige;outline:none;font-family:inherit;}
+input:focus{outline:none;}
