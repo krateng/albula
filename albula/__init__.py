@@ -2,7 +2,7 @@
 
 __name__ = "albula"
 __desc__ = "A minimalist self-hosted music server."
-__version__ = 0,4
+__version__ = 0,5
 __versionstr__ = ".".join(str(n) for n in __version__)
 __author__ = {
 	"name":"Johannes Krattenmacher",
@@ -27,7 +27,7 @@ __resources__ = [
 ]
 
 __commands__ = {
-	#"albula":"controller:main"
+	"albula":"controller:main"
 }
 
 ### DOREAH CONFIGURATION

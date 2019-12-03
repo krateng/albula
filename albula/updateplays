@@ -1,9 +1,0 @@
-#!/usr/bin/env python3
-
-from db import db, Track
-from dbbuild.malojareader import get_scrobbles
-
-
-tracks = db.getall(Track)
-get_scrobbles(tracks)
-db.save()

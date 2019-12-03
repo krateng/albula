@@ -14,7 +14,7 @@ I just made Albula for myself because I disliked several things about the other 
 
 * Support for multiple artists per track / album artists per album / albums per track
 * Less crowded interface
-* Direct server-side scrobbling to Maloja, removing the need for individual solutions for each client
+* Direct server-side scrobbling to [Maloja](https://github.com/krateng/maloja), removing the need for individual solutions for each client
 * No Javascript-bloated web interface
 * No central authentication / phone-home
 
