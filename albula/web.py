@@ -11,9 +11,28 @@ import os
 WEBFOLDER = pkg_resources.resource_filename(__name__,"web")
 STATICFOLDER = pkg_resources.resource_filename(__name__,"static")
 
+pthjoin = os.path.join
+
+def generate_css():
+	import lesscpy
+	from six import StringIO
+	less = ""
+	for f in os.listdir(pthjoin(STATICFOLDER,"less")):
+		with open(pthjoin(STATICFOLDER,"less",f),"r") as lessf:
+			less += lessf.read()
+
+	css = lesscpy.compile(StringIO(less),minify=True)
+	return css
+
+css = generate_css()
+
 def server_handlers(server):
 
 
+	@server.get("/style.css")
+	def get_css():
+		response.content_type = 'text/css'
+		return css
 
 	@server.get("/<file>.<ext>")
 	def file(file,ext):

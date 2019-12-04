@@ -2,7 +2,7 @@
 
 __name__ = "albula"
 __desc__ = "A minimalist self-hosted music server."
-__version__ = 0,5
+__version__ = 0,5,1
 __versionstr__ = ".".join(str(n) for n in __version__)
 __author__ = {
 	"name":"Johannes Krattenmacher",
@@ -17,7 +17,7 @@ __requires__ = [
 	"nimrodel>=0.6.1",
 	"mutagen>=1.42",
 	"pyyaml>=5.1",
-	#"lesscpy>=0.13"
+	"lesscpy>=0.13"
 ]
 __resources__ = [
 	"web/*/*",

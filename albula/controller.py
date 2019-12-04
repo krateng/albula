@@ -13,7 +13,6 @@ def setpassword():
 	if pw != getpass.getpass():
 		print("Passwords do not match!")
 	else:
-
 		from doreah import auth
 		auth.defaultuser.setpw(pw)
 
