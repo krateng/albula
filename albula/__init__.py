@@ -2,7 +2,7 @@
 
 __name__ = "albula"
 __desc__ = "A minimalist self-hosted music server."
-__version__ = 0,5,1
+__version__ = 0,5,2
 __versionstr__ = ".".join(str(n) for n in __version__)
 __author__ = {
 	"name":"Johannes Krattenmacher",

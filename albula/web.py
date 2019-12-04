@@ -34,9 +34,9 @@ def server_handlers(server):
 		response.content_type = 'text/css'
 		return css
 
-	@server.get("/<file>.<ext>")
-	def file(file,ext):
-		return static_file(ext + "/" + file + "." + ext,root=STATICFOLDER)
+	@server.get("/<name>.<ext>")
+	def file(name,ext):
+		return static_file(ext + "/" + name + "." + ext,root=STATICFOLDER)
 
 
 	@server.get("/")
