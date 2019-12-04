@@ -15,7 +15,7 @@ pthjoin = os.path.join
 
 def generate_css():
 	import lesscpy
-	from six import StringIO
+	from io import StringIO
 	less = ""
 	for f in os.listdir(pthjoin(STATICFOLDER,"less")):
 		with open(pthjoin(STATICFOLDER,"less",f),"r") as lessf:
@@ -70,7 +70,7 @@ def server_handlers(server):
 		try:
 			uid = int(uid)
 		except:
-			return static_file("/static/png/unknown_" + uid + ".png",root="")
+			return static_file("png/unknown_" + uid + ".png",root=STATICFOLDER)
 
 		artwork = db.db.get(uid)
 		mime,stream = artwork.read()
