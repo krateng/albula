@@ -74,3 +74,6 @@ def copy_initial_local_files():
 	dir_util.copy_tree(folder,DATA_DIR)
 
 copy_initial_local_files()
+
+__dev__ = os.path.exists(os.path.join(DATA_DIR,".dev"))
+if __dev__: print("Running the development version!")

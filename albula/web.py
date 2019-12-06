@@ -32,7 +32,9 @@ def server_handlers(server):
 	@server.get("/style.css")
 	def get_css():
 		response.content_type = 'text/css'
-		return css
+		from .__init__ import __dev__
+		if __dev__: return generate_css()
+		else: return css
 
 	@server.get("/<name>.<ext>")
 	def file(name,ext):

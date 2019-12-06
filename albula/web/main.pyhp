@@ -12,7 +12,7 @@
 			<div onclick="lnk('view','list','type','album')">Albums</div>
 			<div onclick="lnk('view','list','type','track')">Tracks</div>
 			<br/><br/>
-			<input id="search" autocomplete="off" placeholder="Search..." oninput="searchCurrentView(this.value)" />
+			<input type="search" id="search" autocomplete="off" placeholder="Search..." oninput="searchCurrentView(this.value)" />
 
 			<div id="admin_controls">
 				<pyhp include="../static/svg/action_scanlibrary.svg" onclick="" id="icon_action_scanlibrary" />
