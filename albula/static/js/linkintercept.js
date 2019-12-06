@@ -12,6 +12,7 @@ function interceptClickEvent(e) {
 
 		e.preventDefault();
 		history.pushState({},"",href);
+		document.getElementById("search").value = "";
 		showView();
     }
 }

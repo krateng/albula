@@ -4,6 +4,18 @@ var inactiveNodes = document.createDocumentFragment();
 
 function getCurrent() { return currentObj; }
 
+function getAllShown() {
+	var result = []
+	var elements = document.getElementsByClassName("content_element");
+	for (let e of elements) {
+		if (e.classList.contains("hide")) {}
+		else {
+			result.push(e.__uid__);
+		}
+	}
+	return result;
+}
+
 
 function renderElement(element,info) {
 	secondary_info_html = [];
@@ -52,6 +64,8 @@ function entityElement(element,info) {
 
 	var node = document.createElement("template");
 	node.innerHTML = renderElement(element,info);
+	node.content.firstElementChild.__searchstr__ = info.primary(element).toLowerCase().replace("'","").replace('"','');
+	node.content.firstElementChild.__uid__ = element.uid;
 	return node.content.firstElementChild;
 }
 
@@ -125,10 +139,10 @@ function showView() {
 		}
 
 
-		if (document.getElementById("search").value != "") {
-			searchCurrentView(document.getElementById("search").value);
-			return;
-		}
+	//	if (document.getElementById("search").value != "") {
+	//		searchCurrentView(document.getElementById("search").value);
+	//		return;
+	//	}
 
 		elements.sort(sortingfuncs[sortby]);
 		//console.log(elements)
@@ -143,6 +157,8 @@ function showView() {
 			inactiveNodes.appendChild(content_area.firstChild)
 		}
 		content_area.appendChild(entityElements(elements,info))
+
+		filterView(document.getElementById("search").value);
 
 		document.title = "Albula";
 	}
@@ -245,7 +261,7 @@ function showView() {
 
 				}
 
-
+				filterView(document.getElementById("search").value);
 
 				//document.getElementById("content_area").scrollTo(0,0);
 

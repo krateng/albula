@@ -190,6 +190,11 @@ function allTracksOf(id) {
 	}
 }
 
+function allTracksOfObjects(idlst) {
+	var tracklists = idlst.map(x => objs[x].track_ids);
+	return [].concat.apply([],tracklists);
+}
+
 
 
 
@@ -262,4 +267,17 @@ function searchCurrentView(query) {
 		});
 	}
 
+}
+
+function filterView(query) {
+	var elements = document.getElementsByClassName("content_element");
+	query = query.toLowerCase().replace("'","").replace('"','');
+	for (let e of elements) {
+		if (e.__searchstr__.includes(query)) {
+			e.classList.remove("hide");
+		}
+		else {
+			e.classList.add("hide");
+		}
+	}
 }

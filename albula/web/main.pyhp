@@ -12,7 +12,7 @@
 			<div onclick="lnk('view','list','type','album')">Albums</div>
 			<div onclick="lnk('view','list','type','track')">Tracks</div>
 			<br/><br/>
-			<input type="search" id="search" autocomplete="off" placeholder="Search..." oninput="searchCurrentView(this.value)" />
+			<input type="search" id="search" autocomplete="off" placeholder="Search..." oninput="filterView(this.value)" />
 
 			<div id="admin_controls">
 				<pyhp include="../static/svg/action_scanlibrary.svg" onclick="" id="icon_action_scanlibrary" />
@@ -34,11 +34,11 @@
 		</div>
 
 		<div class="content_controls" id="content_controls_play">
-			<div onclick="setPlaylistRandom(allTracksOf(getCurrent()))">
+			<div onclick="setPlaylistRandom(allTracksOfObjects(getAllShown()))">
 				<pyhp include="../static/svg/play_random.svg" />
 			</div>
 			<br/>
-			<div onclick="setPlaylistWeightedRandom(allTracksOf(getCurrent()))" data-hotkey="KeyR">
+			<div onclick="setPlaylistWeightedRandom(allTracksOfObjects(getAllShown()))" data-hotkey="KeyR">
 				<pyhp include="../static/svg/play_radio.svg" />
 			</div>
 
