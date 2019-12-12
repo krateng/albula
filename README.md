@@ -1,5 +1,10 @@
 # Albula
 
+[![](https://img.shields.io/pypi/v/albula?style=for-the-badge)](https://pypi.org/project/albula/)
+[![](https://img.shields.io/pypi/dm/albula?style=for-the-badge)](https://pypi.org/project/albula/)
+[![](https://img.shields.io/github/stars/krateng/albula?style=for-the-badge&color=purple)](https://github.com/krateng/albula/stargazers)
+[![](https://img.shields.io/pypi/l/albula?style=for-the-badge)](https://github.com/krateng/albula/blob/master/LICENSE)
+
 A minimalist self-hosted music server.
 
 Install with `pip install albula`.
@@ -20,8 +25,7 @@ I just made Albula for myself because I disliked several things about the other 
 
 ## Requirements
 
-* Python 3
-* Several Pip packages (automatically downloaded)
+* Python 3.5 or higher
 
 ## Library guidelines
 

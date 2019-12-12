@@ -4,7 +4,6 @@
 *.txt
 *.sh
 !/requirements.txt
-*.egg-info
 
 # user files
 /testlibrary
