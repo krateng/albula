@@ -366,25 +366,31 @@ def get_artwork_of(uid):
 @api.post("play")
 def play_track(id:int,seconds:int,time:int):
 	track = db.get(id)
-	if seconds > 5:
+	while seconds > 5:
 		track.timesplayed += 1
 		track.lastplayed = time
 
-	if seconds > (track.length / 2):
+		if seconds > (track.length / 2) and get_settings("MALOJA_SCROBBLE"):
 
-		if get_settings("MALOJA_SCROBBLE"):
+			starttime = time - seconds
+			endtime = starttime + min(track.length,seconds)
+
 			server = get_settings("MALOJA_SERVER")
 			key = get_settings("MALOJA_KEY")
 			url = server + "/api/newscrobble"
 			data = {
 				"artist":"/".join(a.name for a in track.artists),
 				"title":track.title,
-				"duration":seconds,
-				"time":time,
+				"duration":max(seconds,track.length),
+				"time":endtime,
 				"key":key
 			}
 
-		requests.post(url, data=data)
+			requests.post(url, data=data)
+
+		seconds -= track.length
+
+
 
 @api.post("setartwork")
 def set_artwork(element:int,artwork:int):

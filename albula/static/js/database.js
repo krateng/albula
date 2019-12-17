@@ -158,7 +158,7 @@ function playTrack(id,played) {
 
 	//update local info
 	var track = objs[id];
-	if (played > 5) {
+	while (played > 5) {
 		track.last_played = time;
 		track.times_played += 1;
 
@@ -172,6 +172,8 @@ function playTrack(id,played) {
 			objs[id].last_played = time;
 			objs[id].times_played += 1;
 		}
+
+		played -= track.length
 
 	}
 
